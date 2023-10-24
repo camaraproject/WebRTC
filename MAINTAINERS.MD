@@ -10,4 +10,5 @@
 | Quobis | Elías Pérez |
 | Vodafone | Jesus Pedruelo |
 | Vodafone | Ratna Ratnanandan |
-|Orange | Benjamin Busvel |
+| Orange | Benjamin Busvel |
+| Orange | Maxime Delon |
