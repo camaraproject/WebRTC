@@ -15,12 +15,12 @@ This service brings new functionalities for the WebRTC services whose idea is to
 **Out-bound calls:**
 
 - Recipient receives call as if it was from User's normal phone number.
-- Maintains common number through web comms service and standard subscription.
+- Maintains common number through web communication service and standard subscription.
 - Facilitates number recognition and call-back for co-workers, partners and/or clients.
 
 **In-bound calls:**
 
-- Receive phone calls simultaneously on phone subscription and web comms service.
+- Receive phone calls simultaneously on phone subscription and web communication service.
 - Presents 'Occupied user' info to caller user is already in phone call.
 - Facilitates common multi-channel contact with co-workers, partners and/or clients.
 
@@ -35,8 +35,9 @@ Actors: Application service providers, hyperscalers, application developers.
 Scope:
 
 1. Register to Network – Register the client endpoint instance to MNO's IMS Network.
-2. Create Notification Channel – Create Notification channel of specified type to receive notifications from the network (e.g. incoming call).
+2. Create Notification Channel – Create Notification channel of specified type to receive notifications from the network (e.g. incoming call).  
 3. Place an Out Call – Place an outbound voice call request to the MNO's IMS Network.
+4. Receive an Incoming Call - Receive an incoming call request from the MNO's IMS network. 
 
 ### Authentication and Authorization
 
