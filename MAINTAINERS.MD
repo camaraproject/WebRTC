@@ -9,6 +9,6 @@
 | Quobis | Santiago Troncoso |
 | Quobis | Elías Pérez |
 | Vodafone | Jesus Pedruelo |
-| Vodafone | Ratna Ratnanandan |
+| Vodafone | Ratna Ganeshanandan |
 | Orange | Benjamin Busvel |
 | Orange | Maxime Delon |
