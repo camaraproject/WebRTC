@@ -95,12 +95,22 @@ components:
       description: Specifies the type of Notification Channel to be used and thereby defines the method that will be used to receive new notifications on the channel.
       enum:
       - WebSockets
+      - PNSChannel
       
     WebSocketsData:
       properties:
         channelURL:
           type: string
           description: "Specified by the server. Contains the URL used to open a WebSockets connection to receive event notification. The channelURL SHALL NOT be included in POST request to create the Notification Channel resource, but MUST be included in the response to the channel creation and any HTTP method that returns an entity body."
+
+    PNSChannelData:
+      description: This specifies the properties of PNS channel the client wish to use
+      properties:
+        registrationToken:
+          type: string
+          description: |
+            The client shall include this in the request & this provides the token assigned by the notification service provider for the device (e.g. APNS or FCM).
+            How client obtain this token is outside the scope of this API specification.
 
     NotificationChannel:
       required:
@@ -112,6 +122,7 @@ components:
         channelData:
           oneOf:
           - $ref: '#/components/schemas/WebSocketsData'
+          - $ref: '#/components/schemas/PNSChannelData'
         resourceURL:
           type: string
           description: "Self referring URL. The resourceURL SHALL NOT be included in POST requests by the client, but MUST be included in POST requests representing notifications by the server to the client, when a complete representation of the resource is embedded in the notification. The resourceURL MUST be also included in responses to any HTTP method that returns an entity body, and in PUT requests."

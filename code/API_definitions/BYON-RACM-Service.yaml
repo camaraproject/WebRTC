@@ -4,7 +4,7 @@ info:
   description: This API provide REST API for clients to manage Registration and Connectivity (RACM) towards MNO's IMS Network.
   version: 1.0.0
 servers:
-  - url: '{apiRoot}/racm/{apiVersion}/{userId}'
+  - url: '{apiRoot}/racm/{apiVersion}'
     description: APIs to manage Client Registration and Connection
     variables:
       apiRoot:
@@ -13,9 +13,6 @@ servers:
       apiVersion:
         description: The version of API to be used
         default: v1
-      userId:
-        description: User name allocated by the operator
-        default: userId
 tags:
   - name: Registration and Connection Management
     description: APIs for Client to Register into MNO's IMS Network
@@ -89,6 +86,9 @@ components:
         deviceId:
           type: string
           description: The device-id of the client in UUID format.
+        notificationUri:
+          type: string
+          description: The URI which need to be used by WebRTC Gateway for posting notifications towards the client. This should be filled only when the notification channel is provided by a independent notification channel provider.
     RacmResponse:
       type: object
       properties:
