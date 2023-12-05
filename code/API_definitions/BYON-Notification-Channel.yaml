@@ -2,7 +2,12 @@ openapi: 3.0.0
 info:
   title: Bring Your Own Number (BYON) Notification Channel APIs
   description: This API provide REST API for a client, browser or native application, to establish notification channel to receive asynchronous notifications from MNO's IMS Network.
-  version: 1.0.0
+  version: 0.1.0
+  contact:
+    email: contact@mavenir.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
 servers:
 - url: '{apiRoot}/notificationchannel/{apiVersion}/{deviceId}'
   description: APIs to create Notification Channels

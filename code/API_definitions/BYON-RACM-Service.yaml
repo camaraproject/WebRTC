@@ -2,7 +2,12 @@ openapi: 3.0.0
 info:
   title: Bring Your Own Number (BYON) Registration and Connectivity Management (RACM) Service APIs
   description: This API provide REST API for clients to manage Registration and Connectivity (RACM) towards MNO's IMS Network.
-  version: 1.0.0
+  version: 0.1.0
+  contact:
+    email: contact@mavenir.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
 servers:
   - url: '{apiRoot}/racm/{apiVersion}'
     description: APIs to manage Client Registration and Connection
@@ -38,7 +43,55 @@ paths:
               schema:
                 $ref: '#/components/schemas/RacmResponse'
         '400':
-          $ref: '#/components/responses/Generic400'
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInfo'
+              examples:
+                400emergencyAdressMissing:
+                  summary: Emergency address missing
+                  value:
+                    status: 400
+                    code: EMERGENCY_ADDRESS_MISSING
+                    message: Emergency address missing
+                400genericResponse:
+                  summary: Generic Response
+                  value:
+                    status: 400
+                    code: INVALID_ARGUMENT
+                    message: Schema validation failed at  ...
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInfo'
+              examples:
+                403maxRegistrationUser:
+                  summary: Max registration per user
+                  value:
+                    status: 403
+                    code: MAX_REGISTRATION_PER_USER
+                    message: 'The maximum number of service registrations per user has been reached'
+                403maxRegistrationMSISDN:
+                  summary: Max registration per MSISDN
+                  value:
+                    status: 403
+                    code: MAX_REGISTRATION_PER_MSISDN
+                    message: 'The maximum number of service registrations per MSISDN has been reached'
+                403maxDevicesUser:
+                  summary: Max devices per user
+                  value:
+                    status: 403
+                    code: MAX_DEVICES_PER_USER
+                    message: 'The maximum number of device instances per user has been reached'
+                403genericResponse:
+                  summary: Generic Response
+                  value:
+                    status: 403
+                    code: PERMISSION_DENIED
+                    message: 'Operation not allowed: ...' 
       security:
         - BearerAuth:
             - read
