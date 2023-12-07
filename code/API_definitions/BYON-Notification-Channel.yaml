@@ -131,7 +131,10 @@ components:
         resourceURL:
           type: string
           description: "Self referring URL. The resourceURL SHALL NOT be included in POST requests by the client, but MUST be included in POST requests representing notifications by the server to the client, when a complete representation of the resource is embedded in the notification. The resourceURL MUST be also included in responses to any HTTP method that returns an entity body, and in PUT requests."
-    
+        callbackURL:
+          type: string
+          description: This will be specified by the server and contains the callback URL used when establishing subscription for notifications from service providing servers.
+
     NotificationChannelList:
       type: object
       properties:

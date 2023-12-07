@@ -147,6 +147,10 @@ components:
       properties:
         connectionInformation:
           $ref: '#/components/schemas/ConnectionInformation'
+        regInfo:
+          type: array
+          items:
+            $ref: '#/components/schemas/RegistrationInformation'
         resourceURL:
           type: string
           description: The resource URL allocated by WebRTC GW representing the RACM session created. The sessionId assigned for RACM session is part of the url.
@@ -156,6 +160,17 @@ components:
         clientId:
           type: string
           description: The unique id assigned by WebRTC GW for identifying the association of device with WebRTC GW. The clients are required to include this value in clientId header.
+    RegistrationStatus:
+      type: string
+      enum:
+        - Registered
+    RegistrationInformation:
+      type: object
+      properties:
+        msisdn:
+          type: string
+        regStatus:
+          $ref: '#/components/schemas/RegistrationStatus'
     ErrorInfo:
       type: object
       properties:
