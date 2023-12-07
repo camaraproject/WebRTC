@@ -1,0 +1,254 @@
+openapi: 3.0.0
+info:
+  title: Bring Your Own Number (BYON) Notification Channel APIs
+  description: This API provide REST API for a client, browser or native application, to establish notification channel to receive asynchronous notifications from MNO's IMS Network.
+  version: 0.1.0
+  contact:
+    email: contact@mavenir.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+- url: '{apiRoot}/notificationchannel/{apiVersion}/{deviceId}'
+  description: APIs to create Notification Channels
+  variables:
+    apiRoot:
+      description: API Root
+      default: http://localhost:9091
+    apiVersion:
+      description: The version of API to be used
+      default: v1
+    deviceId:
+      description: "The notification channel creation is specific to a device instance, the device-id in the uuid format (rfc4412) shall be included in the request"
+      default: 'deviceId'
+tags:
+  - name: Notification Channel
+    description: APIs for establishing notification channel to receive asynchronous notifications from MNO's IMS network
+paths:
+  /channels:
+    get:
+      description: Retrieves the list of Notification Channels
+      parameters:
+        - $ref: '#/components/parameters/hdrTransactionId'
+        - $ref: '#/components/parameters/hdrClientId'
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationChannelList'
+        "403":
+          $ref: '#/components/responses/Generic403'
+      security:
+        - BearerAuth:
+          - read
+          - write
+    post:
+      description: Create notification channel(s)
+      parameters:
+        - $ref: '#/components/parameters/hdrTransactionId'
+        - $ref: '#/components/parameters/hdrClientId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationChannelsInformation'
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationChannelsInformation'
+        "403":
+          description: Forbidden
+        "409":
+          description: Conflict
+      security:
+        - BearerAuth:
+            - read
+            - write
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    hdrClientId:
+      name: clientId
+      in: header
+      description: The Client ID assigned by WebRTC GW
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    hdrTransactionId:
+      name: transactionId
+      in: header
+      description: The Transaction ID associated with the request
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+
+  schemas:
+    ChannelType:
+      type: string
+      description: Specifies the type of Notification Channel to be used and thereby defines the method that will be used to receive new notifications on the channel.
+      enum:
+      - WebSockets
+      - PNSChannel
+      
+    WebSocketsData:
+      properties:
+        channelURL:
+          type: string
+          description: "Specified by the server. Contains the URL used to open a WebSockets connection to receive event notification. The channelURL SHALL NOT be included in POST request to create the Notification Channel resource, but MUST be included in the response to the channel creation and any HTTP method that returns an entity body."
+
+    PNSChannelData:
+      description: This specifies the properties of PNS channel the client wish to use
+      properties:
+        registrationToken:
+          type: string
+          description: |
+            The client shall include this in the request & this provides the token assigned by the notification service provider for the device (e.g. APNS or FCM).
+            How client obtain this token is outside the scope of this API specification.
+
+    NotificationChannel:
+      required:
+      - channelType
+      - channelData
+      properties:
+        channelType:
+          $ref: '#/components/schemas/ChannelType'
+        channelData:
+          oneOf:
+          - $ref: '#/components/schemas/WebSocketsData'
+          - $ref: '#/components/schemas/PNSChannelData'
+        resourceURL:
+          type: string
+          description: "Self referring URL. The resourceURL SHALL NOT be included in POST requests by the client, but MUST be included in POST requests representing notifications by the server to the client, when a complete representation of the resource is embedded in the notification. The resourceURL MUST be also included in responses to any HTTP method that returns an entity body, and in PUT requests."
+        callbackURL:
+          type: string
+          description: This will be specified by the server and contains the callback URL used when establishing subscription for notifications from service providing servers.
+
+    NotificationChannelList:
+      type: object
+      properties:
+        channels:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationChannel'
+        resourceURL:
+          type: string
+          description: Self referring URL
+    
+    NotificationChannelsInformation:
+      type: object
+      properties:
+        channels:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationChannel'
+
+    ErrorInfo:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: HTTP status code returned along with this error response
+        code:
+          type: string
+          description: Code given to this error
+        message:
+          type: string
+          description: Detailed error description
+      required:
+        - status
+        - code
+        - message
+  
+  responses:
+    Generic400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          example:
+            status: 400
+            code: INVALID_ARGUMENT
+            message: Schema validation failed at  ...
+    Generic401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          example:
+            status: 401
+            code: UNAUTHENTICATED
+            message: 'Authorization failed: ...'
+    Generic403:
+      description: Device not authorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          example:
+            status: 403
+            code: PERMISSION_DENIED
+            message: 'Operation not allowed: ...'
+    Generic409:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          example:
+            status: 409
+            code: CONFLICT
+            message: 'Simultaneous channel requests not supported'
+    NotFound404:
+      description: Session Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          example:
+            status: 404
+            code: NOT_FOUND
+            message: Unable to find the session with the provided Id parameters
+    Generic500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          example:
+            status: 500
+            code: INTERNAL
+            message: 'Internal server error: ...'
+    Generic501:
+      description: Not Implemented
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          example:
+            status: 501
+            code: NOT_IMPLEMENTED
+            message: Service not implemented for the specified user device
+    Generic503:
+      description: Service unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          example:
+            status: 503
+            code: UNAVAILABLE
+            message: Service unavailable
