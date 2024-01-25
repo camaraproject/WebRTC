@@ -5,7 +5,7 @@
 | Mavenir | Sushanth Hegde
 | Mavenir | Pradeep Achar Pushpa|
 | Deutsche Telekom | Rafał Artych |
-| Deutsche Telekom| Deepak Jaiswal |
+| T-Mobile US | Deepak Jaiswal |
 | Quobis | Santiago Troncoso |
 | Quobis | Elías Pérez |
 | Vodafone | Jesus Pedruelo |
