@@ -187,6 +187,7 @@ components:
           description: Friendly name of the receiver
           example: receiver
         status:
+          description: Provides the status of the VVOIP session. During the session creation, this attribute SHALL NOT be included in the request.
           $ref: '#/components/schemas/SessionStatus'
         offer:
           $ref: '#/components/schemas/WrtcsOffer'
