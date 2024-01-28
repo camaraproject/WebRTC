@@ -4,7 +4,7 @@ info:
   description: This API provide REST API for a client, browser or native application, to establish notification channel to receive asynchronous notifications from MNO's IMS Network.
   version: 0.1.0
   contact:
-    email: contact@mavenir.com
+    email: contact@domain.com
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
