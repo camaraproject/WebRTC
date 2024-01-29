@@ -3,7 +3,7 @@ info:
   title: Bring Your Own Number (BYON) call handling API (VVOIP Service)
   description: APIs for REST clients for 1-1 calling
   contact:
-    email: contact@mavenir.com
+    email: contact@domain.com
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -188,6 +188,7 @@ components:
           description: Friendly name of the receiver
           example: receiver
         status:
+          description: Provides the status of the VVOIP session. During the session creation, this attribute SHALL NOT be included in the request.
           $ref: '#/components/schemas/SessionStatus'
         offer:
           $ref: '#/components/schemas/WrtcsOffer'
