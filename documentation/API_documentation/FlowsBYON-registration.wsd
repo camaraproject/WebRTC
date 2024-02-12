@@ -1,0 +1,66 @@
+@startuml BYON Registration
+
+title "BYON WEB RTC FLOW - Registration"
+autonumber
+
+
+participant WebClient
+participant OAuth #LightGreen
+participant "WebRTC\ngateway" as WebRTC_GW
+participant "IMS\nNetwork" as IMS_Network
+participant "Remote\nendpoint" as RemoteEndpoint
+
+
+group USER AUTHENTICATION and REGISTRATION
+
+WebClient -> OAuth: Authentication/refresh Token
+OAuth -> WebClient: Access/refresh Token
+WebClient -> WebRTC_GW: POST /racm/{apiVersion}/session.\n Parameters:\n· transactionId \n· clientId
+WebRTC_GW <-> OAuth: Validate Auth-token (MSISDN/IMSI)
+WebRTC_GW -> IMS_Network: SIP REGISTER
+IMS_Network -> WebRTC_GW: 200 OK
+WebRTC_GW -> WebClient: 200 OK \n [sessionID, clientid, resourceURL, channelURL, status] 
+
+group Refreshing of registration
+  WebRTC_GW -> IMS_Network: SIP RE-REGISTER
+  note right
+   Periodically refresh Auth-Token
+   is still valid
+  end note
+  IMS_Network -> WebRTC_GW: 200 OK
+
+else
+WebClient -> WebRTC_GW: PUT /racm/{apiVersion}/session/{sessionId} \n Parameters: \n · transactionId \n · clientId \n · sessionId
+note left
+183: InProgress
+180: ringing
+200: connected
+
+end note
+note right
+  Auth-token refresh (after expiry)
+end note
+WebRTC_GW -> IMS_Network: SIP RE-REGISTER
+IMS_Network -> WebRTC_GW: 200 OK
+WebRTC_GW -> WebClient: 200 OK
+end
+end
+
+group Notification Channel 
+WebClient <-> WebRTC_GW: Websocket Establish {apiRoot}/noitificationChannel/{apiVersion}/{deviceId}
+WebRTC_GW -> WebClient: 200 OK
+  note right
+   webSocketsdata->channelURL
+   PNSChannelData->registrationToken
+  end note
+end
+
+group DE-REGISTRATION
+WebClient -> WebClient: Graceful Logout
+WebClient -> WebRTC_GW: DELETE /racm/{apiVersion}/session/{sessionId}. \n Parameters: \n ·transactionId. \n ·clientID. \n ·sessionId
+WebRTC_GW -> IMS_Network: SIP DE-REGISTER
+IMS_Network -> WebRTC_GW: 200 OK
+WebRTC_GW -> WebClient: 204 No content [session deleted]
+      note right: Clean up session context
+end 
+@enduml
