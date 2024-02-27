@@ -1,7 +1,7 @@
 @startuml BYON Registration
 
 title "BYON WEB RTC FLOW - Registration"
-autonumber
+autonumber "<font color=blue><b>[0]"
 
 
 participant WebClient
@@ -10,57 +10,95 @@ participant "WebRTC\ngateway" as WebRTC_GW
 participant "IMS\nNetwork" as IMS_Network
 participant "Remote\nendpoint" as RemoteEndpoint
 
-
+' --- USER AUTHENTICATION and REGISTRATION
 group USER AUTHENTICATION and REGISTRATION
 
 WebClient -> OAuth: Authentication/refresh Token
 OAuth -> WebClient: Access/refresh Token
-WebClient -> WebRTC_GW: POST /racm/{apiVersion}/session.\n Parameters:\n· transactionId \n· clientId
+WebClient -> WebRTC_GW: **POST /racm/{apiVersion}/session**\n\
+ Parameteres:\n - authorization\n - transactionId\n - clientId\n\
+ Body:\n - deviceId\n - notificationUri
 WebRTC_GW <-> OAuth: Validate Auth-token (MSISDN/IMSI)
-WebRTC_GW -> IMS_Network: SIP REGISTER
+WebRTC_GW -> IMS_Network: **SIP REGISTER**\nFrom: IMPU\nTo:IMPU\nContact: WebRTC_GW
+IMS_Network -> WebRTC_GW: 100 Trying
 IMS_Network -> WebRTC_GW: 200 OK
-WebRTC_GW -> WebClient: 200 OK \n [sessionID, clientid, resourceURL, channelURL, status] 
+WebRTC_GW -> WebClient: **200 OK**\nBody:\n - sessionID\n - clientid\n - resourceURL\n - channelURL\n - status
+note over WebClient
+  Registrations will be valid while
+  auth-token is still valid.
+end note
 
+' --- Refreshing of registration
 group Refreshing of registration
-  WebRTC_GW -> IMS_Network: SIP RE-REGISTER
-  note right
-   Periodically refresh Auth-Token
-   is still valid
+  note over WebRTC_GW
+   Periodically refresh REGISTER
+   while Auth-Token is still valid
   end note
+  WebRTC_GW -> IMS_Network: SIP RE-REGISTER
   IMS_Network -> WebRTC_GW: 200 OK
 
 else
-WebClient -> WebRTC_GW: PUT /racm/{apiVersion}/session/{sessionId} \n Parameters: \n · transactionId \n · clientId \n · sessionId
-note left
-183: InProgress
-180: ringing
-200: connected
-
+note over WebClient
+  Use **sessionId** from 200OK
+  response body to POST racm/
+  endpoint (session creation)
 end note
+WebClient -> WebRTC_GW: **PUT /racm/{apiVersion}/session/{sessionId}** \n\
+ Parameters: \n - authorization\n - transactionId \n - clientId \n - sessionId
+
 note right
   Auth-token refresh (after expiry)
 end note
 WebRTC_GW -> IMS_Network: SIP RE-REGISTER
 IMS_Network -> WebRTC_GW: 200 OK
-WebRTC_GW -> WebClient: 200 OK
+WebRTC_GW -> WebClient: **200 OK**\nBody:\n - sessionID\n - clientid\n - resourceURL\n - channelURL\n - status
 end
 end
 
+' --- Notification Channel 
 group Notification Channel 
-WebClient <-> WebRTC_GW: Websocket Establish {apiRoot}/noitificationChannel/{apiVersion}/{deviceId}
-WebRTC_GW -> WebClient: 200 OK
-  note right
-   webSocketsdata->channelURL
-   PNSChannelData->registrationToken
-  end note
+note over WebClient
+  Create notification channel for
+  incoming updates. Valid options:
+  - Websocket channel
+  - PNS channel
+end note
+  
+WebClient -> WebRTC_GW: **POST /notification/{apiVersion}/channels** \n\
+  Parameteres:\n - authorization\n - transactionId\n - clientId\n\
+  Body:\n - channelType\n - channelURL\n - resourceURL\n - callbackURL
+
+WebRTC_GW -> WebClient: **200 OK**\nBody:\n\
+ - channelType\n - channelData\n - resourceURL\n - callbackURL\n - status
+
+WebClient <-[#blue]> WebRTC_GW: Notification websocket established
+note right
+  webSocketsdata->channelURL
+  PNSChannelData->registrationToken
+  --
+  A PSN notification channel won't requiere
+  a direct WS. It will reach the user device
+  using another connection.
+end note
 end
 
+' --- DE-REGISTRATION
 group DE-REGISTRATION
-WebClient -> WebClient: Graceful Logout
-WebClient -> WebRTC_GW: DELETE /racm/{apiVersion}/session/{sessionId}. \n Parameters: \n ·transactionId. \n ·clientID. \n ·sessionId
+note over WebClient
+  Graceful logout
+end note
+WebClient -> WebRTC_GW: **DELETE /racm/{apiVersion}/session/{sessionId}** \n\
+ Parameters: \n - authorization\n - transactionId\n - clientID
 WebRTC_GW -> IMS_Network: SIP DE-REGISTER
 IMS_Network -> WebRTC_GW: 200 OK
-WebRTC_GW -> WebClient: 204 No content [session deleted]
+WebRTC_GW -> WebClient: **204 No content**
       note right: Clean up session context
+note over WebClient
+  Non-graceful logout will let the
+  auth token to expire, leading to
+  a SIP DE-REGISTRATION on the
+  WebRTC gateway
+end note
 end 
+
 @enduml
