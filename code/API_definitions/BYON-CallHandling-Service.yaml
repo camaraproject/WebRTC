@@ -3,11 +3,11 @@ info:
   title: Bring Your Own Number (BYON) call handling API (VVOIP Service)
   description: APIs for REST clients for 1-1 calling
   contact:
-    email: contact@mavenir.com
+    email: contact@domain.com
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 0.1.0
+  version: 0.1.2
 servers:
   - url: '{apiRoot}/vvoip/{apiVersion}'
     variables:
