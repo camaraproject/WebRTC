@@ -1,0 +1,57 @@
+@startuml BYON Callhandling
+
+title "BYON WEB RTC FLOW - Call handling"
+autonumber "<font color=blue><b>[0]"
+
+<style>
+.audioStyle {
+  arrow {
+    LineColor red
+    LineThickness 5
+  }
+}
+.wsStyle {
+  arrow {
+    LineColor blue
+    LineThickness 5
+  }
+}
+</style>
+
+'participant "Notification\nclient" as WebClient
+participant "Web\nClient" as WebClient
+participant OAuth #LightGreen
+participant "WebRTC\ngateway" as WebRTC_GW
+participant "IMS\nNetwork" as IMS_Network
+participant "Remote\nendpoint" as RemoteEndpoint
+
+' --- Notification Channel 
+group Notification Channel 
+note right WebClient
+  Create notification channel for
+  incoming updates. Valid options:
+  - Websocket channel
+  - PNS channel
+end note
+  
+WebClient -> WebRTC_GW: **POST /notificationchannel/{apiVersion}/channels** \n\
+  Parameters:\n - authorization\n - transactionId\n - clientId\n\
+  Body:\n - channelType\n - channelURL\n - resourceURL\n - callbackURL
+
+activate WebClient #LightGray
+
+WebRTC_GW -> WebClient: **200 OK**\nBody:\n\
+ - channelType\n - channelData\n - resourceURL\n - callbackURL\n - status
+
+WebClient <-> WebRTC_GW <<wsStyle>>: Notification websocket established
+note right
+  webSocketsdata->channelURL
+  PNSChannelData->registrationToken
+  --
+  A PSN notification channel won't requiere
+  a direct WS. It will reach the user device
+  using another connection.
+end note
+end
+
+@enduml
