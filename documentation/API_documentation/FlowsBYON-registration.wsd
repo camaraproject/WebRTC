@@ -64,7 +64,7 @@ note over WebClient
   - PNS channel
 end note
   
-WebClient -> WebRTC_GW: **POST /notification/{apiVersion}/channels** \n\
+WebClient -> WebRTC_GW: **POST /notificationchannel/{apiVersion}/channels** \n\
   Parameteres:\n - authorization\n - transactionId\n - clientId\n\
   Body:\n - channelType\n - channelURL\n - resourceURL\n - callbackURL
 

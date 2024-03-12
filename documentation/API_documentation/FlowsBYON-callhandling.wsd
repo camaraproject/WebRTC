@@ -1,39 +1,92 @@
 @startuml BYON Callhandling
 
 title "BYON WEB RTC FLOW - Call handling"
-autonumber
+autonumber "<font color=blue><b>[0]"
 
-participant WebClient
+<style>
+.audioStyle {
+  arrow {
+    LineColor blue
+    LineThickness 5
+  }
+}
+</style>
+
+'participant "Notification\nclient" as WebClient
+participant "Web\nClient" as WebClient
 participant OAuth #LightGreen
 participant "WebRTC\ngateway" as WebRTC_GW
 participant "IMS\nNetwork" as IMS_Network
 participant "Remote\nendpoint" as RemoteEndpoint
 
-
+' --- Notification Channel 
 group Notification Channel 
-WebClient <-> WebRTC_GW: Websocket Establish {apiRoot}/noitificationChannel/{apiVersion}/{deviceId}
-WebRTC_GW -> WebClient: 200 OK
-  note right
-   webSocketsdata->channelURL
-   PNSChannelData->registrationToken
-  end note
+note right WebClient
+  Create notification channel for
+  incoming updates. Valid options:
+  - Websocket channel
+  - PNS channel
+end note
+  
+WebClient -> WebRTC_GW: **POST /notificationchannel/{apiVersion}/channels** \n\
+  Parameters:\n - authorization\n - transactionId\n - clientId\n\
+  Body:\n - channelType\n - channelURL\n - resourceURL\n - callbackURL
+
+activate WebClient #LightGray
+
+WebRTC_GW -> WebClient: **200 OK**\nBody:\n\
+ - channelType\n - channelData\n - resourceURL\n - callbackURL\n - status
+
+WebClient <-[#blue]> WebRTC_GW: Notification websocket established
+note right
+  webSocketsdata->channelURL
+  PNSChannelData->registrationToken
+  --
+  A PSN notification channel won't requiere
+  a direct WS. It will reach the user device
+  using another connection.
+end note
 end
-
-
 
 group CALL ORIGINATION
 
-WebClient -> WebRTC_GW : POST vvoip/{userId}/sessions} \n Parameters: \n ·transactionId \n ·clientId
-WebRTC_GW -> IMS_Network: SIP INVITE
-IMS_Network -> RemoteEndpoint: SIP INVITE
-WebRTC_GW -> WebClient: 201 Created session
-IMS_Network -> WebRTC_GW: 100 Trying 
-RemoteEndpoint -> IMS_Network: 100 Trying
+WebClient -> WebRTC_GW : **POST vvvoip/{apiVersion}/{userId}/sessions}** \n\
+  Parameters:\n - authorization\n - transactionId\n - clientId\n\
+  Body:\n\
+  - originatorAddress \n\
+  - receiverAddress : callbackURL \n\
+  - status \n\
+  - offer : sdp_description
 
-RemoteEndpoint -> IMS_Network: 183 session in porgress
-IMS_Network -> WebRTC_GW: 183 session in porgress
-WebRTC_GW -> WebClient: JSON (SessionStatusNotification)
-WebClient -> WebRTC_GW: JSON Ack
+activate WebClient
+
+WebRTC_GW -> IMS_Network: **SIP INVITE** \n\
+From: originatorAddress \n\
+To: receiverAddress
+IMS_Network -> RemoteEndpoint: SIP INVITE
+RemoteEndpoint -> IMS_Network: 100 Trying
+IMS_Network -> WebRTC_GW: 100 Trying 
+WebRTC_GW -> WebClient: **201 Created session** \n\
+  Body: \n\
+  - originatorAddress \n\
+  - receiverAddress \n\
+  - status : "Initial" \n\
+  - resourceURL
+
+...
+RemoteEndpoint -> IMS_Network: 183 Session progress
+IMS_Network -> WebRTC_GW: 183 Session progress
+WebRTC_GW --> WebClient: JSON vvoipsession status\n\
+  - status: **InProgress**
+note right of WebClient #LightSalmon
+Event docs pending
+Issue #15
+end note
+note right of WebClient
+Assuming info from
+GET /vvoip
+end note
+WebClient --> WebRTC_GW: JSON Ack
 WebRTC_GW ->IMS_Network: PRACK
 IMS_Network -> RemoteEndpoint: PRACK
 RemoteEndpoint -> IMS_Network: 200 OK (PRACK)
@@ -44,20 +97,23 @@ WebClient <[#purple]-> WebRTC_GW: ICE Connectivity Check
 
 RemoteEndpoint ->IMS_Network: 180 Ringing
 IMS_Network -> WebRTC_GW: 180 Ringing
-WebRTC_GW -> WebClient: JSON (SessionStatusNotificaiton)[Ringing]
-WebClient -> WebRTC_GW: JSON Ack
+WebRTC_GW --> WebClient: JSON vvoipsession status\n\
+  - status: **Ringing**
+WebClient --> WebRTC_GW: JSON Ack
 
 RemoteEndpoint -> IMS_Network: 200 OK (INVITE)
 IMS_Network -> WebRTC_GW: 200 OK (INVITE)
-WebRTC_GW -> WebClient: JSON (SessionStatus) [connected]
-WebClient -> WebRTC_GW: JSON Ack
+WebRTC_GW --> WebClient: JSON vvoipsession status\n\
+  - status: **Connected**
+WebClient --> WebRTC_GW: JSON Ack
 WebRTC_GW -> IMS_Network: ACK (200 Ok)
 IMS_Network -> RemoteEndpoint: ACK (200 Ok)
 
-WebClient <--[#red]> WebRTC_GW: DTLS-SRTP
-WebRTC_GW <--[#red]> RemoteEndpoint: RTP/SRTP
+WebClient <--[#red]> WebRTC_GW <<audioStyle>>: DTLS-SRTP
+WebRTC_GW <--[#red]> RemoteEndpoint <<audioStyle>>: RTP/SRTP
 
-WebClient -> WebRTC_GW: DELETE vvoip/{userId}/sessions/{sessionId}. \n Parameters: \n·transactionId \n·clientId \n·sessionId
+WebClient -> WebClient: Hangup
+WebClient -> WebRTC_GW: **DELETE vvoip/{userId}/sessions/{sessionId}**. \n Parameters: \n·transactionId \n·clientId \n·sessionId
 WebRTC_GW -> IMS_Network: BYE
 IMS_Network -> RemoteEndpoint: BYE
 
@@ -65,19 +121,40 @@ RemoteEndpoint -> IMS_Network: 200 OK (BYE)
 IMS_Network -> WebRTC_GW: 200 OK (BYE)
 WebRTC_GW -> WebClient: 200 OK
 
+deactivate WebClient
+deactivate WebClient
+
 end
 
+' CALL TERMINATION: Registration and notification
+' already setup
 group CALL TERMINATION
 
+WebClient <-> WebRTC_GW: **POST /racm/session**
+activate WebClient #LightGray
+WebClient <-> WebRTC_GW: **POST /notificationchannel/channels**
+...
+
 RemoteEndpoint -> IMS_Network: SIP INVITE [Offer 1]
-WebClient <-> WebRTC_GW: websocket Active
+'WebClient <-> WebRTC_GW: websocket Active
 IMS_Network -> RemoteEndpoint: 100 Trying
 IMS_Network -> WebRTC_GW: SIP INVITE [Offer 1]
 WebRTC_GW -> IMS_Network: 100 Trying
-WebRTC_GW -> WebClient: JSON SessionInvitationNotification [sdpUNI offer 1]
-WebClient -> WebRTC_GW: JSON Ack
+'WebRTC_GW -> WebClient: JSON SessionInvitationNotification [sdpUNI offer 1]
+WebRTC_GW --> WebClient: JSON vvoipsession status\n\
+  - status: **Initial ??**
+activate WebClient
+WebClient --> WebRTC_GW: JSON Ack
+note right of WebClient: Now call starts on the\ndevice side
 
-WebClient -> WebRTC_GW: PUT [Inprogress] vvoip/{userId}/sessions/{sessionId}/status
+' Initial WebClient setup
+note right of WebClient
+Local or no media provided
+end note
+WebClient -> WebRTC_GW: **PUT vvoip/{userId}/sessions/{sessionId}/status**\n\
+  Body: \n\
+  - sdp \n\
+  - status: In Progress
 WebRTC_GW -> IMS_Network: 183 SessionInProgress [Answer1]
 IMS_Network -> RemoteEndpoint: 183 SessionInProgress [Answer1]
 WebRTC_GW ->   WebClient: 200 OK
@@ -86,15 +163,25 @@ IMS_Network -> WebRTC_GW: PRACK
 WebRTC_GW -> IMS_Network: 200 OK (PRACK)
 IMS_Network -> RemoteEndpoint: 200 OK (PRACK)
 
+' WebClient Media discovery
+note right of WebClient: Media ICE\ndiscovery
 WebClient <[#purple]-> WebRTC_GW: DTLS Handshake
 WebClient <[#purple]-> WebRTC_GW: ICE Connectivity Check
 
-WebClient -> WebRTC_GW: PUT [Ringing] vvoip/{userId}/sessions/{sessionId}/status
+note right of WebClient: Ringing notification\nfrom device
+WebClient -> WebRTC_GW: **PUT vvoip/{userId}/sessions/{sessionId}/status**\n\
+  Body: \n\
+  - sdp \n\
+  - status: Ringing
 WebRTC_GW -> WebClient: JSON Ack
 WebRTC_GW -> IMS_Network: 180 Ringing
 IMS_Network -> RemoteEndpoint: 180 Ringing
 
-WebClient -> WebRTC_GW: PUT [answer] vvoip/{userId}/sessions/{sessionId}/status
+note right of WebClient: User answer envent
+WebClient -> WebRTC_GW: **PUT vvoip/{userId}/sessions/{sessionId}/status**\n\
+  Body: \n\
+  - sdp \n\
+  - status: Answer ??
 WebRTC_GW -> WebClient: JSON Ack
 WebRTC_GW -> IMS_Network: 200 OK
 IMS_Network -> RemoteEndpoint: 200 Ok 
@@ -102,12 +189,14 @@ WebRTC_GW -> WebClient: JSON Ack
 RemoteEndpoint -> IMS_Network: ACK
 IMS_Network -> WebRTC_GW: ACK
 
-WebClient <--[#red]> WebRTC_GW: DTLS-SRTP
-WebRTC_GW <--[#red]> RemoteEndpoint: RTP/SRTP
+WebClient <--[#red]> WebRTC_GW <<audioStyle>>: DTLS-SRTP
+WebRTC_GW <--[#red]> RemoteEndpoint <<audioStyle>>: RTP/SRTP
 
 RemoteEndpoint -> IMS_Network: BYE
 IMS_Network -> WebRTC_GW: BYE
 WebRTC_GW -> WebClient: JSON [Release]
+
+deactivate WebClient
 
 WebClient -> WebRTC_GW: JSON Ack
 WebRTC_GW -> IMS_Network: 200 OK (BYE)
