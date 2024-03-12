@@ -1,20 +1,26 @@
-@startuml BYON Callhandling
+@startuml BYON Callhandling 0.1.0
 
-title "BYON WEB RTC FLOW - Call handling"
+title "BYON WEB RTC FLOW - Call handling v0.1.0"
 autonumber "<font color=blue><b>[0]"
 
 <style>
 .audioStyle {
   arrow {
-    LineColor blue
+    LineColor red
     LineThickness 5
   }
 }
+.wsStyle { 
+  arrow { 
+    LineColor blue 
+    LineThickness 5 
+  } 
+} 
 </style>
 
 'participant "Notification\nclient" as WebClient
 participant "Web\nClient" as WebClient
-participant OAuth #LightGreen
+'participant OAuth #LightGreen
 participant "WebRTC\ngateway" as WebRTC_GW
 participant "IMS\nNetwork" as IMS_Network
 participant "Remote\nendpoint" as RemoteEndpoint
@@ -27,7 +33,9 @@ note right WebClient
   - Websocket channel
   - PNS channel
 end note
-  
+
+[-> WebClient: Launch app
+
 WebClient -> WebRTC_GW: **POST /notificationchannel/{apiVersion}/channels** \n\
   Parameters:\n - authorization\n - transactionId\n - clientId\n\
   Body:\n - channelType\n - channelURL\n - resourceURL\n - callbackURL
@@ -37,7 +45,7 @@ activate WebClient #LightGray
 WebRTC_GW -> WebClient: **200 OK**\nBody:\n\
  - channelType\n - channelData\n - resourceURL\n - callbackURL\n - status
 
-WebClient <-[#blue]> WebRTC_GW: Notification websocket established
+WebClient <-> WebRTC_GW <<wsStyle>>: Notification channel established
 note right
   webSocketsdata->channelURL
   PNSChannelData->registrationToken
@@ -48,22 +56,32 @@ note right
 end note
 end
 
+' -------------------------------------------------------
+' CALL TERMINATION - WebRTC device receives voice session
+' -------------------------------------------------------
+
 group CALL ORIGINATION
 
-WebClient -> WebRTC_GW : **POST vvvoip/{apiVersion}/{userId}/sessions}** \n\
+WebClient -> WebRTC_GW : **POST /vvoip/{apiVersion}/sessions** \n\
   Parameters:\n - authorization\n - transactionId\n - clientId\n\
   Body:\n\
   - originatorAddress \n\
   - receiverAddress : callbackURL \n\
   - status \n\
-  - offer : sdp_description
+  - offer : sdp_WebRTC
 
 activate WebClient
 
 WebRTC_GW -> IMS_Network: **SIP INVITE** \n\
 From: originatorAddress \n\
-To: receiverAddress
-IMS_Network -> RemoteEndpoint: SIP INVITE
+To: receiverAddress \n\
+sdp_inital_offer
+
+IMS_Network -> RemoteEndpoint: **SIP INVITE** \n\
+From: originatorAddress \n\
+To: receiverAddress \n\
+sdp_inital_offer
+
 RemoteEndpoint -> IMS_Network: 100 Trying
 IMS_Network -> WebRTC_GW: 100 Trying 
 WebRTC_GW -> WebClient: **201 Created session** \n\
@@ -74,10 +92,13 @@ WebRTC_GW -> WebClient: **201 Created session** \n\
   - resourceURL
 
 ...
-RemoteEndpoint -> IMS_Network: 183 Session progress
-IMS_Network -> WebRTC_GW: 183 Session progress
-WebRTC_GW --> WebClient: JSON vvoipsession status\n\
-  - status: **InProgress**
+RemoteEndpoint -> IMS_Network: **183 Session progress** \n\
+sdp_provisonal_response
+IMS_Network -> WebRTC_GW: **183 Session progress** \n\
+sdp_provisonal_response
+WebRTC_GW --> WebClient: JSON vvoipsession status \n\
+  - status: **InProgress** \n\
+  - answer: sdp_provisonal_response
 note right of WebClient #LightSalmon
 Event docs pending
 Issue #15
@@ -87,6 +108,7 @@ Assuming info from
 GET /vvoip
 end note
 WebClient --> WebRTC_GW: JSON Ack
+note right #LightSalmon: Not defined\nMaybe a PUT?
 WebRTC_GW ->IMS_Network: PRACK
 IMS_Network -> RemoteEndpoint: PRACK
 RemoteEndpoint -> IMS_Network: 200 OK (PRACK)
@@ -100,20 +122,30 @@ IMS_Network -> WebRTC_GW: 180 Ringing
 WebRTC_GW --> WebClient: JSON vvoipsession status\n\
   - status: **Ringing**
 WebClient --> WebRTC_GW: JSON Ack
+note right #LightSalmon
+  Not defined, maybe a PUT? Seems not
+  really necesary, since the WebRTC_GW
+  is not doing nothing with this message.
+end note
+
+...
 
 RemoteEndpoint -> IMS_Network: 200 OK (INVITE)
 IMS_Network -> WebRTC_GW: 200 OK (INVITE)
 WebRTC_GW --> WebClient: JSON vvoipsession status\n\
   - status: **Connected**
 WebClient --> WebRTC_GW: JSON Ack
+note right #LightSalmon: Not defined\nMaybe a PUT?
 WebRTC_GW -> IMS_Network: ACK (200 Ok)
 IMS_Network -> RemoteEndpoint: ACK (200 Ok)
 
-WebClient <--[#red]> WebRTC_GW <<audioStyle>>: DTLS-SRTP
-WebRTC_GW <--[#red]> RemoteEndpoint <<audioStyle>>: RTP/SRTP
+WebClient <--> WebRTC_GW <<audioStyle>>: DTLS-SRTP
+WebRTC_GW <--> RemoteEndpoint <<audioStyle>>: RTP/SRTP
 
-WebClient -> WebClient: Hangup
-WebClient -> WebRTC_GW: **DELETE vvoip/{userId}/sessions/{sessionId}**. \n Parameters: \n·transactionId \n·clientId \n·sessionId
+...
+
+[-> WebClient: Hangup
+WebClient -> WebRTC_GW: **DELETE /vvoip/{userId}/sessions/{sessionId}**. \n Parameters: \n·transactionId \n·clientId \n·sessionId
 WebRTC_GW -> IMS_Network: BYE
 IMS_Network -> RemoteEndpoint: BYE
 
@@ -126,13 +158,18 @@ deactivate WebClient
 
 end
 
-' CALL TERMINATION: Registration and notification
-' already setup
+' -------------------------------------------------------
+' CALL TERMINATION - WebRTC device receives voice session
+' -------------------------------------------------------
+
 group CALL TERMINATION
 
+[-> WebClient: Launch app
 WebClient <-> WebRTC_GW: **POST /racm/session**
 activate WebClient #LightGray
 WebClient <-> WebRTC_GW: **POST /notificationchannel/channels**
+WebClient <-> WebRTC_GW <<wsStyle>>: Notification channel established
+
 ...
 
 RemoteEndpoint -> IMS_Network: SIP INVITE [Offer 1]
@@ -142,16 +179,18 @@ IMS_Network -> WebRTC_GW: SIP INVITE [Offer 1]
 WebRTC_GW -> IMS_Network: 100 Trying
 'WebRTC_GW -> WebClient: JSON SessionInvitationNotification [sdpUNI offer 1]
 WebRTC_GW --> WebClient: JSON vvoipsession status\n\
-  - status: **Initial ??**
+  - status: **Initial** \n\
+  - offer: sdp
 activate WebClient
-WebClient --> WebRTC_GW: JSON Ack
+'WebClient --> WebRTC_GW: JSON Ack
+'note right #LightSalmon: Not defined\nMaybe a PUT?
 note right of WebClient: Now call starts on the\ndevice side
 
 ' Initial WebClient setup
 note right of WebClient
 Local or no media provided
 end note
-WebClient -> WebRTC_GW: **PUT vvoip/{userId}/sessions/{sessionId}/status**\n\
+WebClient -> WebRTC_GW: **PUT /vvoip/{userId}/sessions/{sessionId}/status**\n\
   Body: \n\
   - sdp \n\
   - status: In Progress
@@ -160,6 +199,7 @@ IMS_Network -> RemoteEndpoint: 183 SessionInProgress [Answer1]
 WebRTC_GW ->   WebClient: 200 OK
 RemoteEndpoint -> IMS_Network: PRACK
 IMS_Network -> WebRTC_GW: PRACK
+note left #LightSalmon: Maybe JSON event to WebClient missed?
 WebRTC_GW -> IMS_Network: 200 OK (PRACK)
 IMS_Network -> RemoteEndpoint: 200 OK (PRACK)
 
@@ -168,37 +208,47 @@ note right of WebClient: Media ICE\ndiscovery
 WebClient <[#purple]-> WebRTC_GW: DTLS Handshake
 WebClient <[#purple]-> WebRTC_GW: ICE Connectivity Check
 
-note right of WebClient: Ringing notification\nfrom device
-WebClient -> WebRTC_GW: **PUT vvoip/{userId}/sessions/{sessionId}/status**\n\
+[<- WebClient : Ringing
+WebClient -> WebRTC_GW: **PUT /vvoip/{userId}/sessions/{sessionId}/status**\n\
   Body: \n\
-  - sdp \n\
-  - status: Ringing
-WebRTC_GW -> WebClient: JSON Ack
+  - status: Ringing \n\
+  - offer: sdp
+WebRTC_GW ->   WebClient: 200 OK
 WebRTC_GW -> IMS_Network: 180 Ringing
 IMS_Network -> RemoteEndpoint: 180 Ringing
 
-note right of WebClient: User answer envent
-WebClient -> WebRTC_GW: **PUT vvoip/{userId}/sessions/{sessionId}/status**\n\
+[-> WebClient : Answer]
+WebClient -> WebRTC_GW: **PUT /vvoip/{userId}/sessions/{sessionId}/status**\n\
   Body: \n\
-  - sdp \n\
-  - status: Answer ??
-WebRTC_GW -> WebClient: JSON Ack
+  - status: **Connected** \n\
+  - offer: sdp \n\
+  - asnwer: sdp
+WebRTC_GW -> WebClient: 200 OK
+
 WebRTC_GW -> IMS_Network: 200 OK
 IMS_Network -> RemoteEndpoint: 200 Ok 
-WebRTC_GW -> WebClient: JSON Ack
 RemoteEndpoint -> IMS_Network: ACK
 IMS_Network -> WebRTC_GW: ACK
+WebRTC_GW --> WebClient: JSON vvoipsession status\n\
+  - status: **Connected** \n\
+  - offer: sdp \n\
+  - answer: sdp
 
-WebClient <--[#red]> WebRTC_GW <<audioStyle>>: DTLS-SRTP
-WebRTC_GW <--[#red]> RemoteEndpoint <<audioStyle>>: RTP/SRTP
+WebClient <--> WebRTC_GW <<audioStyle>>: DTLS-SRTP
+WebRTC_GW <--> RemoteEndpoint <<audioStyle>>: RTP/SRTP
 
 RemoteEndpoint -> IMS_Network: BYE
 IMS_Network -> WebRTC_GW: BYE
-WebRTC_GW -> WebClient: JSON [Release]
+WebRTC_GW --> WebClient: JSON vvoipsession status\n\
+  - status: **Released** \n\
+  - offer: sdp \n\
+  - answer: sdp
 
-deactivate WebClient
+
 
 WebClient -> WebRTC_GW: JSON Ack
+note right #LightSalmon: Not defined\nMaybe a PUT?
+deactivate WebClient
 WebRTC_GW -> IMS_Network: 200 OK (BYE)
 IMS_Network -> RemoteEndpoint: 200 OK (BYE)
 

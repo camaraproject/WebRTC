@@ -1,6 +1,6 @@
-@startuml BYON Registration
+@startuml BYON Registration 0.1.0
 
-title "BYON WEB RTC FLOW - Registration"
+title "BYON WEB RTC FLOW - Registration - 0.1.0"
 autonumber "<font color=blue><b>[0]"
 
 
