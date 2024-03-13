@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Bring Your Own Number (BYON) Registration and Connectivity Management (RACM) Service APIs
   description: This API provide REST API for clients to manage Registration and Connectivity (RACM) towards MNO's IMS Network.
-  version: 0.1.0
+  version: 0.1.2
   contact:
     email: contact@domain.com
   license:
@@ -22,7 +22,7 @@ tags:
   - name: Registration and Connection Management
     description: APIs for Client to Register into MNO's IMS Network
 paths:
-  /session:
+  /sessions:
     post:
       tags:
         - RACM
@@ -96,16 +96,16 @@ paths:
         - BearerAuth:
             - read
             - write
-  /session/{sessionId}:
+  /sessions/{racmSessionId}:
     put:
       tags:
         - RACM
       summary: For sharing new AccessToken with WebRTC GW, the AccessToken is expected to be received from the Auth server.
-      description: '**The client shall use the resourceUrl supplied in the session creation request. There is no need of constructing the URL**'
+      description: '**The client shall use the racmSessionId to construct the API path.**'
       parameters:
         - $ref: '#/components/parameters/hdrTransactionId'
         - $ref: '#/components/parameters/hdrClientId'
-        - $ref: '#/components/parameters/pathParamSessionId'
+        - $ref: '#/components/parameters/pathParamRacmSessionId'
       responses:
         '200':
           description: No Content
@@ -117,11 +117,11 @@ paths:
       tags:
         - RACM
       summary: Delete Registration Session.
-      description: '**The client shall use the resourceUrl supplied in the session creation request. There is no need of constructing the URL**'
+      description: '**The client shall use the racmSessionId to construct the API path.**'
       parameters:
         - $ref: '#/components/parameters/hdrTransactionId'
         - $ref: '#/components/parameters/hdrClientId'
-        - $ref: '#/components/parameters/pathParamSessionId'
+        - $ref: '#/components/parameters/pathParamRacmSessionId'
       responses:
         '204':
           description: No Content
@@ -139,9 +139,10 @@ components:
         deviceId:
           type: string
           description: The device-id of the client in UUID format.
-        notificationUri:
+        channelId:
           type: string
-          description: The URI which need to be used by WebRTC Gateway for posting notifications towards the client. This should be filled only when the notification channel is provided by a independent notification channel provider.
+          description: ID of an existing notification channel.
+          example: "channel_id_123"
     RacmResponse:
       type: object
       properties:
@@ -151,9 +152,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RegistrationInformation'
-        resourceURL:
+        racmSessionId:
           type: string
-          description: The resource URL allocated by WebRTC GW representing the RACM session created. The sessionId assigned for RACM session is part of the url.
+          description: The RACM session ID created by WebRTC Gateway. Clients must utilize this ID to construct the API path.
     ConnectionInformation:
       type: object
       properties:
@@ -171,6 +172,7 @@ components:
           type: string
         regStatus:
           $ref: '#/components/schemas/RegistrationStatus'
+
     ErrorInfo:
       type: object
       properties:
@@ -206,8 +208,8 @@ components:
       explode: false
       schema:
         type: string
-    pathParamSessionId:
-      name: sessionId
+    pathParamRacmSessionId:
+      name: racmSessionId
       in: path
       description: The sessionId assigned by the RACM service
       required: true

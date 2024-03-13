@@ -2,15 +2,15 @@ openapi: 3.0.0
 info:
   title: Bring Your Own Number (BYON) Notification Channel APIs
   description: This API provide REST API for a client, browser or native application, to establish notification channel to receive asynchronous notifications from MNO's IMS Network.
-  version: 0.1.0
+  version: 0.1.1
   contact:
     email: contact@domain.com
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 servers:
-- url: '{apiRoot}/notificationchannel/{apiVersion}/{deviceId}'
-  description: APIs to create Notification Channels
+- url: '{apiRoot}/notificationchannel/{apiVersion}'
+  description: APIs to create and manage Notification Channels
   variables:
     apiRoot:
       description: API Root
@@ -18,34 +18,96 @@ servers:
     apiVersion:
       description: The version of API to be used
       default: v1
-    deviceId:
-      description: "The notification channel creation is specific to a device instance, the device-id in the uuid format (rfc4412) shall be included in the request"
-      default: 'deviceId'
 tags:
   - name: Notification Channel
     description: APIs for establishing notification channel to receive asynchronous notifications from MNO's IMS network
 paths:
-  /channels:
+  /channels/{channelId}:
     get:
-      description: Retrieves the list of Notification Channels
+      tags:
+        - Notification Channel
+      summary: Retrieves Notification Channel
+      description: '**The client shall use the racmSessionId to construct the API path**'
       parameters:
         - $ref: '#/components/parameters/hdrTransactionId'
         - $ref: '#/components/parameters/hdrClientId'
+        - $ref: '#/components/parameters/pathParamChannelId'
       responses:
         "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NotificationChannelList'
-        "403":
-          $ref: '#/components/responses/Generic403'
+                $ref: '#/components/schemas/NotificationChannel'
+        '400':
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '404':
+          $ref: '#/components/responses/NotFound404'
+        '500':
+          $ref: '#/components/responses/Generic500'
       security:
         - BearerAuth:
           - read
           - write
+    put:
+      tags:
+        - Notification Channel
+      summary: Update Notification Channel properties e.g., expire time, tokens
+      description: '**The client shall use racmSessionId to construct API path**'
+      parameters:
+        - $ref: '#/components/parameters/hdrTransactionId'
+        - $ref: '#/components/parameters/hdrClientId'
+        - $ref: '#/components/parameters/pathParamChannelId'
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationChannel'
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '404':
+          $ref: '#/components/responses/NotFound404'
+        '500':
+          $ref: '#/components/responses/Generic500'
+      security:
+        - BearerAuth:
+            - read
+            - write
+    delete:
+      tags:
+        - Notification Channel
+      summary: Delete Notification Channel
+      description: '**The client shall use racmSessionId to construct API path**'
+      parameters:
+        - $ref: '#/components/parameters/hdrTransactionId'
+        - $ref: '#/components/parameters/hdrClientId'
+        - $ref: '#/components/parameters/pathParamChannelId'
+      responses:
+        '204':
+          description: No Content
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '404':
+          $ref: '#/components/responses/NotFound404'
+        '500':
+          $ref: '#/components/responses/Generic500'
+      security:
+        - BearerAuth:
+            - read
+            - write
+  /channels:
     post:
-      description: Create notification channel(s)
+      tags:
+        - Notification Channel      
+      description: Create notification channel
       parameters:
         - $ref: '#/components/parameters/hdrTransactionId'
         - $ref: '#/components/parameters/hdrClientId'
@@ -53,18 +115,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NotificationChannelsInformation'
+              $ref: '#/components/schemas/NotificationChannel'
       responses:
-        "200":
-          description: Success
+        "201":
+          description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NotificationChannelsInformation'
-        "403":
-          description: Forbidden
-        "409":
-          description: Conflict
+                $ref: '#/components/schemas/NotificationChannel'
+        '400':
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
+        '500':
+          $ref: '#/components/responses/Generic500'
       security:
         - BearerAuth:
             - read
@@ -78,8 +144,8 @@ components:
     hdrClientId:
       name: clientId
       in: header
-      description: The Client ID assigned by WebRTC GW
-      required: true
+      description: The Client ID provided by the WebRTC Gateway is necessary solely if the notification channel is created by the gateway itself.
+      required: false
       style: simple
       explode: false
       schema:
@@ -93,6 +159,15 @@ components:
       explode: false
       schema:
         type: string
+    pathParamChannelId:
+      name: channelId
+      in: path
+      description: The Channel ID associated with the request
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
 
   schemas:
     ChannelType:
@@ -101,7 +176,31 @@ components:
       enum:
       - WebSockets
       - PNSChannel
-      
+      - Webhook
+
+    WebhookData:
+      properties:
+        webhook:
+          $ref: '#/components/schemas/Webhook'
+        expiresAt:
+            type: string
+            format: date-time
+            description: Time indicating when the channel will expire if it is not renewed.
+            example: "2024-02-29T12:00:00Z"
+
+    Webhook:
+      type: object
+      properties:
+        notificationUrl:
+          type: string
+          description: URL of the webhook endpoint.
+          format: uri
+          example: https://example.com/webhooks
+        notificationAuthToken:
+          type: string
+          description: (Optional) Secret used for authentication with the webhook.
+          example: "your_secret_key"
+
     WebSocketsData:
       properties:
         channelURL:
@@ -128,32 +227,12 @@ components:
           oneOf:
           - $ref: '#/components/schemas/WebSocketsData'
           - $ref: '#/components/schemas/PNSChannelData'
-        resourceURL:
+          - $ref: '#/components/schemas/WebhookData'
+        channelId:
           type: string
-          description: "Self referring URL. The resourceURL SHALL NOT be included in POST requests by the client, but MUST be included in POST requests representing notifications by the server to the client, when a complete representation of the resource is embedded in the notification. The resourceURL MUST be also included in responses to any HTTP method that returns an entity body, and in PUT requests."
-        callbackURL:
-          type: string
-          description: This will be specified by the server and contains the callback URL used when establishing subscription for notifications from service providing servers.
+          description: Notification Channel ID. The clients are required to construct API path using this ID.
 
-    NotificationChannelList:
-      type: object
-      properties:
-        channels:
-          type: array
-          items:
-            $ref: '#/components/schemas/NotificationChannel'
-        resourceURL:
-          type: string
-          description: Self referring URL
     
-    NotificationChannelsInformation:
-      type: object
-      properties:
-        channels:
-          type: array
-          items:
-            $ref: '#/components/schemas/NotificationChannel'
-
     ErrorInfo:
       type: object
       properties:
@@ -213,7 +292,7 @@ components:
             code: CONFLICT
             message: 'Simultaneous channel requests not supported'
     NotFound404:
-      description: Session Not found
+      description: Channel Not found
       content:
         application/json:
           schema:
@@ -221,7 +300,7 @@ components:
           example:
             status: 404
             code: NOT_FOUND
-            message: Unable to find the session with the provided Id parameters
+            message: Unable to find the channel with the provided Id 
     Generic500:
       description: Internal server error
       content:
