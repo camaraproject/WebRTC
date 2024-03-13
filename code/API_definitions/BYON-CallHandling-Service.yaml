@@ -528,7 +528,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ObjectResponse'
+            $ref: '#/components/schemas/ReceiverSessionStatus'
           examples:
             SessionCreatedMT183:
               $ref: '#/components/examples/exMT201_183'
