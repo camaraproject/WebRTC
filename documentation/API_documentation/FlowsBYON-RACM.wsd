@@ -18,7 +18,7 @@ OAuth -> WebClient: Access/refresh Token
 WebClient -> WebRTC_GW: **POST /racm/{apiVersion}/session**\n\
  Parameteres:\n - authorization\n - transactionId\n - clientId\n\
  Body:\n - deviceId\n - notificationUri
-WebRTC_GW <-> OAuth: Validate Auth-token (MSISDN/IMSI)
+WebRTC_GW <-> OAuth: Validate Auth-token
 WebRTC_GW -> IMS_Network: **SIP REGISTER**\nFrom: IMPU\nTo:IMPU\nContact: WebRTC_GW
 IMS_Network -> WebRTC_GW: 100 Trying
 IMS_Network -> WebRTC_GW: 200 OK
@@ -53,33 +53,6 @@ WebRTC_GW -> IMS_Network: SIP RE-REGISTER
 IMS_Network -> WebRTC_GW: 200 OK
 WebRTC_GW -> WebClient: **200 OK**\nBody:\n - sessionID\n - clientid\n - resourceURL\n - channelURL\n - status
 end
-end
-
-' --- Notification Channel 
-group Notification Channel 
-note over WebClient
-  Create notification channel for
-  incoming updates. Valid options:
-  - Websocket channel
-  - PNS channel
-end note
-  
-WebClient -> WebRTC_GW: **POST /notificationchannel/{apiVersion}/channels** \n\
-  Parameteres:\n - authorization\n - transactionId\n - clientId\n\
-  Body:\n - channelType\n - channelURL\n - resourceURL\n - callbackURL
-
-WebRTC_GW -> WebClient: **200 OK**\nBody:\n\
- - channelType\n - channelData\n - resourceURL\n - callbackURL\n - status
-
-WebClient <-[#blue]> WebRTC_GW: Notification websocket established
-note right
-  webSocketsdata->channelURL
-  PNSChannelData->registrationToken
-  --
-  A PSN notification channel won't requiere
-  a direct WS. It will reach the user device
-  using another connection.
-end note
 end
 
 ' --- DE-REGISTRATION

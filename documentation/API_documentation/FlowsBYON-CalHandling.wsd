@@ -16,12 +16,6 @@ autonumber "<font color=blue><b>[0]"
     LineThickness 5
   }
 }
-.wsStyle { 
-  arrow { 
-    LineColor blue 
-    LineThickness 5 
-  } 
-} 
 </style>
 
 'participant "Notification\nclient" as WebClient
@@ -40,7 +34,7 @@ note right WebClient
   Valir notification channels are:
   - Websocket channel
   - PNS channel
-  - Webhook
+  - Webhook URL
 end note
 
 

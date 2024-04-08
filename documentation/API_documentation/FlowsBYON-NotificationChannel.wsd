@@ -29,14 +29,22 @@ participant "Remote\nendpoint" as RemoteEndpoint
 group Notification Channel 
 note right WebClient
   Create notification channel for
-  incoming updates. Valid options:
+  incoming updates.
+  
+  Valir notification channels are:
   - Websocket channel
   - PNS channel
+  - Webhook URL
 end note
+
+WebClient -> OAuth: Authentication/refresh Token
+OAuth -> WebClient: Access/refresh Token
   
 WebClient -> WebRTC_GW: **POST /notificationchannel/{apiVersion}/channels** \n\
   Parameters:\n - authorization\n - transactionId\n - clientId\n\
   Body:\n - channelType\n - channelURL\n - resourceURL\n - callbackURL
+
+WebRTC_GW <-> OAuth: Validate Auth-token
 
 activate WebClient #LightGray
 
@@ -44,13 +52,14 @@ WebRTC_GW -> WebClient: **200 OK**\nBody:\n\
  - channelType\n - channelData\n - resourceURL\n - callbackURL\n - status
 
 WebClient <-> WebRTC_GW <<wsStyle>>: Notification websocket established
-note right
+note right 
   webSocketsdata->channelURL
-  PNSChannelData->registrationToken
+  PNSChannelData->registrationToken+URL
+  webhookURL->webhookURL with all params
   --
-  A PSN notification channel won't requiere
-  a direct WS. It will reach the user device
-  using another connection.
+  PSN notification and webhooks channels would not
+  requiere a mandatory direct WS. They could reach
+  the user device using some other paths.
 end note
 end
 
