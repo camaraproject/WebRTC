@@ -151,9 +151,7 @@ paths:
                 $ref: '#/components/examples/exMT200'
       responses:
         '200':
-          description: Updated the session status
-        '201':
-          $ref: '#/components/responses/Generic201'
+          $ref: '#/components/responses/Generic200'
         '401':
           $ref: '#/components/responses/Generic401'
         '403':
@@ -513,8 +511,8 @@ components:
             status: 503
             code: UNAVAILABLE
             message: Service unavailable
-    Generic201:
-      description: Created
+    Generic200:
+      description: Updated
       content:
         application/json:
           schema:
