@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
   title: Bring Your Own Number (BYON) call handling API (VVOIP Service)
   description: APIs for REST clients for 1-1 calling
