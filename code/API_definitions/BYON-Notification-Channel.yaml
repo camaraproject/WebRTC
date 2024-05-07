@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
   title: Bring Your Own Number (BYON) Notification Channel APIs
   description: This API provide REST API for a client, browser or native application, to establish notification channel to receive asynchronous notifications from MNO's IMS Network.
