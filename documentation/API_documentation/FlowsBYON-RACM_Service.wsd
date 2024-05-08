@@ -13,11 +13,19 @@ participant "Remote\nendpoint" as RemoteEndpoint
 ' --- USER AUTHENTICATION and REGISTRATION
 group USER AUTHENTICATION and REGISTRATION
 
+[-> WebClient: Launch app
+activate WebClient #LightGray
+
 WebClient -> OAuth: Authentication/refresh Token
 OAuth -> WebClient: Access/refresh Token
 WebClient -> WebRTC_GW: **POST /racm/{apiVersion}/session**\n\
- Parameteres:\n - authorization\n - transactionId\n - clientId\n\
- Body:\n - deviceId\n - notificationUri
+  Headers: \n\
+  - authorization \n\
+  - transactionId \n\
+  Body: \n\
+  - deviceId \n\
+  - notificationUri
+
 WebRTC_GW <-> OAuth: Validate Auth-token
 WebRTC_GW -> IMS_Network: **SIP REGISTER**\nFrom: IMPU\nTo:IMPU\nContact: WebRTC_GW
 IMS_Network -> WebRTC_GW: 100 Trying
@@ -44,7 +52,10 @@ note over WebClient
   endpoint (session creation)
 end note
 WebClient -> WebRTC_GW: **PUT /racm/{apiVersion}/session/{sessionId}** \n\
- Parameters: \n - authorization\n - transactionId \n - clientId \n - sessionId
+ Headers: \n\
+ - authorization \n\
+ - transactionId \n\
+ - clientId
 
 note right
   Auth-token refresh (after expiry)
@@ -55,8 +66,20 @@ WebRTC_GW -> WebClient: **200 OK**\nBody:\n - sessionID\n - clientid\n - resourc
 end
 end
 
+note right WebClient
+  Notification channel required
+  to receive sessions and to
+  wakeup user's device
+end note
+
+WebClient <-> WebRTC_GW: **POST /notif/{apiVersion}/channels**
+WebClient <-> WebRTC_GW <<wsStyle>>: Notification channel established
+
 ' --- DE-REGISTRATION
 group DE-REGISTRATION
+
+[-> WebClient: Closes session
+
 note over WebClient
   Graceful logout
 end note
@@ -66,6 +89,9 @@ WebRTC_GW -> IMS_Network: SIP DE-REGISTER
 IMS_Network -> WebRTC_GW: 200 OK
 WebRTC_GW -> WebClient: **204 No content**
       note right: Clean up session context
+      
+deactivate WebClient
+
 note over WebClient
   Non-graceful logout will let the
   auth token to expire, leading to

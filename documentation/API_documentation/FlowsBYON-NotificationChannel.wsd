@@ -37,21 +37,23 @@ note right WebClient
   - Webhook URL
 end note
 
+activate WebClient #LightGray
+
 WebClient -> OAuth: Authentication/refresh Token
 OAuth -> WebClient: Access/refresh Token
   
-WebClient -> WebRTC_GW: **POST /notificationchannel/{apiVersion}/channels** \n\
+WebClient -> WebRTC_GW: **POST /notif/{apiVersion}/channels** \n\
   Parameters:\n - authorization\n - transactionId\n - clientId\n\
   Body:\n - channelType\n - channelURL\n - resourceURL\n - callbackURL
 
 WebRTC_GW <-> OAuth: Validate Auth-token
 
-activate WebClient #LightGray
-
 WebRTC_GW -> WebClient: **200 OK**\nBody:\n\
  - channelType\n - channelData\n - resourceURL\n - callbackURL\n - status
 
-WebClient <-> WebRTC_GW <<wsStyle>>: Notification websocket established
+activate WebClient #LightGreen
+
+WebClient <-> WebRTC_GW <<wsStyle>>: Notification channel established
 note right 
   webSocketsdata->channelURL
   PNSChannelData->registrationToken+URL

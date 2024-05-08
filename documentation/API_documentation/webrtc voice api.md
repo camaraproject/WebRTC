@@ -101,3 +101,32 @@ Several exceptions might occur during the API operations,
 | PUT /session/{sessionId}/status | Modify a Voice session | This modification request is to modify the call object attributes such as media properties included in the SDP (e.g. call placed on hold). |
 | DELETE /session/{sessionId} | Delete a Voice session | When the call is terminated from the client's end, the corresponding Voice session object is deleted, which will trigger the WebRTC GW to initiate a Call release into the MNO's IMS network. |
 | | | When the call is released from the network's end, the call release notification is sent over the websocket notification channel, which will result in deleting of the Voice session object. |
+
+### Event status enumeration
+
+There are defined a series of status for the call. These status are used by the session endpoint for PUT actions and also used by the event notification channel.
+
+Status are:
+
+| Status | SIP Response | Description |
+| ------ | ------------ | ----------- |
+`Initial`     | n/a | Initial status of transaction
+`InProgress`  | 183 Session progress | Updated info about a session 
+`Ringing`     | 180 Ringing | Destination user agent is alerting the user
+`Proceding`   | n/a | Call progressing
+`Connected`   | 200 OK | Session in place
+`Terminated`  | n/a | The call is being terminated, but not defined the reason. It needs to add a "reason"
+`Hold`        | n/a | Status when a call on hold
+`Resume`      | n/a | Status for a call that is resumed
+`SessionCancelled` | n/a | 487 Resquest terminated or CANCEL+200OK
+`Declined`    | 603 Decline | The destination does not want to participate
+`Failed`      | 412 / 430 | Call terminated and failed without 200 OK
+`Waiting`     | 182 Queued | Call pending to be processed
+`NoAnswer`    | 408 Request Timeout | No answer before timer expires
+`NotReachable` | 404 Not found | Destination requested not found
+`Busy`        | 486 Busy here | Callee is busy
+
+Ref. for status mapping: https://www.gsma.com/newsroom/wp-content/uploads//NG.114-v1.0-3.pdf
+
+## Call handling
+### About updates and addrress modifications
