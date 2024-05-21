@@ -18,9 +18,7 @@ autonumber "<font color=blue><b>[0]"
 } 
 </style>
 
-'participant "Notification\nclient" as WebClient
 participant "Web\nClient" as WebClient
-'participant OAuth #LightGreen
 participant "WebRTC\ngateway" as WebRTC_GW
 participant "IMS\nNetwork" as IMS_Network
 participant "Remote\nendpoint" as RemoteEndpoint
@@ -55,7 +53,7 @@ WebClient -> WebRTC_GW : **POST /vvoip/{apiVersion}/sessions** \n\
   - clientId\n\
   Body:\n\
   - originatorAddress \n\
-  - receiverAddress : callbackURL \n\
+  - receiverAddress \n\
   - status \n\
   - offer : sdp_webrtc_offer
 activate WebClient
@@ -81,7 +79,7 @@ WebRTC_GW -> WebClient: **201 Created session** \n\
   - originatorAddress \n\
   - receiverAddress \n\
   - status : "Initial" \n\
-  - resourceURL: $url/{sessionId}
+  - vvoipSessionId: {vvoipSessionId}
 
 ...Inactivity timer applies...
 
@@ -106,7 +104,7 @@ IMS_Network -> WebRTC_GW: 200 OK (PRACK)
 group Late media ICE discovery
 WebClient <[#purple]-> WebRTC_GW: DTLS Handshake
 WebClient <[#purple]-> WebRTC_GW: ICE Connectivity Check
-WebClient -> WebRTC_GW: **PUT /vvoip/{apiVersion}/sessions/{sessionId}/status**\n\
+WebClient -> WebRTC_GW: **PUT /vvoip/{apiVersion}/sessions/{vvoipSessionId}/status**\n\
   Headers:\n\
   - authorization\n\
   - transactionId\n\
@@ -148,7 +146,7 @@ WebRTC_GW <--> RemoteEndpoint <<audioStyle>>: RTP/SRTP
 ...Session timer applies...
 
 [-> WebClient: Hangup
-WebClient -> WebRTC_GW: **DELETE /vvoip/{apiVersion}/sessions/{sessionId}**\n\
+WebClient -> WebRTC_GW: **DELETE /vvoip/{apiVersion}/sessions/{vvoipSessionId}**\n\
   Headers:\n\
   - authorization\n\
   - transactionId\n\
@@ -185,7 +183,7 @@ note right WebClient
   
 end note
 WebClient <-> WebRTC_GW: **POST /racm/{apiVersion}/session**
-WebClient <-> WebRTC_GW: **POST /notif/{apiVersion}/channels**
+WebClient <-> WebRTC_GW: **POST /notificationchannel/{apiVersion}/channels**
 WebClient <-> WebRTC_GW <<wsStyle>>: Notification channel established
 
 ...
@@ -207,7 +205,7 @@ WebRTC_GW -> IMS_Network: 100 Trying
 WebRTC_GW --> WebClient: JSON vvoipsession status\n\
   - status: **Initial** \n\
   - offer: sdp_webrtc_offer \n\
-  - sessionId: sessionId
+  - vvoipSessionId: vvoipSessionId
 activate WebClient
 note left of WebClient
 Now call starts to be
@@ -216,7 +214,7 @@ device.
 end note
 
 ' Retrieve call information
-WebClient -> WebRTC_GW: **GET /vvoip/{apiVersion}/sessions/{sessionId}**\n\
+WebClient -> WebRTC_GW: **GET /vvoip/{apiVersion}/sessions/{vvoipSessionId}**\n\
   Headers:\n\
   - authorization\n\
   - transactionId\n\
@@ -232,7 +230,7 @@ note right WebRTC_GW
 end note
 
 ' Initial WebClient setup
-WebClient -> WebRTC_GW: **PUT /vvoip/{apiVersion}/sessions/{sessionId}/status**\n\
+WebClient -> WebRTC_GW: **PUT /vvoip/{apiVersion}/sessions/{vvoipSessionId}/status**\n\
   Body: \n\
   - status: **In Progress** \n\
   - offer: sdp_webrtc_offer \n\
@@ -254,7 +252,7 @@ IMS_Network -> RemoteEndpoint: 200 OK (PRACK)
 group Late Media ICE discovery
 WebClient <[#purple]-> WebRTC_GW: DTLS Handshake
 WebClient <[#purple]-> WebRTC_GW: ICE Connectivity Check
-WebClient -> WebRTC_GW: **PUT /vvoip/{apiVersion}/sessions/{sessionId}/status**\n\
+WebClient -> WebRTC_GW: **PUT /vvoip/{apiVersion}/sessions/{vvoipSessionId}/status**\n\
   Headers:\n\
   - authorization\n\
   - transactionId\n\
@@ -268,7 +266,7 @@ WebRTC_GW -> WebClient: 200 Updated
 end
 
 [<- WebClient : Ringing
-WebClient -> WebRTC_GW: **PUT /vvoip/{apiVersion}/sessions/{sessionId}/status**\n\
+WebClient -> WebRTC_GW: **PUT /vvoip/{apiVersion}/sessions/{vvoipSessionId}/status**\n\
   Headers:\n\
   - authorization\n\
   - transactionId\n\
@@ -282,7 +280,7 @@ WebRTC_GW -> IMS_Network: 180 Ringing
 IMS_Network -> RemoteEndpoint: 180 Ringing
 
 [-> WebClient : Answer]
-WebClient -> WebRTC_GW: **PUT /vvoip/{apiVersion}/sessions/{sessionId}/status**\n\
+WebClient -> WebRTC_GW: **PUT /vvoip/{apiVersion}/sessions/{vvoipSessionId}/status**\n\
   Headers:\n\
   - authorization\n\
   - transactionId\n\

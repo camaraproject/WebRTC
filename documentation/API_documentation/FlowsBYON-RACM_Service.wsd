@@ -18,26 +18,31 @@ activate WebClient #LightGray
 
 WebClient -> OAuth: Authentication/refresh Token
 OAuth -> WebClient: Access/refresh Token
-WebClient -> WebRTC_GW: **POST /racm/{apiVersion}/session**\n\
+WebClient -> WebRTC_GW: **POST /racm/{apiVersion}/sessions**\n\
   Headers: \n\
   - authorization \n\
   - transactionId \n\
   Body: \n\
   - deviceId \n\
-  - notificationUri
+  - channelId
 
 WebRTC_GW <-> OAuth: Validate Auth-token
 WebRTC_GW -> IMS_Network: **SIP REGISTER**\nFrom: IMPU\nTo:IMPU\nContact: WebRTC_GW
 IMS_Network -> WebRTC_GW: 100 Trying
 IMS_Network -> WebRTC_GW: 200 OK
-WebRTC_GW -> WebClient: **200 OK**\nBody:\n - sessionID\n - clientid\n - resourceURL\n - channelURL\n - status
+WebRTC_GW -> WebClient: **200 OK**\n\
+  Body:\n\
+  - clientid\n\
+  - regInfo/msisdn\n\
+  - regInfo/regStatus\n\
+  - racmSessionId
 note over WebClient
   Registrations will be valid while
   auth-token is still valid.
 end note
 
 ' --- Refreshing of registration
-group Refreshing of registration
+group REGISTRATION REFRESH
   note over WebRTC_GW
    Periodically refresh REGISTER
    while Auth-Token is still valid
@@ -47,22 +52,25 @@ group Refreshing of registration
 
 else
 note over WebClient
-  Use **sessionId** from 200OK
+  When auth-token is about to
+  expire, it is need to refresh
+  and update WebRTC GW.
+  Use **racmSessionId** from 200OK
   response body to POST racm/
-  endpoint (session creation)
+  endpoint (session update)
 end note
-WebClient -> WebRTC_GW: **PUT /racm/{apiVersion}/session/{sessionId}** \n\
+WebClient -> WebRTC_GW: **PUT /racm/{apiVersion}/sessions/{racmSessionId}** \n\
  Headers: \n\
  - authorization \n\
  - transactionId \n\
  - clientId
 
-note right
-  Auth-token refresh (after expiry)
+note over WebRTC_GW
+  Auth-token refresh and check
 end note
 WebRTC_GW -> IMS_Network: SIP RE-REGISTER
 IMS_Network -> WebRTC_GW: 200 OK
-WebRTC_GW -> WebClient: **200 OK**\nBody:\n - sessionID\n - clientid\n - resourceURL\n - channelURL\n - status
+WebRTC_GW -> WebClient: **204 No content**
 end
 end
 
@@ -72,7 +80,7 @@ note right WebClient
   wakeup user's device
 end note
 
-WebClient <-> WebRTC_GW: **POST /notif/{apiVersion}/channels**
+WebClient <-> WebRTC_GW: **POST /notificationchannel/{apiVersion}/channels**
 WebClient <-> WebRTC_GW <<wsStyle>>: Notification channel established
 
 ' --- DE-REGISTRATION
@@ -83,8 +91,11 @@ group DE-REGISTRATION
 note over WebClient
   Graceful logout
 end note
-WebClient -> WebRTC_GW: **DELETE /racm/{apiVersion}/session/{sessionId}** \n\
- Parameters: \n - authorization\n - transactionId\n - clientID
+WebClient -> WebRTC_GW: **DELETE /racm/{apiVersion}/sessions/{racmSessionId}** \n\
+ Headers: \n\
+ - authorization \n\
+ - transactionId \n\
+ - clientID
 WebRTC_GW -> IMS_Network: SIP DE-REGISTER
 IMS_Network -> WebRTC_GW: 200 OK
 WebRTC_GW -> WebClient: **204 No content**

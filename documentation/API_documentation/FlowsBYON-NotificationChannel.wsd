@@ -42,14 +42,22 @@ activate WebClient #LightGray
 WebClient -> OAuth: Authentication/refresh Token
 OAuth -> WebClient: Access/refresh Token
   
-WebClient -> WebRTC_GW: **POST /notif/{apiVersion}/channels** \n\
-  Parameters:\n - authorization\n - transactionId\n - clientId\n\
-  Body:\n - channelType\n - channelURL\n - resourceURL\n - callbackURL
+WebClient -> WebRTC_GW: **POST /notificationchannel/{apiVersion}/channels** \n\
+  Headers:\n\
+  - authorization\n\
+  - transactionId\n\
+  - clientId\n\
+  Body:\n\
+  - channelType\n\
+  - channelData/channelURL\n\
 
 WebRTC_GW <-> OAuth: Validate Auth-token
 
-WebRTC_GW -> WebClient: **200 OK**\nBody:\n\
- - channelType\n - channelData\n - resourceURL\n - callbackURL\n - status
+WebRTC_GW -> WebClient: **201 Created**\n\
+  Body:\n\
+  - channelType\n\
+  - channelData/channelURL\n\
+  - channelId
 
 activate WebClient #LightGreen
 
