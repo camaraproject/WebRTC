@@ -8,7 +8,7 @@
 | T-Mobile US | Deepak Jaiswal | deepakjaiswal1 |
 | Quobis | Santiago Troncoso | stroncoso-quobis |
 | Quobis | Elías Pérez | eliaspc |
-| Vodafone | Jesus Pedruelo | ?? |
-| Vodafone | Ratna Ganeshanandan | ?? |
+| Vodafone | Jesus Pedruelo | jesus-pb |
+| Vodafone | Ratna Ganeshanandan | ratnavf |
 | Orange | Benjamin Busvel | BenjaminBusvel |
 | Orange | Maxime Delon | maximedelon |
