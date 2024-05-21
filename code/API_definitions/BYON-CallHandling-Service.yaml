@@ -50,7 +50,7 @@ paths:
         - BearerAuth:
             - read
             - write
-  '/sessions/{sessionId}':
+  /sessions/{sessionId}:
     get:
       tags:
         - OneToOneCall
@@ -124,7 +124,7 @@ paths:
         - BearerAuth:
             - read
             - write
-  '/sessions/{sessionId}/status':
+  /sessions/{sessionId}/status:
     put:
       tags:
         - OneToOneCall
@@ -211,7 +211,7 @@ components:
             resource is embedded in the notification. The resourceURL must also
             be included in responses to any HTTP method that returns an entity
             body, and in PUT requests
-          example: '$url/{sessionId}'
+          example: $url/{sessionId}
     SessionInvitationNotification:
       required:
         - originatorAddress
