@@ -1,8 +1,10 @@
+---
 openapi: 3.0.3
 info:
   title: Bring Your Own Number (BYON) Registration and Connectivity Management (RACM) Service APIs
   description: This API provide REST API for clients to manage Registration and Connectivity (RACM) towards MNO's IMS Network.
   version: 0.1.0
+---  
   contact:
     email: contact@domain.com
   license:
