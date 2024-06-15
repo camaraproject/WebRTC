@@ -1,6 +1,6 @@
-@startuml BYON Registration 0.1.0
+@startuml BYON Registration 0.1.2
 
-title "BYON WEB RTC FLOW - Registration - 0.1.0"
+title "BYON WEB RTC FLOW - Registration - 0.1.2"
 autonumber "<font color=blue><b>[0]"
 
 
@@ -25,6 +25,13 @@ WebClient -> WebRTC_GW: **POST /racm/{apiVersion}/sessions**\n\
   Body: \n\
   - deviceId \n\
   - channelId
+
+note right WebClient
+  **Note** channelId is an optional argument
+  only provided when an independent external
+  notification is created prior to the RACM
+  session. Check API doc about it.
+end note
 
 WebRTC_GW <-> OAuth: Validate Auth-token
 WebRTC_GW -> IMS_Network: **SIP REGISTER**\nFrom: IMPU\nTo:IMPU\nContact: WebRTC_GW
