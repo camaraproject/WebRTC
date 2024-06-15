@@ -28,13 +28,19 @@ participant "Remote\nendpoint" as RemoteEndpoint
 ' --- Notification Channel 
 group Notification Channel 
 note right WebClient
-  Create notification channel for
-  incoming updates.
+  Create notification channel for incoming updates.
   
   Valir notification channels are:
-  - Websocket channel
-  - PNS channel
-  - Webhook URL
+  - "WebSockets"
+    - Requires channelURL
+  - "PNSChannel"
+    - Requires regsitrationToken
+  - "Webhook"
+    - Requires notificationUrl and notificationAuthToken
+
+  Check details about each noticiation channel
+  requirements on the API documentation
+
 end note
 
 activate WebClient #LightGray
@@ -62,14 +68,11 @@ WebRTC_GW -> WebClient: **201 Created**\n\
 activate WebClient #LightGreen
 
 WebClient <-> WebRTC_GW <<wsStyle>>: Notification channel established
-note right 
-  webSocketsdata->channelURL
-  PNSChannelData->registrationToken+URL
-  webhookURL->webhookURL with all params
-  --
-  PSN notification and webhooks channels would not
-  requiere a mandatory direct WS. They could reach
-  the user device using some other paths.
+note left WebRTC_GW
+  It is possible to include any other
+  optional parameters during the notification
+  channel creation, depending on the WebRTC
+  GW notification available functionalities.
 end note
 end
 
