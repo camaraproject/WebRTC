@@ -1,6 +1,6 @@
-@startuml BYON NotificationChannel 0.1.0
+@startuml BYON NotificationChannel 0.1.2
 
-title "BYON WEB RTC FLOW - Notification channel 0.1.0"
+title "BYON WEB RTC FLOW - Notification channel 0.1.2"
 autonumber "<font color=blue><b>[0]"
 
 <style>
