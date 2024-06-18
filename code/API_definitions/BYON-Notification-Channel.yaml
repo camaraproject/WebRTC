@@ -62,8 +62,8 @@ paths:
           $ref: '#/components/responses/Generic500'
       security:
         - BearerAuth:
-          - read
-          - write
+            - read
+            - write
     put:
       tags:
         - Notification Channel
