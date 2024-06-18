@@ -1,0 +1,79 @@
+@startuml BYON NotificationChannel 0.1.2
+
+title "BYON WEB RTC FLOW - Notification channel 0.1.2"
+autonumber "<font color=blue><b>[0]"
+
+<style>
+.audioStyle {
+  arrow {
+    LineColor red
+    LineThickness 5
+  }
+}
+.wsStyle {
+  arrow {
+    LineColor blue
+    LineThickness 5
+  }
+}
+</style>
+
+'participant "Notification\nclient" as WebClient
+participant "Web\nClient" as WebClient
+participant OAuth #LightGreen
+participant "WebRTC\ngateway" as WebRTC_GW
+participant "IMS\nNetwork" as IMS_Network
+participant "Remote\nendpoint" as RemoteEndpoint
+
+' --- Notification Channel 
+group Notification Channel 
+note right WebClient
+  Create notification channel for incoming updates.
+  
+  Valir notification channels are:
+  - "WebSockets"
+    - Requires channelURL
+  - "PNSChannel"
+    - Requires regsitrationToken
+  - "Webhook"
+    - Requires notificationUrl and notificationAuthToken
+
+  Check details about each noticiation channel
+  requirements on the API documentation
+
+end note
+
+activate WebClient #LightGray
+
+WebClient -> OAuth: Authentication/refresh Token
+OAuth -> WebClient: Access/refresh Token
+  
+WebClient -> WebRTC_GW: **POST /notificationchannel/{apiVersion}/channels** \n\
+  Headers:\n\
+  - authorization\n\
+  - transactionId\n\
+  - clientId\n\
+  Body:\n\
+  - channelType\n\
+  - channelData/channelURL\n\
+
+WebRTC_GW <-> OAuth: Validate Auth-token
+
+WebRTC_GW -> WebClient: **201 Created**\n\
+  Body:\n\
+  - channelType\n\
+  - channelData/channelURL\n\
+  - channelId
+
+activate WebClient #LightGreen
+
+WebClient <-> WebRTC_GW <<wsStyle>>: Notification channel established
+note left WebRTC_GW
+  It is possible to include any other
+  optional parameters during the notification
+  channel creation, depending on the WebRTC
+  GW notification available functionalities.
+end note
+end
+
+@enduml
