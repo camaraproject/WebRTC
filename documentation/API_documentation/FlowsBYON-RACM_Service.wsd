@@ -1,0 +1,121 @@
+@startuml BYON Registration 0.1.2
+
+title "BYON WEB RTC FLOW - Registration - 0.1.2"
+autonumber "<font color=blue><b>[0]"
+
+
+participant WebClient
+participant OAuth #LightGreen
+participant "WebRTC\ngateway" as WebRTC_GW
+participant "IMS\nNetwork" as IMS_Network
+participant "Remote\nendpoint" as RemoteEndpoint
+
+' --- USER AUTHENTICATION and REGISTRATION
+group USER AUTHENTICATION and REGISTRATION
+
+[-> WebClient: Launch app
+activate WebClient #LightGray
+
+WebClient -> OAuth: Authentication/refresh Token
+OAuth -> WebClient: Access/refresh Token
+WebClient -> WebRTC_GW: **POST /racm/{apiVersion}/sessions**\n\
+  Headers: \n\
+  - authorization \n\
+  - transactionId \n\
+  Body: \n\
+  - deviceId \n\
+  - channelId
+
+note right WebClient
+  **Note** channelId is an optional argument
+  only provided when an independent external
+  notification is created prior to the RACM
+  session. Check API doc about it.
+end note
+
+WebRTC_GW <-> OAuth: Validate Auth-token
+WebRTC_GW -> IMS_Network: **SIP REGISTER**\nFrom: IMPU\nTo:IMPU\nContact: WebRTC_GW
+IMS_Network -> WebRTC_GW: 100 Trying
+IMS_Network -> WebRTC_GW: 200 OK
+WebRTC_GW -> WebClient: **200 OK**\n\
+  Body:\n\
+  - clientid\n\
+  - regInfo/msisdn\n\
+  - regInfo/regStatus\n\
+  - racmSessionId
+note over WebClient
+  Registrations will be valid while
+  auth-token is still valid.
+end note
+
+' --- Refreshing of registration
+group REGISTRATION REFRESH
+  note over WebRTC_GW
+   Periodically refresh REGISTER
+   while Auth-Token is still valid
+  end note
+  WebRTC_GW -> IMS_Network: SIP RE-REGISTER
+  IMS_Network -> WebRTC_GW: 200 OK
+
+else
+note over WebClient
+  When auth-token is about to
+  expire, it is need to refresh
+  and update WebRTC GW.
+  Use **racmSessionId** from 200OK
+  response body to POST racm/
+  endpoint (session update)
+end note
+WebClient -> WebRTC_GW: **PUT /racm/{apiVersion}/sessions/{racmSessionId}** \n\
+ Headers: \n\
+ - authorization \n\
+ - transactionId \n\
+ - clientId
+
+note over WebRTC_GW
+  Auth-token refresh and check
+end note
+WebRTC_GW -> IMS_Network: SIP RE-REGISTER
+IMS_Network -> WebRTC_GW: 200 OK
+WebRTC_GW -> WebClient: **204 No content**
+end
+end
+
+note right WebClient
+  Notification channel required
+  to receive sessions and to
+  wakeup user's device
+end note
+
+WebClient <-> WebRTC_GW: **POST /notificationchannel/{apiVersion}/channels**
+WebClient <-> WebRTC_GW <<wsStyle>>: Notification channel established
+
+' --- DE-REGISTRATION
+group DE-REGISTRATION
+
+[-> WebClient: Closes session
+
+note over WebClient
+  Graceful logout
+end note
+WebClient -> WebRTC_GW: **DELETE /racm/{apiVersion}/sessions/{racmSessionId}** \n\
+ Headers: \n\
+ - authorization \n\
+ - transactionId \n\
+ - clientID
+WebRTC_GW -> IMS_Network: SIP DE-REGISTER
+IMS_Network -> WebRTC_GW: 200 OK
+WebRTC_GW -> WebClient: **204 No content**
+      note right: Clean up session context
+      
+deactivate WebClient
+
+note over WebClient
+  Non-graceful logout will let the
+  auth token to expire, leading to
+  a SIP DE-REGISTRATION on the
+  WebRTC gateway
+end note
+end 
+
+@enduml
