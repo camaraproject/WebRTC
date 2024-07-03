@@ -179,7 +179,7 @@ paths:
                 Resume:
                   $ref: '#/components/examples/exMTResume'
         '204':
-          description: Updated the session status (no content) 
+          description: Updated the session status (no content)
         '401':
           $ref: '#/components/responses/Generic401'
         '403':
@@ -215,7 +215,6 @@ components:
           description: Friendly name of the receiver
           example: receiver
         status:
-          description: Provides the status of the VVOIP session. During the session creation, this attribute SHALL NOT be included in the request.
           $ref: '#/components/schemas/SessionStatus'
         offer:
           $ref: '#/components/schemas/WrtcsOffer'
@@ -317,6 +316,7 @@ components:
           $ref: '#/components/schemas/Address'
     SessionStatus:
       type: string
+      description: Provides the status of the VVOIP session. During the session creation, this attribute SHALL NOT be included in the request.
       enum:
         - Initial
         - InProgress
@@ -501,7 +501,7 @@ components:
         ReceiverSessionStatus:
           status: Resume
           answer:
-            sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\na=extmap:2 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=sendrecv\r\na=rtcp-mux\r\na=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ruAnBNYnTJqDVZAIJV59VpQ5DxGI6tMX9h9kkHSz\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n" 
+            sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\na=extmap:2 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=sendrecv\r\na=rtcp-mux\r\na=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ruAnBNYnTJqDVZAIJV59VpQ5DxGI6tMX9h9kkHSz\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
   securitySchemes:
     BearerAuth:
       type: http
@@ -577,9 +577,3 @@ components:
             status: 503
             code: UNAVAILABLE
             message: Service unavailable
-    Generic200:
-      description: Updated
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ReceiverSessionStatus'
