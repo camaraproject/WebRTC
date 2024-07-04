@@ -22,9 +22,8 @@ Repository to describe, develop, document and test the WebRTC API family
 
 ## Meetings
 * Meetings are held virtually
-* Schedule: Tuesdays 4pm CET each 15 days
-* Meeting link: [Microsoft Teams](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NzY5YjcyMDgtYzY3ZS00Nzk0LWI0ZWMtZDQzZjJjYTQwMmNk%40thread.v2/0?context=%7b%22Tid%22%3a%229744600e-3e04-492e-baa1-25ec245c6f10%22%2c%22Oid%22%3a%2286dd8610-2012-48f8-acc8-9bcae0975a71%22%7d)
-
+* Schedule: Tuesdays 4pm CEST (Madrid, Paris, Berlin, Rome), each 15 days
+* Meeting link: [LFX Zoom](https://zoom-lfx.platform.linuxfoundation.org/meeting/99827941663?password=ac67c375-4795-4389-93b5-bb5ed5ef0977).
 ## Contributorship and mailing list
 * To subscribe / unsubscribe to the mailing list of this Sub Project and thus be / resign as Contributor please visit <https://lists.camaraproject.org/g/sp-rtc>.
 * A message to all Contributors of this Sub Project can be sent using <sp-rtc@lists.camaraproject.org>.
