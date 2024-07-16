@@ -20,8 +20,14 @@ Repository to describe, develop, document and test the WebRTC API family
 * Started: September 2023
 * Location: virtually  
 
+## API Documentation
+
+* Find API reference documentation at folder: [code/API_definitions](code/API_definitions/)
+* Find detailed detailed API explanations at folder: [documentation/API_documentation](documentation/API_documentation)
+
 ## Meetings
 * Meetings are held virtually
+  * Find meeting notes at https://wiki.camaraproject.org/display/CAM/WebRTC+Meeting+Minutes
 * Schedule: Tuesdays 4pm CEST (Madrid, Paris, Berlin, Rome), each 15 days
 * Meeting link: [LFX Zoom](https://zoom-lfx.platform.linuxfoundation.org/meeting/99827941663?password=ac67c375-4795-4389-93b5-bb5ed5ef0977).
 ## Contributorship and mailing list
