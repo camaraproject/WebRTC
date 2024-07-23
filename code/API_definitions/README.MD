@@ -29,9 +29,9 @@ Use the previous links to check the DEV main version of the API. Copy & paste an
 * Swagger: https://editor.swagger.io/
 
 
-## Build HTLM from sources
+## Build HTML from sources
 
-Build an HTLM from sources using a local build OpenAPI v3 compatible like Node `redocly/cli`
+Build an HTML from sources using a local build OpenAPI v3 compatible like Node `redocly/cli`
 
 Execute redocly for each API document, use -o to 
 ```
