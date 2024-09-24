@@ -1,4 +1,4 @@
-@startuml BYON Callhandling 0.1.2
+@startuml BYON-Callhandling-0_1_2
 
 title "BYON WEB RTC FLOW - Call handling v0.1.2"
 autonumber "<font color=blue><b>[0]"
