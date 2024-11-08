@@ -91,8 +91,8 @@ info:
     Find more information at the Schema description.
 
     A `org.camaraproject.webrtc-events.registration` event includes two main use cases: update about netowrk status of the registration **and** provide notification about requested sessions (incoming calls).
-        
-    On one hand, it provides the same session information received using the WebRTC BYON RACM API, when retrieving information from the GET /racm/sessions/{racmSessionId} endpoint. Mainly it includes a unique registration ID, and the registration status. A valid `Registered` registration status grants that endpoint is visible for the network, since an invalid `Unregistered` status value means that network considers your endpoint unreachable. 
+
+    On one hand, it provides the same session information received using the WebRTC BYON RACM API, when retrieving information from the GET /racm/sessions/{racmSessionId} endpoint. Mainly it includes a unique registration ID, and the registration status. A valid `Registered` registration status grants that endpoint is visible for the network, since an invalid `Unregistered` status value means that network considers your endpoint unreachable.
 
     When a new session is requested, it includes the context information: caller and possible carrier data to contextualize (call subject, branding info, etc) and a unique SessionId, with this SessionId is possible to create a subscription and receive events about the call itself and its status progressing on the telco network.
 
@@ -459,9 +459,9 @@ components:
     Config:
       description: |-
         Implementation-specific configuration parameters needed by the subscription manager for acquiring events. `subscriptionExpireTime`, `subscriptionMaxEvents`, `initialEvent` are predefined for CAMARA specifications.
-        
+
         WebRTC specific event type attributes are included into `subscriptionDetail`
-        
+
         Note: if a request is performed for several event type, all subscribed event will use same `config` parameters.
       type: object
       required:
@@ -601,7 +601,7 @@ components:
           - Events triggered for any media session related event (e.g. far end new media endpoints)
         - `org.camaraproject.webrtc-events.registration`
           - Events triggered for any media endpoint registration event (e.g. incomming session)
-          
+
         `subscription-ends` is not supported for subscription. Sent by defatult
       enum:
         - org.camaraproject.webrtc-events.session
@@ -734,7 +734,7 @@ components:
             - $ref: "#/components/schemas/SubscriptionEnds"
           description: |-
             Event details payload. Depending of the event type, it will will include one of the data structures defined on this specification. Along with the subscription-ends, that is an authomatic event.
-            
+
             Check the introduction documentation and the CAMARA WebRTC BYON APIs for extra info about data structures included on the events.
         time:
           $ref: "#/components/schemas/DateTime"
@@ -779,8 +779,8 @@ components:
     RegistrationEvent:
       description: |-
         A `org.camaraproject.webrtc-events.registration` event includes two main use cases: update about netowrk status of the registration **and** provide notification about requested sessions (incoming calls).
-        
-        On one hand, it provides the same session information received using the WebRTC BYON RACM API, when retrieving information from the GET /racm/sessions/{racmSessionId} endpoint. Mainly it includes a unique registration ID, and the registration status. A valid `Registered` registration status grants that endpoint is visible for the network, since an invalid `Unregistered` status value means that network considers your endpoint unreachable. 
+
+        On one hand, it provides the same session information received using the WebRTC BYON RACM API, when retrieving information from the GET /racm/sessions/{racmSessionId} endpoint. Mainly it includes a unique registration ID, and the registration status. A valid `Registered` registration status grants that endpoint is visible for the network, since an invalid `Unregistered` status value means that network considers your endpoint unreachable.
 
         When a new session is requested, it includes the context information: caller and possible carrier data to contextualize (call subject, branding info, etc) and a unique SessionId, with this SessionId is possible to create a subscription and receive events about the call itself and its status progressing on the telco network.
 
@@ -898,7 +898,7 @@ components:
         sdp:
           type: string
           description: |-
-            An inlined session description in SDP format [RFC4566].If XML syntax is used, the content of this element SHALL be embedded in a CDATA section 
+            An inlined session description in SDP format [RFC4566].If XML syntax is used, the content of this element SHALL be embedded in a CDATA section
 
     # CloudEvent and CAMARA standard
     EventSubscriptionEnds:
@@ -1388,11 +1388,11 @@ components:
       description: |-
         A sample of WebRTC **registration** subscription for phone number
         `+1234567890` at `acme.opentelco.com`.
-        
+
         This will be used to receive incoming sessions (incoming
         calls) and to be aware of registration status updates from the server.
         (i.e. when a REGISTRATION expires).
-        
+
         The provided example will be able to receive up to 50 calls until
         subscription is cancelled via server or by configuration timeout. Check
         callback examples to check some possible events received:
@@ -1442,7 +1442,7 @@ components:
     NEW_SESSION_INCOMING:
       description: |-
         Example of `resgitration` events.
-      
+
         A new WebRTC session is requested (i.e. incoming call). This event
         starts a session negotiation. All other eventes related with this
         webrtc session will be shared via the session events.
@@ -1459,7 +1459,7 @@ components:
           subscriptionId: 987654321
           subscriber:
             username: "tel:+447911123456"
-            domain: acme.opentelco.com 
+            domain: acme.opentelco.com
           registration:
             status: active
           session:
@@ -1470,12 +1470,12 @@ components:
               username: "+1987654320"
               domain: opentelco.com
             status: initial
-            remoteSdp: "<SDP_WEBRTC_OFFER>" 
+            remoteSdp: "<SDP_WEBRTC_OFFER>"
             webrtcSessionId: 1f14dc636262b319-22@0.0.0.0
     REGISTRATION_REVOKED:
       description: |-
         Example of `resgitration` events.
-        
+
         When a re-registration is requested from server, maybe due
         administrative token revocation or due any other technical reason. It
         is expected from the endpoint to re-register. No new sessions will be
@@ -1491,7 +1491,7 @@ components:
           subscriptionId: 987654321
           subscriber:
             username: "tel:+447911123456"
-            domain: acme.opentelco.com 
+            domain: acme.opentelco.com
           registration:
             status: inactive
     SESSION_UPDATE:
@@ -1502,4 +1502,4 @@ components:
         status, due changes on the SDP of both parties and / or on the SIP
         session established on the other side of the gateway.
       value:
-    
+
