@@ -805,6 +805,9 @@ components:
             subject:
               type: string
               description: Subject of the call
+            sessionId:
+              type: string
+              description: Unique identifier of the session to subscribe to notifications
 
     RegistrationStatus:
       type: string
@@ -1403,7 +1406,7 @@ components:
         protocol: HTTP
         sink: https://notificationServer.opentelco.com
         types:
-         - org.camaraproject.webrtc-events.registration
+          - org.camaraproject.webrtc-events.registration
         config:
           subscriptionDetail:
             deviceId: "1qazxsw23edc"
@@ -1427,7 +1430,7 @@ components:
         protocol: HTTP
         sink: https://notificationServer.opentelco.com
         types:
-         - org.camaraproject.webrtc-events.session
+          - org.camaraproject.webrtc-events.session
         config:
           subscriptionDetail:
             deviceId: "1qazxsw23edc"
@@ -1456,22 +1459,19 @@ components:
         datacontenttype: application/json
         time: 2024-11-05T05:40:23.682Z
         data:
-          subscriptionId: 987654321
-          subscriber:
-            username: "tel:+447911123456"
-            domain: acme.opentelco.com
-          registration:
-            status: active
-          session:
-            to:
-              username: "+1987654320"
-              domain: opentelco.com
-            from:
-              username: "+1987654320"
-              domain: opentelco.com
-            status: initial
-            remoteSdp: "<SDP_WEBRTC_OFFER>"
-            webrtcSessionId: 1f14dc636262b319-22@0.0.0.0
+          subscriptionId: qs15-h556-rt89-1298
+          msisdn: "+8801500121121"
+          regStatus: Registered
+          sessionRequest:
+            originator:
+              username: "tel:+447911123456"
+              domain: acme.opentelco.com
+            receiver:
+              username: "tel:+447911123456"
+              domain: acme.opentelco.com
+            subject: "Not defined"
+            sessionid: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
+
     REGISTRATION_REVOKED:
       description: |-
         Example of `resgitration` events.
@@ -1489,6 +1489,7 @@ components:
         time: 2024-11-05T05:40:23.682Z
         data:
           subscriptionId: 987654321
+          msisdn: "+8801500121121"
           subscriber:
             username: "tel:+447911123456"
             domain: acme.opentelco.com
@@ -1502,4 +1503,23 @@ components:
         status, due changes on the SDP of both parties and / or on the SIP
         session established on the other side of the gateway.
       value:
-
+        id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
+        source: https://notificationServer.opentelco.com
+        type: org.camaraproject.webrtc-events.registration
+        specversion: "1.0"
+        datacontenttype: application/json
+        time: 2024-11-05T05:40:23.682Z
+        data:
+          originator:
+            username: "tel:+447911123456"
+            domain: acme.opentelco.com
+          receiver:
+            username: "tel:+447956781234"
+            domain: acme.opentelco.com
+          status: "Proceeding"
+          offer:
+            sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\na=extmap:2 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=sendrecv\r\na=rtcp-mux\r\na=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ruAnBNYnTJqDVZAIJV59VpQ5DxGI6tMX9h9kkHSz\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
+          answer:
+            sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\na=extmap:2 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=sendrecv\r\na=rtcp-mux\r\na=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ruAnBNYnTJqDVZAIJV59VpQ5DxGI6tMX9h9kkHSz\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
+          clientCorrelator: fda6e26d-e7c8-4596-870c-c083c0d39b2c
+          vvoipSessionId: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
