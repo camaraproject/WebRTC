@@ -5,39 +5,45 @@ info:
     ## 1. Introduction
 
     This API provide REST API for a client, browser or native application, to
-    receive events about state of the call or updated of th registration status.
-    Any device can check for its own active registrations and calls, allowing
-    them to receive updates about the status of its registrations and calls and
-    progress them to the UI.
+    receive events about updates of an active session or new sessions requests
+    (incoming calls).
+
+    Any device can subscribe for events its own active sessions using the
+    `sessionId` to identify the session to track. And using a valid
+    `racmSessionId` it can subscribe to new sessions events. This allows them
+    to update the UI while WebRTC sessions are progressing and also, allows
+    them to receive new session request, generating incoming call scenarios for
+    non SIM devices.
 
     A classic use case is the negotiation of a live WebRTC session (call), that
     requires multiple asynchronous events from server side. Other classic
     example, is to notify that a subscriber is not logged into the network
-    anymore, for example, when the IMS expires the registration.
+    anymore and requires refresh, for example, when the IMS expires the
+    endpoint registration.
 
-    In adition, this API, allows to an external service to create "notification
+    In addition, this API, allows to an external service to create "notification
     channels" for other systems that does no support the async event mechanisms.
     For instance, a classic browser using websockets to receive server-side
     events.
 
     **Use cases to cover:**
       - Functional:
-        - A push notitification service based on an external webhook
+        - A push notification service based on an external webhook
         - A browser that requires a WS to receive events from the server side.
           - This will require to create a dedicated endpoint using the
             NotificationChannel API
       - Observability:
         - A monitoring system that wants to monitor registration status of
           endpoints
-        - A call audit application that requires to remotly monitor call status
+        - A call audit application that requires to remotely monitor call status
 
     ## 2. Relevant terms and definitions
 
     - **BYON**: Bring Your Own Number. A commercial name for the functionality
-      to use your telco credentials and phone number identity to no-SIM devices
-      using WebRTC sessions.
-    - **session**: A media session, an exchange of media between endpoints,
-      usually knonw as a "single one-to-one call".
+      to use your network credentials and phone number identity to no-SIM
+      devices using WebRTC sessions.
+    - **session**: A media session, an exchange of media between endpoints.
+      Typical example of session is a "single one-to-one call".
     - **registration**: An endpoint status were it is properly identified to be
       reachable by the server side of the WebRTC gateway.
 
@@ -55,66 +61,103 @@ info:
 
     Following event types are managed for this API:
 
-    - `org.camaraproject.webrtc-events.session`
+    - `org.camaraproject.webrtc-events.session-status`
 
-      - Events triggered for any media session related event (e.g. far end new media endpoints)
+      - Events triggered for any media session related event (e.g. far end new
+        media endpoints)
 
-    - `org.camaraproject.webrtc-events.registration`
+    - `org.camaraproject.webrtc-events.session-invitation`
 
-      - Events triggered for any media endpoint registration event (e.g. incomming session)
+      - Events triggered when a new session is requested (e.g. incoming call
+        received)
 
     Note: Additionally to these list, ``org.camaraproject.webrtc-events.subscription-ends``
     notification `type` is sent when the subscription ends.
     This notification does not require dedicated subscription.
 
     It is used when:
-    - the subscription expire time (optionally set by the requester) has been reached
-    - the maximum number of subscription events (optionally set by the requester) has been reached
+    - the subscription expire time has been reached (optionally set by the
+      requester)
+    - the maximum number of subscription events has been reached (optionally
+      set by the requester)
     - the subscription was deleted by the requester
-    - the Access Token `sinkCredential` (optionally set by the requester) expiration time has been reached
+    - the Access Token `sinkCredential` expiration time has been reached
+      (optionally set by the requester)
     - the API server has to stop sending notification prematurely
 
-    ### 3.1. Session events
+    ### 3.1. Session events (session-status)
 
     Find more information at the Schema description.
 
-    A `org.camaraproject.webrtc-events.session` event includes the same session information received using the WebRTC BOYN CallHandling API, when retrieving information from the GET /vvoip/session/{vvoipSessionID} endpoint.
+    A `org.camaraproject.webrtc-events.session-status` event includes
+    session information updates. With the same schema that is used with the
+    WebRTC BYON CallHandling API, when retrieving information from the
+    `GET /vvoip/session/{vvoipSessionID}` endpoint.
 
-    In general lines, it is receive each time that an event happens with the session. This might happen when a call is received, when SDP updates are included for any party or when the call is finished due an ordered cleanup or a service outage.
+    In general lines, it is emitted each time that an event happens within the
+    subscribed session. This might happen when SDP updates are included for any
+    party or when the call is finished due an ordered cleanup or a service
+    outage. Any other any relevant internal event could be transmitted through
+    this channel (eg.: Any SIP response is potentially a
+    session-status event.
 
     Regarding the SDP descriptions for offer and answer:
-    - The offer, which MUST be present in a request from the application to the server to create a session. Note that the offer can be absent in a session created by the server as part of an offerless INVITE [RFC3261].
-    - For the answer. This type represents an answer in WebRTC Signaling. This element is not present in case there is no answer yet, or the session invitation has been declined by the Terminating Participant. This element MUST NOT be present in a request from the application to the server to create a session.
+    - The offer, which MUST be present in a request from the application to the
+      server to create a session. Note that the offer can be absent in a session
+      created by the server as part of an offerless INVITE [RFC3261].
+    - For the answer. This type represents an answer in WebRTC Signaling. This
+      element is not present in case there is no answer yet, or the session
+      invitation has been declined by the Terminating Participant. This element
+      MUST NOT be present in a request from the application to the server to
+      create a session.
 
-    ### 3.2. Registration events
+    ### 3.2. New session request (session-invitation)
 
     Find more information at the Schema description.
 
-    A `org.camaraproject.webrtc-events.registration` event includes two main use cases: update about netowrk status of the registration **and** provide notification about requested sessions (incoming calls).
+    A `org.camaraproject.webrtc-events.session-invitation` event
+    includes information about new requested sessions (incoming calls), it
+    requires a valid registration on the network.
 
-    On one hand, it provides the same session information received using the WebRTC BYON RACM API, when retrieving information from the GET /racm/sessions/{racmSessionId} endpoint. Mainly it includes a unique registration ID, and the registration status. A valid `Registered` registration status grants that endpoint is visible for the network, since an invalid `Unregistered` status value means that network considers your endpoint unreachable.
+    This event is triggered each time that the endpoint is requested to join
+    an incoming new session. This is done, usually, to indicate that a new
+    WebRTC "call" is incoming. In practical terms, this is a new WebRTC
+    session that requests the endpoint presence. The event include all
+    functional information required to join the session (media info, caller).
 
-    When a new session is requested, it includes the context information: caller and possible carrier data to contextualize (call subject, branding info, etc) and a unique SessionId, with this SessionId is possible to create a subscription and receive events about the call itself and its status progressing on the telco network.
+    When a new session is requested, it will include context information:
+    identification of the caller and other possible carrier data to
+    contextualize (call subject, branding info, etc). It will also include
+    a unique SessionId, to create a dedicated subscription and receive events
+    about the session itself and its status progressing inside the network.
 
-    **NOTE**: The `Unregistered` status will be only provided by the notification service, a GET /racm/sessions/ for an unregistered endpoint will produce an 404 response.
+    ### 3.3. Subscription ends (subscription-ends)
+
+    A `org.camaraproject.webrtc-events.subscription-ends` event will indicate
+    that the endpoint will not be notified if a new session is received. From
+    the developer point of view the reception of the `subscription-ends` should
+    be an indicator to check the registration status and try to register again.
 
     ## 4. Authorization and authentication
 
-    The "Camara Security and Interoperability Profile" provides details on how a client requests
-    an access token. Please refer to Identify and Consent Management
-    (https://github.com/camaraproject/IdentityAndConsentManagement/) for the released version of
+    The "Camara Security and Interoperability Profile" provides details on how
+    a client requests an access token. Please refer to [Identify and Consent
+    Management](https://github.com/camaraproject/IdentityAndConsentManagement/)
+    for the released version of
     the Profile.
 
-    Which specific authorization flows are to be used will be determined during onboarding process,
-    happening between the API Client and the API Provider, taking into account the declared purpose
-    for accessing the API, while also being subject to the prevailing legal framework dictated by
-    local legislation.
+    Which specific authorization flows are to be used will be determined during
+    onboarding process, happening between the API Client and the API Provider,
+    taking into account the declared purpose for accessing the API, while also
+    being subject to the prevailing legal framework dictated by local
+    legislation.
 
-    It is important to remark that in cases where personal user data is processed by the API, and
-    users can exercise their rights through mechanisms such as opt-in and/or opt-out, the use of
-    3-legged access tokens becomes mandatory. This measure ensures that the API remains in strict
-    compliance with user privacy preferences and regulatory obligations, upholding the principles
-    of transparency and user-centric data control.
+    It is important to remark that in cases where personal user data is
+    processed by the API, and users can exercise their rights through
+    mechanisms such as opt-in and/or opt-out, the use of 3-legged access tokens
+    becomes mandatory. This measure ensures that the API remains in strict
+    compliance with user privacy preferences and regulatory obligations,
+    upholding the principles of transparency and user-centric data control.
 
     ## 5. Further info and support
     (Will be added in a later version of the documentation)
@@ -150,14 +193,14 @@ paths:
       tags:
         - webrtc-events Subscription
       summary: "Create a webrtc-events event subscription"
-      description: Create a webrtc-events event subscription. For the correspoding type, `session` or `registration`.
+      description: Create a webrtc-events event subscription. For the corresponding type, `session` or `registration`.
       operationId: createNotificationChannelSubscription
       parameters:
         - $ref: "#/components/parameters/x-correlator"
       security:
         - openId:
-            - webrtc-events:org.camaraproject.webrtc-events.session:create
-            - webrtc-events:org.camaraproject.webrtc-events.registration:create
+            - webrtc-events:org.camaraproject.webrtc-events.session-status:create
+            - webrtc-events:org.camaraproject.webrtc-events.session-invitation:create
       requestBody:
         content:
           application/json:
@@ -431,8 +474,8 @@ components:
         types:
           description: |-
             Camara Event types eligible to be delivered by this subscription.
-            Note: for the Commonalities meta-release v0.4 we enforce to have only event type per subscription then for following meta-release use of array MUST be decided
-             at API project level.
+            Note: for the Commonalities meta-release v0.4 we enforce to have only event type per subscription
+            then for following meta-release use of array MUST be decided at API project level.
           type: array
           minItems: 1
           maxItems: 1
@@ -445,25 +488,22 @@ components:
         mapping:
           HTTP: "#/components/schemas/HTTPSubscriptionRequest"
 
-    Protocol:
-      type: string
-      enum: ["HTTP"]
-      description: Identifier of a delivery protocol. Only HTTP is allowed for now
-      example: "HTTP"
-
     Config:
       description: |-
-        Implementation-specific configuration parameters needed by the subscription manager for acquiring events. `subscriptionExpireTime`, `subscriptionMaxEvents`, `initialEvent` are predefined for CAMARA specifications.
+        Implementation-specific configuration parameters needed by the subscription manager for acquiring
+        events. `subscriptionExpireTime`, `subscriptionMaxEvents`, `initialEvent` are predefined for CAMARA
+        specifications.
 
-        WebRTC specific event type attributes are included into `subscriptionDetail`
+        WebRTC specific event type attributes are included into `WebrtcSubscriptionDetail` schema.
 
-        Note: if a request is performed for several event type, all subscribed event will use same `config` parameters.
+        Note: if a request is performed for several event type, all subscribed event will use same `config`
+        parameters.
       type: object
       required:
         - subscriptionDetail
       properties:
         subscriptionDetail:
-          $ref: "#/components/schemas/SubscriptionDetail"
+          $ref: "#/components/schemas/WebrtcSubscriptionDetail"
         subscriptionExpireTime:
           type: string
           format: date-time
@@ -480,6 +520,12 @@ components:
             Set to `true` by API consumer if consumer wants to get an event as soon as the subscription is created and current situation reflects event request.
             Example: Consumer request Roaming event. If consumer sets initialEvent to true and device is in roaming situation, an event is triggered
             Up to API project decision to keep it.
+
+    Protocol:
+      type: string
+      enum: ["HTTP"]
+      description: Identifier of a delivery protocol. Only HTTP is allowed for now
+      example: "HTTP"
 
     SinkCredential:
       description: A sink credential provides authentication or authorization information necessary to enable delivery of events to a target.
@@ -572,49 +618,66 @@ components:
         - refreshToken
         - refreshTokenEndpoint
 
-    SubscriptionDetail:
+    WebrtcSubscriptionDetail:
       description: |-
-        The detail of the requested event subscription. `registration` event subscription requires a the subscriber information, while `session` event subscription requires both, the user information and the sessionId to subscribe to.
+        The detail of the requested event subscription.
+        - org.camaraproject.webrtc-events.session-invitation requires a
+          valid `racmSessionId` obtained via RACM endpoint.
+        - org.camaraproject.webrtc-events.session-status requires both, a
+          valid `racmSessionId` obtained via RACM endpoint and a valid
+          `sessionId` obtained via session-invitation event or via CallHandling
+          API
       type: object
       required:
         - deviceId
+        - racmSessionId
       properties:
         deviceId:
           type: string
           example: 1qazxsw23edc
+          description: The device-id of the client in UUID format.
         sessionId:
           type: string
+          example: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EFAAF209EE52FD0BECC5B7CDE645F50DE7D
+          description: |-
+            The VVOIP session ID created by WebRTC Gateway.
+            The sessionID will identify a unique session between the WebRTC
+            Gateway and the device client.
+            It will be included on the events generated.
+        racmSessionId:
+          type: string
           example: xsmcaum3z4zw4l0cu4w115m0
-        subscriber:
-          $ref: "#/components/schemas/SubscriberUser"
+          description: |-
+            The RACM session ID created by WebRTC Gateway.
+            Obtained via RACM API.
 
     SubscriptionEventTypeNotification:
       type: string
       description: |-
         event-type - Event triggered when an event-type event occurred
-        - `org.camaraproject.webrtc-events.session`
+        - `org.camaraproject.webrtc-events.session-status`
           - Events triggered for any media session related event (e.g. far end new media endpoints)
-        - `org.camaraproject.webrtc-events.registration`
-          - Events triggered for any media endpoint registration event (e.g. incomming session)
+        - `org.camaraproject.webrtc-events.session-invitation`
+          - Events triggered for any media endpoint registration event (e.g. incoming session)
 
-        `subscription-ends` is not supported for subscription. Sent by defatult
+        `subscription-ends` is not supported for subscription. Sent by default
       enum:
-        - org.camaraproject.webrtc-events.session
-        - org.camaraproject.webrtc-events.registration
+        - org.camaraproject.webrtc-events.session-status
+        - org.camaraproject.webrtc-events.session-invitation
 
     EventTypeNotification:
       type: string
       description: |-
         event-type - Event triggered when an event-type event occurred
-        - `org.camaraproject.webrtc-events.session`
+        - `org.camaraproject.webrtc-events.session-status`
           - Events triggered for any media session related event (e.g. far end new media endpoints)
-        - `org.camaraproject.webrtc-events.registration`
-          - Events triggered for any media endpoint registration event (e.g. incomming session)
+        - `org.camaraproject.webrtc-events.session-invitation`
+          - Events triggered for any media endpoint registration event (e.g. incoming session)
         - `org.camaraproject.webrtc-events.subscription-ends`
           - Event triggered when the subscription ends
       enum:
-        - org.camaraproject.webrtc-events.session
-        - org.camaraproject.webrtc-events.registration
+        - org.camaraproject.webrtc-events.session-status
+        - org.camaraproject.webrtc-events.session-invitation
         - org.camaraproject.webrtc-events.subscription-ends
 
     Subscription:
@@ -677,11 +740,6 @@ components:
         propertyName: protocol
         mapping:
           HTTP: '#/components/schemas/HTTPSubscriptionResponse'
-          MQTT3: '#/components/schemas/MQTTSubscriptionResponse'
-          MQTT5: '#/components/schemas/MQTTSubscriptionResponse'
-          AMQP: '#/components/schemas/AMQPSubscriptionResponse'
-          NATS: '#/components/schemas/NATSSubscriptionResponse'
-          KAFKA: '#/components/schemas/ApacheKafkaSubscriptionResponse'
 
     SubscriptionAsync:
       description: Response for a event-type subscription request managed asynchronously (Creation or Deletion)
@@ -724,8 +782,8 @@ components:
         data:
           type: object
           oneOf:
-            - $ref: "#/components/schemas/EventRegistration"
-            - $ref: "#/components/schemas/EventSession"
+            - $ref: "#/components/schemas/SessionInvitationEvent"
+            - $ref: "#/components/schemas/SessionStatusEvent"
             - $ref: "#/components/schemas/SubscriptionEnds"
           description: |-
             Event details payload. Depending of the event type, it will will include one of the data structures defined on this specification. Along with the subscription-ends, that is an authomatic event.
@@ -736,8 +794,8 @@ components:
       discriminator:
         propertyName: "type"
         mapping:
-          org.camaraproject.api-name.v0.resgistration: "#/components/schemas/EventRegistration"
-          org.camaraproject.api-name.v0.session: "#/components/schemas/EventSession"
+          org.camaraproject.api-name.v0.resgistration: "#/components/schemas/SessionInvitationEvent"
+          org.camaraproject.api-name.v0.session: "#/components/schemas/SessionStatusEvent"
           org.camaraproject.api-name.v0.subscription-ends: "#/components/schemas/EventSubscriptionEnds"
 
     Source:
@@ -762,85 +820,79 @@ components:
       description: Timestamp of when the occurrence happened. Must adhere to RFC 3339.
       example: "2018-04-05T17:31:00Z"
 
-    EventRegistration:
-      description: Event detail structure for REGISTRATION events
-      allOf:
-        - $ref: "#/components/schemas/CloudEvent"
-        - type: object
-          properties:
-            data:
-              $ref: "#/components/schemas/RegistrationEvent"
-
-    RegistrationEvent:
+    SessionInvitationEvent:
       description: |-
-        A `org.camaraproject.webrtc-events.registration` event includes two main use cases: update about netowrk status of the registration **and** provide notification about requested sessions (incoming calls).
+        A `org.camaraproject.webrtc-events.session-invitation` event includes two main use cases: update about network status of the registration **and** provide notification about requested sessions (incoming calls).
 
         On one hand, it provides the same session information received using the WebRTC BYON RACM API, when retrieving information from the GET /racm/sessions/{racmSessionId} endpoint. Mainly it includes a unique registration ID, and the registration status. A valid `Registered` registration status grants that endpoint is visible for the network, since an invalid `Unregistered` status value means that network considers your endpoint unreachable.
 
         When a new session is requested, it includes the context information: caller and possible carrier data to contextualize (call subject, branding info, etc) and a unique SessionId, with this SessionId is possible to create a subscription and receive events about the call itself and its status progressing on the telco network.
 
         **NOTE**: The `Unregistered` status will be only provided by the notification service, a GET /racm/sessions/ for an unregistered endpoint will produce an 404 response.
-      type: object
-      properties:
-        subscriptionId:
-          $ref: "#/components/schemas/SubscriptionId"
-        msisdn:
-          type: string
-          description: The MSISDN is the mapping of the telephone number to the subscriber identity module in a mobile or cellular phone system. A unique identifier on the network to this subscriber.
-        regStatus:
-          $ref: '#/components/schemas/RegistrationStatus'
-        sessionRequest:
-          description: Object present only when receiving a new session request
-          type: object
-          properties:
-            originator:
-              $ref: "#/components/schemas/SubscriberUser"
-            receiver:
-              $ref: "#/components/schemas/SubscriberUser"
-            subject:
-              type: string
-              description: Subject of the call
-            sessionId:
-              type: string
-              description: Unique identifier of the session to subscribe to notifications
-
-    RegistrationStatus:
-      type: string
-      enum:
-        - Registered
-        - Unregistered
-
-    EventSession:
-      description: event structure for session events
       allOf:
-        - $ref: "#/components/schemas/CloudEvent"
         - type: object
-          properties:
-            data:
-              $ref: "#/components/schemas/SessionInformation"
+        - $ref: '#/components/schemas/SessionStatusEvent'
 
-    SessionInformation:
+    SessionStatusEvent:
       description: |-
-        A `org.camaraproject.webrtc-events.registration` event includes the same session information received using the WebRTC BOYN CallHandling API, when retrieving information from the GET /vvoip/session/{vvoipSessionID} endpoint.
+        A `org.camaraproject.webrtc-events.session-session` event includes the session updates provided by
+        the server. This will include actions form the endpoint and the server (far end).
 
-        In general lines, it is receive each time that an event happens with the session. This might happen when a call is received, when SDP updates are included for any party or when the call is finished due an ordered cleanup or a service outage.
+        In general terms, it is received each time that an event happens within the session, and include
+        all relevant info about the session update.
 
-        Regarding the SDP descriptions for offer and answer:
-        - The offer, which MUST be present in a request from the application to the server to create a session. Note that the offer can be absent in a session created by the server as part of an offerless INVITE [RFC3261].
-        - For the answer. This type represents an answer in WebRTC Signaling. This element is not present in case there is no answer yet, or the session invitation has been declined by the Terminating Participant. This element MUST NOT be present in a request from the application to the server to create a session.
+        Most common use is for SDP updates and signaling updates regarding call status.
       required:
         - vvoipSessionID
       type: object
       properties:
-        originator:
-          $ref: '#/components/schemas/SubscriberUser'
-        receiver:
-          $ref: '#/components/schemas/SubscriberUser'
+        originatorAddress:
+          type: string
+          description: Sender (originator) address
+          pattern: '^(tel:+[0-9]{5,15}|sip:.+@.+|.+)$'
+          example: 'tel:+11234567899'
+        originatorName:
+          type: string
+          description: Friendly name of the call originator
+          example: 'Alice'
+        receiverAddress:
+          type: string
+          description: Receiver (terminator) address
+          pattern: '^(tel:+[0-9]{5,15}|sip:.+@.+|.+)$'
+          example: 'tel:+11234567899'
+        receiverName:
+          type: string
+          description: Friendly name of the call terminator
+          example: 'Bob'
         status:
-          $ref: '#/components/schemas/SessionStatus'
+          type: string
+          description: |-
+            Provides the status of the VVOIP session. During the session creation,
+            this attribute contains 'Initial' value
+          example: Initial
+          enum:
+            - Initial
+            - InProgress
+            - Ringing
+            - Proceeding
+            - Connected
+            - Terminated
+            - Hold
+            - Resume
+            - SessionCancelled
+            - Declined
+            - Failed
+            - Waiting
+            - NoAnswer
+            - NotReachable
+            - Busy
         offer:
+          # allOf:
+          #   - description: SDP descriptor (RFC4566) for call originator
+          #   - $ref: '#/components/schemas/WrtcSDPDescriptor'
           $ref: '#/components/schemas/WrtcSDPDescriptor'
         answer:
+          # description: SDP descriptor (RFC4566) for call terminator
           $ref: '#/components/schemas/WrtcSDPDescriptor'
         clientCorrelator:
           type: string
@@ -849,46 +901,16 @@ components:
           type: string
           description: The VVOIP session ID created by WebRTC Gateway. The vvoipSessionID shall not be included in POST requests by the client, but must be included in the notifications from the WebRTC GW to client.
           example: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
-
-    SubscriberUser:
-      type: object
-      description: |-
-        Information about one of the participants on the WebRTC session. It can
-        be used to describe a caller or callee (source or destination). It can
-        be expanded to include any extra information for authentication out of
-        dialog.
-      properties:
-        address:
-          type: string
-          description: Sender or Receiver address
-          pattern: '^(tel:+[0-9]{5,15}|sip:.+@.+|.+)$'
-          example: 'tel:+11234567899'
-        name:
-          type: string
-          description: Friendly name of the originator
-          example: 'Jonh Doe'
-
-    SessionStatus:
-      type: string
-      description: |-
-        Provides the status of the VVOIP session. During the session creation,
-        this attribute contains 'Initial' value
-      enum:
-        - Initial
-        - InProgress
-        - Ringing
-        - Proceeding
-        - Connected
-        - Terminated
-        - Hold
-        - Resume
-        - SessionCancelled
-        - Declined
-        - Failed
-        - Waiting
-        - NoAnswer
-        - NotReachable
-        - Busy
+        callObjectRef:
+          description: The reference to the call object
+        serverCorrelator:
+          description: A correlator that the server instructs the client to use for end to end correlation.
+        offerRequired:
+          description: This element shall be included and set to true, if the session updates are received without SDP offer. This element indicates clients to send the offer.
+        reason:
+          description: The description of the event that has happened within the session
+        sequenceNumber:
+          description: The sequence number of the notification sent to client
 
     WrtcSDPDescriptor:
       type: object
@@ -969,6 +991,7 @@ components:
           description: The HTTP method to use for sending the message.
           enum:
             - POST
+
   responses:
     CreateSubscriptionBadRequest400:
       description: Problem with the client request
@@ -1282,7 +1305,7 @@ components:
         protocol: HTTP
         sink: https://notificationServer.opentelco.com
         types:
-          - org.camaraproject.webrtc-events.registration
+          - org.camaraproject.webrtc-events.session-invitation
         config:
           subscriptionDetail:
             deviceId: "1qazxsw23edc"
@@ -1306,7 +1329,7 @@ components:
         protocol: HTTP
         sink: https://notificationServer.opentelco.com
         types:
-          - org.camaraproject.webrtc-events.session
+          - org.camaraproject.webrtc-events.session-status
         config:
           subscriptionDetail:
             deviceId: "1qazxsw23edc"
@@ -1330,7 +1353,7 @@ components:
       value:
         id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
         source: https://notificationServer.opentelco.com
-        type: org.camaraproject.webrtc-events.registration
+        type: org.camaraproject.webrtc-events.session-invitation
         specversion: "1.0"
         datacontenttype: application/json
         time: 2024-11-05T05:40:23.682Z
@@ -1350,16 +1373,16 @@ components:
 
     REGISTRATION_REVOKED:
       description: |-
-        Example of `resgitration` events.
+        Example of `session-invitation` events.
 
         When a re-registration is requested from server, maybe due
         administrative token revocation or due any other technical reason. It
         is expected from the endpoint to re-register. No new sessions will be
-        delivered to the user endpoint, as the subscrition is not valid anymore.
+        delivered to the user endpoint, as the subscription is not valid anymore.
       value:
         id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
         source: https://notificationServer.opentelco.com
-        type: org.camaraproject.webrtc-events.registration
+        type: org.camaraproject.webrtc-events.session-invitation
         specversion: "1.0"
         datacontenttype: application/json
         time: 2024-11-05T05:40:23.682Z
