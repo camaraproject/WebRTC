@@ -816,28 +816,37 @@ components:
 
     SessionInvitationEvent:
       description: |-
-        A `org.camaraproject.webrtc-events.session-invitation` event includes two main use cases: update about network status of the registration **and** provide notification about requested sessions (incoming calls).
+        A `org.camaraproject.webrtc-events.session-invitation` event includes an specific type of session
+        update for new requested sessions. It is emitted when the endpoint is associated with a valid
+        registration and the endpoint is susbcribed to recive new incoming calls.
 
-        On one hand, it provides the same session information received using the WebRTC BYON RACM API, when retrieving information from the GET /racm/sessions/{racmSessionId} endpoint. Mainly it includes a unique registration ID, and the registration status. A valid `Registered` registration status grants that endpoint is visible for the network, since an invalid `Unregistered` status value means that network considers your endpoint unreachable.
+        This event includes all the context information: caller, callee and possible carrier data to
+        contextualize (call subject, branding info, etc). It MUST include a vvoipSessionId, to allow the
+        endpoint to subscribe to this new call session.
 
-        When a new session is requested, it includes the context information: caller and possible carrier data to contextualize (call subject, branding info, etc) and a unique SessionId, with this SessionId is possible to create a subscription and receive events about the call itself and its status progressing on the telco network.
-
-        **NOTE**: The `Unregistered` status will be only provided by the notification service, a GET /racm/sessions/ for an unregistered endpoint will produce an 404 response.
       allOf:
         - type: object
-        - $ref: '#/components/schemas/SessionStatusEvent'
+        - $ref: '#/components/schemas/SessionEvent'
 
     SessionStatusEvent:
       description: |-
-        A `org.camaraproject.webrtc-events.session-session` event includes the session updates provided by
+        A `org.camaraproject.webrtc-events.session-status` event includes the session updates provided by
         the server. This will include actions form the endpoint and the server (far end).
 
         In general terms, it is received each time that an event happens within the session, and include
         all relevant info about the session update.
 
         Most common use is for SDP updates and signaling updates regarding call status.
+
+      allOf:
+        - type: object
+        - $ref: '#/components/schemas/SessionEvent'
+
+    SessionEvent:
+      description: |-
+        A prototype for Webrtc events. Used at `SessionStatusEvent` and `SessionInvitationEvent` schemas
       required:
-        - vvoipSessionID
+        - vvoipSessionId
       type: object
       properties:
         subscriptionId:
@@ -1305,9 +1314,7 @@ components:
         config:
           subscriptionDetail:
             deviceId: "1qazxsw23edc"
-            subscriber:
-              address: "tel:+447911123456"
-              name: Jonh Doe
+            racmSessionId: "xsmcaum3z4zw4l0cu4w115m0"
           initialEvent: true
           subscriptionMaxEvents: 50
           subscriptionExpireTime: "2024-11-17T13:18:23.682Z"
@@ -1329,23 +1336,26 @@ components:
         config:
           subscriptionDetail:
             deviceId: "1qazxsw23edc"
+            racmSessionId: "xsmcaum3z4zw4l0cu4w115m0"
             subscriber:
               address: "tel:+447911123456"
               name: Jonh Doe
-            sessionId: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
+            vvoipSessionId: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
           initialEvent: true
           subscriptionMaxEvents: 50
           subscriptionExpireTime: "2024-11-17T13:18:23.682Z"
     # Event examples
     NEW_SESSION_INCOMING:
       description: |-
-        Example of `resgitration` events.
+        Example of `session-invitation` event.
 
         A new WebRTC session is requested (i.e. incoming call). This event
         starts a session negotiation. All other eventes related with this
         webrtc session will be shared via the session events.
 
-        Check example SESSION_UPDATE
+        Main point to distinguish between a *new session* and an update over
+        an *existing session* is the type. A `session-invitation` is described
+        here with all information required to initiate a new voice-video call.
       value:
         id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
         source: https://notificationServer.opentelco.com
@@ -1355,26 +1365,31 @@ components:
         time: 2024-11-05T05:40:23.682Z
         data:
           subscriptionId: qs15-h556-rt89-1298
-          msisdn: "+8801500121121"
-          regStatus: Registered
-          sessionRequest:
-            originator:
-              username: "tel:+447911123456"
-              domain: acme.opentelco.com
-            receiver:
-              username: "tel:+447911123456"
-              domain: acme.opentelco.com
-            subject: "Not defined"
-            sessionid: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
+          originatorAddress: tel:+11234567899
+          originatorName: Alice
+          receiverAddress: tel:+11234998765
+          receiverName: Bob
+          status: Initial
+          offer:
+            sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\na=extmap:2 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=sendrecv\r\na=rtcp-mux\r\na=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ruAnBNYnTJqDVZAIJV59VpQ5DxGI6tMX9h9kkHSz\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
+          clientCorrelator: 79520148-0e79-4bd8-adbf-d04c463de6ba
+          vvoipSessionId: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
+          reason: New subscriber incoming call
+          sequenceNumber: 1
 
     REGISTRATION_REVOKED:
       description: |-
-        Example of `session-invitation` events.
+        Example of `subscription-ends` events.
 
         When a re-registration is requested from server, maybe due
         administrative token revocation or due any other technical reason. It
         is expected from the endpoint to re-register. No new sessions will be
-        delivered to the user endpoint, as the subscription is not valid anymore.
+        delivered to the user endpoint, as the subscription is not valid
+        anymore.
+
+        Here, an example of how WebRTC GW will communicate to the client that
+        the subscription is not valida anymore, detailing on
+        `terminationDescription` the root cause of the susbcription remove.
       value:
         id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
         source: https://notificationServer.opentelco.com
@@ -1383,38 +1398,41 @@ components:
         datacontenttype: application/json
         time: 2024-11-05T05:40:23.682Z
         data:
-          subscriptionId: 987654321
-          msisdn: "+8801500121121"
-          subscriber:
-            username: "tel:+447911123456"
-            domain: acme.opentelco.com
-          registration:
-            status: inactive
+          subscriptionId: qs15-h556-rt89-1298
+          terminationReason: NETWORK_TERMINATED
+          terminationDescription: "SIP re-registration required"
     SESSION_UPDATE:
       description: |-
-        Example of `session` events.
+        Example of `session-status` events.
 
-        Session envents are produced when there is an update on the session
-        status, due changes on the SDP of both parties and / or on the SIP
-        session established on the other side of the gateway.
+        Session status events are produced when there is an update on the
+        session status, due changes on the signaling status of the call (eg.:
+        InProgress, Ringing, Proceeding, Connected, Terminated, ...) or due
+        SDP changes on any involved party.
+
+        This example, presents an SDP update due change on call status (to
+        Progress) and including answer SDP data. Customer client now, can
+        establish a voice-video channel and start transmitting and receiving
+        media.
       value:
         id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
         source: https://notificationServer.opentelco.com
-        type: org.camaraproject.webrtc-events.registration
+        type: org.camaraproject.webrtc-events.session-status
         specversion: "1.0"
         datacontenttype: application/json
         time: 2024-11-05T05:40:23.682Z
         data:
-          originator:
-            username: "tel:+447911123456"
-            domain: acme.opentelco.com
-          receiver:
-            username: "tel:+447956781234"
-            domain: acme.opentelco.com
-          status: "Proceeding"
+          subscriptionId: qs15-h556-rt89-1298
+          originatorAddress: tel:+11234567899
+          originatorName: Alice
+          receiverAddress: tel:+11234998765
+          receiverName: Bob
+          status: Progress
           offer:
             sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\na=extmap:2 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=sendrecv\r\na=rtcp-mux\r\na=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ruAnBNYnTJqDVZAIJV59VpQ5DxGI6tMX9h9kkHSz\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
           answer:
             sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\na=extmap:2 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=sendrecv\r\na=rtcp-mux\r\na=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ruAnBNYnTJqDVZAIJV59VpQ5DxGI6tMX9h9kkHSz\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
-          clientCorrelator: fda6e26d-e7c8-4596-870c-c083c0d39b2c
+          clientCorrelator: 79520148-0e79-4bd8-adbf-d04c463de6ba
           vvoipSessionId: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
+          reason: Answer SDP update
+          sequenceNumber: 3
