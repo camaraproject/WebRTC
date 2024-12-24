@@ -172,7 +172,7 @@ externalDocs:
   description: Product documentation at CAMARA
   url: https://github.com/camaraproject/
 servers:
-  - url: "{apiRoot}/webrtc-events/v0"
+  - url: "{apiRoot}/webrtc-events/vwip"
     variables:
       apiRoot:
         default: http://localhost:9091
@@ -316,7 +316,7 @@ paths:
         - $ref: "#/components/parameters/x-correlator"
       security:
         - openId:
-            - api-name:read
+            - webrtc-events:read
       responses:
         "200":
           description: List of event subscription details
@@ -349,7 +349,7 @@ paths:
       operationId: retrieveNotificationChannelSubscription
       security:
         - openId:
-            - api-name:read
+            - webrtc-events:read
       parameters:
         - $ref: "#/components/parameters/SubscriptionId"
         - $ref: "#/components/parameters/x-correlator"
@@ -383,7 +383,7 @@ paths:
       description: delete a given webrtc-events subscription.
       security:
         - openId:
-            - api-name:delete
+            - webrtc-events:delete
       parameters:
         - $ref: "#/components/parameters/SubscriptionId"
         - $ref: "#/components/parameters/x-correlator"
@@ -541,9 +541,7 @@ components:
         credentialType:
           type: string
           enum:
-            - PLAIN
             - ACCESSTOKEN
-            - REFRESHTOKEN
           description: "The type of the credential."
       discriminator:
         propertyName: credentialType
@@ -709,8 +707,8 @@ components:
         types:
           description: |-
             Camara Event types eligible to be delivered by this subscription.
-            Note: for the Commonalities meta-release v0.4 we enforce to have only event type per subscription then for following meta-release use of array MUST be decided
-             at API project level.
+            For Commonalities v0.4 we enforce to use one subscription per event type. In consequence,
+            this field is an array of a single element.
           type: array
           minItems: 1
           maxItems: 1
