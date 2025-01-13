@@ -1,0 +1,1404 @@
+openapi: 3.0.3
+info:
+  title: BYON WebRTC Event Subscription
+  description: |-
+    ## 1. Introduction
+
+    This API provide REST API for a client, browser or native application, to
+    receive events about updates of an active session or new sessions requests
+    (incoming calls).
+
+    Any device can subscribe for events its own active sessions using the
+    `sessionId` to identify the session to track. And using a valid
+    `racmSessionId` it can subscribe to new sessions events. This allows them
+    to update the UI while WebRTC sessions are progressing and also, allows
+    them to receive new session request, generating incoming call scenarios for
+    non SIM devices.
+
+    A classic use case is the negotiation of a live WebRTC session (call), that
+    requires multiple asynchronous events from server side. Other classic
+    example, is to notify that a subscriber is not logged into the network
+    anymore and requires refresh, for example, when the IMS expires the
+    endpoint registration.
+
+    In addition, this API, allows to an external service to create "notification
+    channels" for other systems that does no support the async event mechanisms.
+    For instance, a classic browser using websockets to receive server-side
+    events.
+
+    **Use cases to cover:**
+      - Functional:
+        - A push notification service based on an external webhook
+        - A browser that requires a WS to receive events from the server side.
+          - This will require to create a dedicated endpoint using the
+            NotificationChannel API
+      - Observability:
+        - A monitoring system that wants to monitor registration status of
+          endpoints
+        - A call audit application that requires to remotely monitor call status
+
+    ## 2. Relevant terms and definitions
+
+    - **BYON**: Bring Your Own Number. A commercial name for the functionality
+      to use your network credentials and phone number identity to no-SIM
+      devices using WebRTC sessions.
+    - **session**: A media session, an exchange of media between endpoints.
+      Typical example of session is a "single one-to-one call".
+    - **registration**: An endpoint status were it is properly identified to be
+      reachable by the server side of the WebRTC gateway.
+
+    ## 3. API functionality
+
+    The CAMARA subscription model is detailed in the CAMARA API design guideline
+    document and follows CloudEvents specification.
+
+    This API allows to create an explicit notification channel for two types of
+    events. It is mandatory in the subscription to provide the event type for
+    which the client would like to subscribe. Per CAMARA Commonalities v0.4,
+    **each subscription only can be dedicated to a single event type**. You
+    usually will need one per endpoint registration and one per session in
+    progress.
+
+    Following event types are managed for this API:
+
+    - `org.camaraproject.webrtc-events.v0.session-status`
+
+      - Events triggered for any media session related event (e.g. far end new
+        media endpoints)
+
+    - `org.camaraproject.webrtc-events.v0.session-invitation`
+
+      - Events triggered when a new session is requested (e.g. incoming call
+        received)
+
+    Note: Additionally to these list, ``org.camaraproject.webrtc-events.v0.subscription-ends``
+    notification `type` is sent when the subscription ends.
+    This notification does not require dedicated subscription.
+
+    It is used when:
+    - the subscription expire time has been reached (optionally set by the
+      requester)
+    - the maximum number of subscription events has been reached (optionally
+      set by the requester)
+    - the subscription was deleted by the requester
+    - the Access Token `sinkCredential` expiration time has been reached
+      (optionally set by the requester)
+    - the API server has to stop sending notification prematurely
+
+    ### 3.1. Session events (session-status)
+
+    Find more information at the Schema description.
+
+    A `org.camaraproject.webrtc-events.v0.session-status` event includes
+    session information updates. With the same schema that is used with the
+    WebRTC BYON CallHandling API, when retrieving information from the
+    `GET /vvoip/session/{vvoipSessionId}` endpoint.
+
+    In general lines, it is emitted each time that an event happens within the
+    subscribed session. This might happen when SDP updates are included for any
+    party or when the call is finished due an ordered cleanup or a service
+    outage. Any other any relevant internal event could be transmitted through
+    this channel (eg.: Any SIP response is potentially a
+    session-status event.
+
+    Regarding the SDP descriptions for offer and answer:
+    - The offer, which MUST be present in a request from the application to the
+      server to create a session. Note that the offer can be absent in a session
+      created by the server as part of an offerless INVITE [RFC3261].
+    - For the answer. This type represents an answer in WebRTC Signaling. This
+      element is not present in case there is no answer yet, or the session
+      invitation has been declined by the Terminating Participant. This element
+      MUST NOT be present in a request from the application to the server to
+      create a session.
+
+    ### 3.2. New session request (session-invitation)
+
+    Find more information at the Schema description.
+
+    A `org.camaraproject.webrtc-events.v0.session-invitation` event
+    includes information about new requested sessions (incoming calls), it
+    requires a valid registration on the network.
+
+    This event is triggered each time that the endpoint is requested to join
+    an incoming new session. This is done, usually, to indicate that a new
+    WebRTC "call" is incoming. In practical terms, this is a new WebRTC
+    session that requests the endpoint presence. The event include all
+    functional information required to join the session (media info, caller).
+
+    When a new session is requested, it will include context information:
+    identification of the caller and other possible carrier data to
+    contextualize (call subject, branding info, etc). It will also include
+    a unique SessionId, to create a dedicated subscription and receive events
+    about the session itself and its status progressing inside the network.
+
+    ### 3.3. Subscription ends (subscription-ends)
+
+    A `org.camaraproject.webrtc-events.v0.subscription-ends` event will indicate
+    that the endpoint will not be notified if a new session is received. From
+    the developer point of view the reception of the `subscription-ends` should
+    be an indicator to check the registration status and try to register again.
+
+    ## 4. Authorization and authentication
+
+    The "Camara Security and Interoperability Profile" provides details on how
+    a client requests an access token. Please refer to [Identify and Consent
+    Management](https://github.com/camaraproject/IdentityAndConsentManagement/)
+    for the released version of
+    the Profile.
+
+    Which specific authorization flows are to be used will be determined during
+    onboarding process, happening between the API Client and the API Provider,
+    taking into account the declared purpose for accessing the API, while also
+    being subject to the prevailing legal framework dictated by local
+    legislation.
+
+    It is important to remark that in cases where personal user data is
+    processed by the API, and users can exercise their rights through
+    mechanisms such as opt-in and/or opt-out, the use of 3-legged access tokens
+    becomes mandatory. This measure ensures that the API remains in strict
+    compliance with user privacy preferences and regulatory obligations,
+    upholding the principles of transparency and user-centric data control.
+
+    ## 5. Further info and support
+    (Will be added in a later version of the documentation)
+
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.1.0
+  x-camara-commonalities: 0.4.0
+
+externalDocs:
+  description: Product documentation at CAMARA
+  url: https://github.com/camaraproject/
+servers:
+  - url: "{apiRoot}/webrtc-events/vwip"
+    variables:
+      apiRoot:
+        default: http://localhost:9091
+        description: API root
+tags:
+  - name: webrtc-events Subscription
+    description: Operations to manage event subscriptions for WebRTC APIs (BYON and RACM)
+
+paths:
+  /subscriptions:
+    post:
+      tags:
+        - webrtc-events Subscription
+      summary: "Create a webrtc-events event subscription"
+      description: |-
+        Create a webrtc-events event subscription. For the corresponding type:
+
+        - `org.camaraproject.webrtc-events.v0.session-invitation`: new calls event
+        - `org.camaraproject.webrtc-events.v0.session-status`: updates on specific call
+
+        To subscribe and receive notifications about new calls, a
+        `session-invitation` subscription is required using the `racmSessionId`
+        obtained from BYON-RACM API.
+
+        Once you create a new voice-video session or receive an
+        new call event, you can subscribe to `session-status` to receive
+        updates about the voice-video session in progress using the
+        `vvoipSessionId` unique identifier.
+      operationId: createNotificationChannelSubscription
+      parameters:
+        - $ref: "#/components/parameters/x-correlator"
+      security:
+        - openId:
+            - webrtc-events:org.camaraproject.webrtc-events.v0.session-status:create
+            - webrtc-events:org.camaraproject.webrtc-events.v0.session-invitation:create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubscriptionRequest"
+            examples:
+              INVITE_SUBSCRIPTION (session-invitation):
+                $ref: "#/components/examples/INVITE_SUBSCRIPTION"
+              SESSION_SUBSCRIPTION (session-status):
+                $ref: "#/components/examples/SESSION_SUBSCRIPTION"
+        required: true
+      callbacks:
+        notifications:
+          "{$request.body#/sink}":
+            post:
+              summary: "notifications callback"
+              description: |-
+                Important: this endpoint is to be implemented by the API
+                consumer. The webrtc-events server will call this endpoint
+                whenever a webrtc-events event occurs. `operationId` value will
+                have to be replaced accordingly with WG API specific semantic.
+              operationId: postNotification
+              parameters:
+                - $ref: "#/components/parameters/x-correlator"
+              requestBody:
+                required: true
+                content:
+                  application/cloudevents+json:
+                    schema:
+                      $ref: "#/components/schemas/CloudEvent"
+                    examples:
+                      NEW_SESSION_INCOMING (session-invitation):
+                        $ref: "#/components/examples/NEW_SESSION_INCOMING"
+                      SESSION_UPDATE (session-status):
+                        $ref: "#/components/examples/SESSION_UPDATE"
+                      REGISTRATION_REVOKED (subscription-ends):
+                        $ref: "#/components/examples/REGISTRATION_REVOKED"
+              responses:
+                "204":
+                  description: Successful notification
+                  headers:
+                    x-correlator:
+                      $ref: "#/components/headers/x-correlator"
+                "400":
+                  $ref: "#/components/responses/Generic400"
+                "401":
+                  $ref: "#/components/responses/Generic401"
+                "403":
+                  $ref: "#/components/responses/Generic403"
+                "410":
+                  $ref: "#/components/responses/Generic410"
+                "429":
+                  $ref: "#/components/responses/Generic429"
+                "500":
+                  $ref: "#/components/responses/Generic500"
+                "503":
+                  $ref: "#/components/responses/Generic503"
+              security:
+                - {}
+                - notificationsBearerAuth: []
+
+      responses:
+        "201":
+          description: Created
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+        "202":
+          description: Request accepted to be processed. It applies for async creation process.
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubscriptionAsync"
+        "400":
+          $ref: "#/components/responses/CreateSubscriptionBadRequest400"
+        "401":
+          $ref: "#/components/responses/Generic401"
+        "403":
+          $ref: "#/components/responses/SubscriptionPermissionDenied403"
+        "409":
+          $ref: "#/components/responses/Generic409"
+        "415":
+          $ref: "#/components/responses/Generic415"
+        "422":
+          $ref: "#/components/responses/CreateSubscriptionUnprocessableEntity422"
+        "429":
+          $ref: "#/components/responses/Generic429"
+        "500":
+          $ref: "#/components/responses/Generic500"
+        "503":
+          $ref: "#/components/responses/Generic503"
+    get:
+      tags:
+        - webrtc-events Subscription
+      summary: "Retrieve a list of webrtc-events event subscription"
+      description: Retrieve a list of webrtc-events event subscription(s)
+      operationId: retrieveNotificationChannelSubscriptionList
+      parameters:
+        - $ref: "#/components/parameters/x-correlator"
+      security:
+        - openId:
+            - webrtc-events:read
+      responses:
+        "200":
+          description: List of event subscription details
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
+          content:
+            application/json:
+              schema:
+                type: array
+                minItems: 0
+                items:
+                  $ref: '#/components/schemas/Subscription'
+        "400":
+          $ref: "#/components/responses/Generic400"
+        "401":
+          $ref: "#/components/responses/Generic401"
+        "403":
+          $ref: "#/components/responses/Generic403"
+        "500":
+          $ref: "#/components/responses/Generic500"
+        "503":
+          $ref: "#/components/responses/Generic503"
+  /subscriptions/{subscriptionId}:
+    get:
+      tags:
+        - webrtc-events Subscription
+      summary: "Retrieve a webrtc-events event subscription"
+      description: retrieve webrtc-events subscription information for a given subscription.
+      operationId: retrieveNotificationChannelSubscription
+      security:
+        - openId:
+            - webrtc-events:read
+      parameters:
+        - $ref: "#/components/parameters/SubscriptionId"
+        - $ref: "#/components/parameters/x-correlator"
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+        "400":
+          $ref: "#/components/responses/SubscriptionIdRequired"
+        "401":
+          $ref: "#/components/responses/Generic401"
+        "403":
+          $ref: "#/components/responses/Generic403"
+        "404":
+          $ref: "#/components/responses/Generic404"
+        "500":
+          $ref: "#/components/responses/Generic500"
+        "503":
+          $ref: "#/components/responses/Generic503"
+    delete:
+      tags:
+        - webrtc-events Subscription
+      summary: "Delete a webrtc-events event subscription"
+      operationId: deleteNotificationChannelSubscription
+      description: delete a given webrtc-events subscription.
+      security:
+        - openId:
+            - webrtc-events:delete
+      parameters:
+        - $ref: "#/components/parameters/SubscriptionId"
+        - $ref: "#/components/parameters/x-correlator"
+      responses:
+        "204":
+          description: webrtc-events subscription deleted
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
+        "202":
+          description: Request accepted to be processed. It applies for async deletion process.
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubscriptionAsync"
+        "400":
+          $ref: "#/components/responses/SubscriptionIdRequired"
+        "401":
+          $ref: "#/components/responses/Generic401"
+        "403":
+          $ref: "#/components/responses/Generic403"
+        "404":
+          $ref: "#/components/responses/Generic404"
+        "500":
+          $ref: "#/components/responses/Generic500"
+        "503":
+          $ref: "#/components/responses/Generic503"
+components:
+  securitySchemes:
+    openId:
+      type: openIdConnect
+      openIdConnectUrl: https://example.com/.well-known/openid-configuration
+    notificationsBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: "{$request.body#/sinkCredential.credentialType}"
+  parameters:
+    SubscriptionId:
+      name: subscriptionId
+      in: path
+      description: Subscription identifier that was obtained from the create event subscription operation
+      required: true
+      schema:
+        $ref: "#/components/schemas/SubscriptionId"
+    x-correlator:
+      name: x-correlator
+      in: header
+      description: Correlation id for the different services
+      schema:
+        type: string
+  headers:
+    x-correlator:
+      description: Correlation id for the different services
+      schema:
+        type: string
+  schemas:
+    ErrorInfo:
+      type: object
+      required:
+        - status
+        - code
+        - message
+      properties:
+        status:
+          type: integer
+          description: HTTP response status code
+        code:
+          type: string
+          description: Code given to this error
+        message:
+          type: string
+          description: Detailed error description
+
+    SubscriptionRequest:
+      description: The request for creating a event-type event subscription
+      type: object
+      required:
+        - sink
+        - protocol
+        - config
+        - types
+      properties:
+        protocol:
+          $ref: "#/components/schemas/Protocol"
+        sink:
+          type: string
+          format: url
+          description: The address to which events shall be delivered using the selected protocol.
+          example: "https://endpoint.example.com/sink"
+        sinkCredential:
+          $ref: "#/components/schemas/SinkCredential"
+        types:
+          description: |-
+            Camara Event types eligible to be delivered by this subscription.
+            Note: for the Commonalities meta-release v0.4 we enforce to have only event type per subscription
+            then for following meta-release use of array MUST be decided at API project level.
+          type: array
+          minItems: 1
+          maxItems: 1
+          items:
+            $ref: "#/components/schemas/SubscriptionEventTypeNotification"
+        config:
+          $ref: "#/components/schemas/Config"
+      discriminator:
+        propertyName: protocol
+        mapping:
+          HTTP: "#/components/schemas/HTTPSubscriptionRequest"
+
+    Config:
+      description: |-
+        Implementation-specific configuration parameters needed by the subscription manager for acquiring
+        events. `subscriptionExpireTime`, `subscriptionMaxEvents`, `initialEvent` are predefined for CAMARA
+        specifications.
+
+        WebRTC specific event type attributes are included into `WebrtcSubscriptionDetail` schema.
+
+        Note: if a request is performed for several event type, all subscribed event will use same `config`
+        parameters.
+      type: object
+      required:
+        - subscriptionDetail
+      properties:
+        subscriptionDetail:
+          $ref: "#/components/schemas/WebrtcSubscriptionDetail"
+        subscriptionExpireTime:
+          type: string
+          format: date-time
+          example: 2023-01-17T13:18:23.682Z
+          description: The subscription expiration time (in date-time format) requested by the API consumer. Up to API project decision to keep it.
+        subscriptionMaxEvents:
+          type: integer
+          description: Identifies the maximum number of event reports to be generated (>=1) requested by the API consumer - Once this number is reached, the subscription ends. Up to API project decision to keep it.
+          minimum: 1
+          example: 5
+        initialEvent:
+          type: boolean
+          description: |-
+            Set to `true` by API consumer if consumer wants to get an event as soon as the subscription is created and current situation reflects event request.
+            Example: Consumer request Roaming event. If consumer sets initialEvent to true and device is in roaming situation, an event is triggered
+            Up to API project decision to keep it.
+
+    Protocol:
+      type: string
+      enum: ["HTTP"]
+      description: Identifier of a delivery protocol. Only HTTP is allowed for now
+      example: "HTTP"
+
+    SinkCredential:
+      description: A sink credential provides authentication or authorization information necessary to enable delivery of events to a target.
+      type: object
+      properties:
+        credentialType:
+          type: string
+          enum:
+            - ACCESSTOKEN
+          description: "The type of the credential."
+      discriminator:
+        propertyName: credentialType
+        mapping:
+          ACCESSTOKEN: "#/components/schemas/AccessTokenCredential"
+      required:
+        - credentialType
+    AccessTokenCredential:
+      type: object
+      description: An access token credential.
+      allOf:
+        - $ref: "#/components/schemas/SinkCredential"
+        - type: object
+          properties:
+            accessToken:
+              description: REQUIRED. An access token is a previously acquired token granting access to the target resource.
+              type: string
+            accessTokenExpiresUtc:
+              type: string
+              format: date-time
+              description: REQUIRED. An absolute UTC instant at which the token shall be considered expired.
+            accessTokenType:
+              description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)).
+              type: string
+              enum:
+                - bearer
+          required:
+            - accessToken
+            - accessTokenExpiresUtc
+            - accessTokenType
+
+    WebrtcSubscriptionDetail:
+      description: |-
+        The detail of the requested event subscription.
+        - org.camaraproject.webrtc-events.v0.session-invitation requires a
+          valid `racmSessionId` obtained via RACM endpoint.
+        - org.camaraproject.webrtc-events.v0.session-status requires both, a
+          valid `racmSessionId` obtained via RACM endpoint and a valid
+          `sessionId` obtained via session-invitation event or via CallHandling
+          API
+      type: object
+      required:
+        - deviceId
+        - racmSessionId
+      properties:
+        deviceId:
+          type: string
+          example: 1qazxsw23edc
+          description: The device-id of the client in UUID format.
+        sessionId:
+          type: string
+          example: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EFAAF209EE52FD0BECC5B7CDE645F50DE7D
+          description: |-
+            The VVOIP session ID created by WebRTC Gateway.
+            The sessionID will identify a unique session between the WebRTC
+            Gateway and the device client.
+            It will be included on the events generated.
+        racmSessionId:
+          type: string
+          example: xsmcaum3z4zw4l0cu4w115m0
+          description: |-
+            The RACM session ID created by WebRTC Gateway.
+            Obtained via RACM API.
+
+    SubscriptionEventTypeNotification:
+      type: string
+      description: |-
+        event-type - Event triggered when an event-type event occurred
+        - `org.camaraproject.webrtc-events.v0.session-status`
+          - Events triggered for any media session related event (e.g. far end new media endpoints)
+        - `org.camaraproject.webrtc-events.v0.session-invitation`
+          - Events triggered for any media endpoint registration event (e.g. incoming session)
+
+        `subscription-ends` is not supported for subscription. Sent by default
+      enum:
+        - org.camaraproject.webrtc-events.v0.session-status
+        - org.camaraproject.webrtc-events.v0.session-invitation
+
+    EventTypeNotification:
+      type: string
+      description: |-
+        event-type - Event triggered when an event-type event occurred
+        - `org.camaraproject.webrtc-events.v0.session-status`
+          - Events triggered for any media session related event (e.g. far end new media endpoints)
+        - `org.camaraproject.webrtc-events.v0.session-invitation`
+          - Events triggered for any media endpoint registration event (e.g. incoming session)
+        - `org.camaraproject.webrtc-events.v0.subscription-ends`
+          - Event triggered when the subscription ends
+      enum:
+        - org.camaraproject.webrtc-events.v0.session-status
+        - org.camaraproject.webrtc-events.v0.session-invitation
+        - org.camaraproject.webrtc-events.v0.subscription-ends
+
+    Subscription:
+      description: Represents a event-type subscription.
+      type: object
+      required:
+        - sink
+        - protocol
+        - config
+        - types
+        - id
+      properties:
+        protocol:
+          $ref: "#/components/schemas/Protocol"
+        sink:
+          type: string
+          format: url
+          description: The address to which events shall be delivered using the selected protocol.
+          example: "https://endpoint.example.com/sink"
+        sinkCredential:
+          $ref: '#/components/schemas/SinkCredential'
+        types:
+          description: |-
+            Camara Event types eligible to be delivered by this subscription.
+            For Commonalities v0.4 we enforce to use one subscription per event type. In consequence,
+            this field is an array of a single element.
+          type: array
+          minItems: 1
+          maxItems: 1
+          items:
+            type: string
+        config:
+          $ref: '#/components/schemas/Config'
+        id:
+          $ref: '#/components/schemas/SubscriptionId'
+        startsAt:
+          type: string
+          format: date-time
+          description: Date when the event subscription will begin/began
+        expiresAt:
+          type: string
+          format: date-time
+          description: Date when the event subscription will expire. Only provided when `subscriptionExpireTime` is indicated by API client or Telco Operator has specific policy about that.
+        status:
+          type: string
+          description: |-
+            Current status of the subscription - Management of Subscription State engine is not mandatory for now. Note not all statuses may be considered to be implemented. Details:
+              - `ACTIVATION_REQUESTED`: Subscription creation (POST) is triggered but subscription creation process is not finished yet.
+              - `ACTIVE`: Subscription creation process is completed. Subscription is fully operative.
+              - `INACTIVE`: Subscription is temporarily inactive, but its workflow logic is not deleted.
+              - `EXPIRED`: Subscription is ended (no longer active). This status applies when subscription is ended due to `SUBSCRIPTION_EXPIRED` or `ACCESS_TOKEN_EXPIRED` event.
+              - `DELETED`: Subscription is ended as deleted (no longer active). This status applies when subscription information is kept (i.e. subscription workflow is no longer active but its meta-information is kept).
+          enum:
+            - ACTIVATION_REQUESTED
+            - ACTIVE
+            - EXPIRED
+            - INACTIVE
+            - DELETED
+      discriminator:
+        propertyName: protocol
+        mapping:
+          HTTP: '#/components/schemas/HTTPSubscriptionResponse'
+
+    SubscriptionAsync:
+      description: Response for a event-type subscription request managed asynchronously (Creation or Deletion)
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/SubscriptionId"
+
+    SubscriptionId:
+      type: string
+      description: The unique identifier of the subscription in the scope of the subscription manager. When this information is contained within an event notification, this concept SHALL be referred as `subscriptionId` as per [Commonalities Event Notification Model](https://github.com/camaraproject/Commonalities/blob/main/documentation/API-design-guidelines.md#122-event-notification).
+      example: qs15-h556-rt89-1298
+
+    CloudEvent:
+      description: The notification callback
+      required:
+        - id
+        - source
+        - specversion
+        - type
+        - time
+      properties:
+        id:
+          type: string
+          description: identifier of this event, that must be unique in the source context.
+        source:
+          $ref: "#/components/schemas/Source"
+        type:
+          $ref: "#/components/schemas/EventTypeNotification"
+        specversion:
+          type: string
+          description: Version of the specification to which this event conforms (must be 1.0 if it conforms to cloudevents 1.0.2 version)
+          enum:
+            - "1.0"
+        datacontenttype:
+          type: string
+          description: 'media-type that describes the event payload encoding, must be "application/json" for CAMARA APIs'
+          enum:
+            - application/json
+        data:
+          type: object
+          description: |-
+            Event details payload. Depending of the event type, it will will include one of the data structures defined on this specification. Along with the subscription-ends, that is an authomatic event.
+
+            Check the introduction documentation and the CAMARA WebRTC BYON APIs for extra info about data structures included on the events.
+        time:
+          $ref: "#/components/schemas/DateTime"
+      discriminator:
+        propertyName: "type"
+        mapping:
+          org.camaraproject.webrtc-events.v0.session-invitation: "#/components/schemas/EventSessionInvitation"
+          org.camaraproject.webrtc-events.v0.session-status: "#/components/schemas/EventSessionStatus"
+          org.camaraproject.webrtc-events.v0.subscription-ends: "#/components/schemas/EventSubscriptionEnds"
+
+    Source:
+      type: string
+      format: uri-reference
+      minLength: 1
+      description: |-
+        Identifies the context in which an event happened - be a non-empty `URI-reference` like:
+        - URI with a DNS authority:
+          * https://github.com/cloudevents
+          * mailto:cncf-wg-serverless@lists.cncf.io
+        - Universally-unique URN with a UUID:
+          * urn:uuid:6e8bc430-9c3a-11d9-9669-0800200c9a66
+        - Application-specific identifier:
+          * /cloudevents/spec/pull/123
+          * 1-555-123-4567
+      example: "https://notificationSendServer12.supertelco.com"
+
+    DateTime:
+      type: string
+      format: date-time
+      description: Timestamp of when the occurrence happened. Must adhere to RFC 3339.
+      example: "2018-04-05T17:31:00Z"
+
+    ############################################
+    EventSessionInvitation:
+      description: |-
+        A `org.camaraproject.webrtc-events.v0.session-invitation` event includes an specific type of session
+        update for new requested sessions. It is emitted when the endpoint is associated with a valid
+        registration and the endpoint is susbcribed to recive new incoming calls.
+
+        This event includes all the context information: caller, callee and possible carrier data to
+        contextualize (call subject, branding info, etc). It MUST include a vvoipSessionId, to allow the
+        endpoint to subscribe to this new call session.
+      allOf:
+        - $ref: "#/components/schemas/CloudEvent"
+        - type: object
+          required:
+            - vvoipSessionId
+          properties:
+            data:
+              $ref: "#/components/schemas/VvoipSessionInformation"
+
+    ############################################
+    EventSessionStatus:
+      description: |-
+        A `org.camaraproject.webrtc-events.v0.session-status` event includes the session updates provided by
+        the server. This will include actions form the endpoint and the server (far end).
+
+        In general terms, it is received each time that an event happens within the session, and include
+        all relevant info about the session update.
+
+        Most common use is for SDP updates and signaling updates regarding call status.
+      allOf:
+        - $ref: "#/components/schemas/CloudEvent"
+        - type: object
+          required:
+            - vvoipSessionId
+            - status
+          properties:
+            data:
+              $ref: "#/components/schemas/VvoipSessionInformation"
+
+    ############################################
+    VvoipSessionInformation:
+      description: |-
+        A prototype for Webrtc events. Used at `SessionStatusEvent` and `SessionInvitationEvent` schemas
+      type: object
+      properties:
+        subscriptionId:
+          $ref: "#/components/schemas/SubscriptionId"
+        originatorAddress:
+          type: string
+          description: Sender (originator) address
+          pattern: '^(tel:+[0-9]{5,15}|sip:.+@.+|.+)$'
+          example: 'tel:+11234567899'
+        originatorName:
+          type: string
+          description: Friendly name of the call originator
+          example: 'Alice'
+        receiverAddress:
+          type: string
+          description: Receiver (terminator) address
+          pattern: '^(tel:+[0-9]{5,15}|sip:.+@.+|.+)$'
+          example: 'tel:+11234567899'
+        receiverName:
+          type: string
+          description: Friendly name of the call terminator
+          example: 'Bob'
+        status:
+          type: string
+          description: |-
+            Provides the status of the VVOIP session. During the session creation,
+            this attribute contains 'Initial' value
+          example: Initial
+          enum:
+            - Initial
+            - InProgress
+            - Ringing
+            - Proceeding
+            - Connected
+            - Terminated
+            - Hold
+            - Resume
+            - SessionCancelled
+            - Declined
+            - Failed
+            - Waiting
+            - NoAnswer
+            - NotReachable
+            - Busy
+        offer:
+          $ref: '#/components/schemas/WrtcSDPDescriptor'
+        answer:
+          $ref: '#/components/schemas/WrtcSDPDescriptor'
+        clientCorrelator:
+          type: string
+          description: A correlator that the client can use to tag this particular resource representation during a request to create a resource on the server. Note - This allows the client to recover from communication failures during resource creation and therefore avoids re-sending the message in such situations. In case the element is present, the WebRTC GW shall not alter its value, and shall provide it as part of the representation of this resource.
+        vvoipSessionId:
+          type: string
+          description: The VVOIP session ID created by WebRTC Gateway. The vvoipSessionId shall not be included in POST requests by the client, but must be included in the notifications from the WebRTC GW to client.
+          example: '0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF'
+        callObjectRef:
+          type: string
+          description: The reference to the call object
+        serverCorrelator:
+          type: string
+          description: A correlator that the server instructs the client to use for end to end correlation.
+        offerRequired:
+          type: boolean
+          description: This element shall be included and set to true, if the session updates are received without SDP offer. This element indicates clients to send the offer.
+        reason:
+          type: string
+          description: The description of the event that has happened within the session
+        sequenceNumber:
+          type: integer
+          description: The sequence number of the notification sent to client
+
+    WrtcSDPDescriptor:
+      type: object
+      properties:
+        sdp:
+          type: string
+          description: |-
+            An inlined session description in SDP format [RFC4566].If XML syntax is used, the content of this element SHALL be embedded in a CDATA section
+
+    # CloudEvent and CAMARA standard
+    EventSubscriptionEnds:
+      description: event structure for event subscription ends
+      allOf:
+        - $ref: "#/components/schemas/CloudEvent"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/SubscriptionEnds"
+
+    SubscriptionEnds:
+      description: Event detail structure for SUBSCRIPTION_ENDS event
+      type: object
+      required:
+        - subscriptionId
+        - terminationReason
+      properties:
+        subscriptionId:
+          $ref: "#/components/schemas/SubscriptionId"
+        terminationReason:
+          $ref: "#/components/schemas/TerminationReason"
+        terminationDescription:
+          type: string
+
+    TerminationReason:
+      type: string
+      description: |-
+        - NETWORK_TERMINATED - API server stopped sending notification
+        - SUBSCRIPTION_EXPIRED - Subscription expire time (optionally set by the requester) has been reached
+        - MAX_EVENTS_REACHED - Maximum number of events (optionally set by the requester) has been reached
+        - ACCESS_TOKEN_EXPIRED - Access Token sinkCredential (optionally set by the requester) expiration time has been reached
+        - SUBSCRIPTION_DELETED - Subscription was deleted by the requester
+      enum:
+        - MAX_EVENTS_REACHED
+        - NETWORK_TERMINATED
+        - SUBSCRIPTION_EXPIRED
+        - ACCESS_TOKEN_EXPIRED
+        - SUBSCRIPTION_DELETED
+
+    HTTPSubscriptionRequest:
+      allOf:
+        - $ref: "#/components/schemas/SubscriptionRequest"
+        - type: object
+          properties:
+            protocolSettings:
+              $ref: "#/components/schemas/HTTPSettings"
+
+    HTTPSubscriptionResponse:
+      allOf:
+        - $ref: "#/components/schemas/Subscription"
+        - type: object
+          properties:
+            protocolSettings:
+              $ref: "#/components/schemas/HTTPSettings"
+
+    HTTPSettings:
+      type: object
+      properties:
+        headers:
+          type: object
+          description: |-
+            A set of key/value pairs that is copied into the HTTP request as custom headers.
+
+            NOTE: Use/Applicability of this concept has not been discussed in Commonalities under the scope of Meta Release v0.4. When required by an API project as an option to meet a UC/Requirement, please generate an issue for Commonalities discussion about it.
+          additionalProperties:
+            type: string
+        method:
+          type: string
+          description: The HTTP method to use for sending the message.
+          enum:
+            - POST
+
+  responses:
+    CreateSubscriptionBadRequest400:
+      description: Problem with the client request
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInfo"
+          examples:
+            GENERIC_400_INVALID_ARGUMENT:
+              description: Invalid Argument. Generic Syntax Exception
+              value:
+                status: 400
+                code: INVALID_ARGUMENT
+                message: Client specified an invalid argument, request body or query param.
+            GENERIC_400_OUT_OF_RANGE:
+              description: Out of Range. Specific Syntax Exception used when a given field has a pre-defined range or a invalid filter criteria combination is requested
+              value:
+                status: 400
+                code: OUT_OF_RANGE
+                message: Client specified an invalid range.
+            GENERIC_400_INVALID_PROTOCOL:
+              value:
+                status: 400
+                code: "INVALID_PROTOCOL"
+                message: "Only HTTP is supported"
+            GENERIC_400_INVALID_CREDENTIAL:
+              value:
+                status: 400
+                code: "INVALID_CREDENTIAL"
+                message: "Only Access token is supported"
+            GENERIC_400_INVALID_TOKEN:
+              value:
+                status: 400
+                code: "INVALID_TOKEN"
+                message: "Only bearer token is supported"
+    Generic400:
+      description: Problem with the client request
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInfo"
+          examples:
+            GENERIC_400_INVALID_ARGUMENT:
+              description: Invalid Argument. Generic Syntax Exception
+              value:
+                status: 400
+                code: INVALID_ARGUMENT
+                message: Client specified an invalid argument, request body or query param.
+    Generic401:
+      description: Authentication problem with the client request
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInfo"
+          examples:
+            GENERIC_401_UNAUTHENTICATED:
+              description: Request cannot be authenticated
+              value:
+                status: 401
+                code: UNAUTHENTICATED
+                message: Request not authenticated due to missing, invalid, or expired credentials.
+            GENERIC_401_AUTHENTICATION_REQUIRED:
+              description: New authentication is needed, authentication is no longer valid
+              value:
+                status: 401
+                code: AUTHENTICATION_REQUIRED
+                message: New authentication is required.
+    Generic403:
+      description: Client does not have sufficient permission
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInfo"
+          examples:
+            GENERIC_403_PERMISSION_DENIED:
+              description: Permission denied. OAuth2 token access does not have the required scope or when the user fails operational security
+              value:
+                status: 403
+                code: PERMISSION_DENIED
+                message: Client does not have sufficient permissions to perform this action.
+    SubscriptionPermissionDenied403:
+      description: Client does not have sufficient permission
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInfo"
+          examples:
+            GENERIC_403_PERMISSION_DENIED:
+              description: Permission denied. OAuth2 token access does not have the required scope or when the user fails operational security
+              value:
+                status: 403
+                code: PERMISSION_DENIED
+                message: Client does not have sufficient permissions to perform this action.
+            GENERIC_403_INVALID_TOKEN_CONTEXT:
+              description: Reflect some inconsistency between information in some field of the API and the related OAuth2 Token
+              value:
+                status: 403
+                code: INVALID_TOKEN_CONTEXT
+                message: "{{field}} is not consistent with access token."
+            GENERIC_403_SUBSCRIPTION_MISMATCH:
+              value:
+                status: 403
+                code: "SUBSCRIPTION_MISMATCH"
+                message: "Inconsistent access token for requested events subscription"
+    Generic404:
+      description: Resource Not Found
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInfo"
+          examples:
+            GENERIC_404_NOT_FOUND:
+              description: Resource is not found
+              value:
+                status: 404
+                code: NOT_FOUND
+                message: The specified resource is not found.
+    Generic409:
+      description: Conflict
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInfo"
+          examples:
+            GENERIC_409_ABORTED:
+              description: Concurreny of processes of the same nature/scope
+              value:
+                status: 409
+                code: ABORTED
+                message: Concurrency conflict.
+            GENERIC_409_ALREADY_EXISTS:
+              description: Trying to create an existing resource
+              value:
+                status: 409
+                code: ALREADY_EXISTS
+                message: The resource that a client tried to create already exists.
+    Generic410:
+      description: Gone
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInfo"
+          examples:
+            GENERIC_410_GONE:
+              description: Use in notifications flow to allow API Consumer to indicate that its callback is no longer available
+              value:
+                status: 410
+                code: GONE
+                message: Access to the target resource is no longer available.
+    Generic415:
+      description: Unsupported Media Type
+      headers:
+        X-Correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInfo"
+          examples:
+            GENERIC_415_UNSUPPORTED_MEDIA_TYPE:
+              description: Payload format of the request is in an unsupported format by the Server. Should not happen
+              value:
+                status: 415
+                code: UNSUPPORTED_MEDIA_TYPE
+                message: The server refuses to accept the request because the payload format is in an unsupported format
+    CreateSubscriptionUnprocessableEntity422:
+      description: Unprocessable Entity
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInfo"
+          examples:
+            GENERIC_422_MULTIEVENT_SUBSCRIPTION_NOT_SUPPORTED:
+              value:
+                status: 422
+                code: "MULTIEVENT_SUBSCRIPTION_NOT_SUPPORTED"
+                message: "Multi event types subscription not managed"
+            GENERIC_422_DEVICE_IDENTIFIERS_MISMATCH:
+              description: Inconsistency between device identifiers not pointing to the same device
+              value:
+                status: 422
+                code: DEVICE_IDENTIFIERS_MISMATCH
+                message: Provided device identifiers are not consistent.
+            GENERIC_422_DEVICE_NOT_APPLICABLE:
+              description: Service is not available for the provided device
+              value:
+                status: 422
+                code: DEVICE_NOT_APPLICABLE
+                message: The service is not available for the provided device.
+    Generic429:
+      description: Too Many Requests
+      headers:
+        X-Correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInfo"
+          examples:
+            GENERIC_429_QUOTA_EXCEEDED:
+              description: Request is rejected due to exceeding a business quota limit
+              value:
+                status: 429
+                code: QUOTA_EXCEEDED
+                message: Either out of resource quota or reaching rate limiting.
+            GENERIC_429_TOO_MANY_REQUESTS:
+              description: API Server request limit is overpassed
+              value:
+                status: 429
+                code: TOO_MANY_REQUESTS
+                message: Either out of resource quota or reaching rate limiting.
+    Generic500:
+      description: Server error
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInfo"
+          examples:
+            GENERIC_500_INTERNAL:
+              description: Problem in Server side. Regular Server Exception
+              value:
+                status: 500
+                code: INTERNAL
+                message: Unknown server error. Typically a server bug.
+    Generic503:
+      description: Service unavailable. Typically the server is down.
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInfo"
+          examples:
+            GENERIC_503_UNAVAILABLE:
+              description: Service is not available. Temporary situation usually related to maintenance process in the server side
+              value:
+                status: 503
+                code: UNAVAILABLE
+                message: Service Unavailable.
+    SubscriptionIdRequired:
+      description: Problem with the client request
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInfo"
+          examples:
+            Generic400:
+              summary: Schema validation failed
+              value:
+                status: 400
+                code: INVALID_ARGUMENT
+                message: "Client specified an invalid argument, request body or query param"
+            subscriptionIdRequired:
+              summary: subscription id is required
+              value:
+                status: 400
+                code: INVALID_ARGUMENT
+                message: "Expected property is missing: subscriptionId"
+  examples:
+    # Subscription examples
+    INVITE_SUBSCRIPTION:
+      description: |-
+        A sample of WebRTC `session-invitation` subscription for phone number
+        `+1234567890` at `acme.opentelco.com`.
+
+        This will be used to receive incoming sessions (incoming
+        calls). The implicit subscription to `subscription-ends` will make
+        the client aware of registration status updates from the server.
+        (i.e. when a REGISTRATION expires).
+
+        The provided example will be able to receive up to 50 calls until
+        subscription is cancelled via server or by configuration timeout. Check
+        callback examples to check some possible events received:
+
+        - New incoming call
+        - Registration revoked
+      value:
+        protocol: HTTP
+        sink: https://notificationServer.opentelco.com
+        types:
+          - org.camaraproject.webrtc-events.v0.session-invitation
+        config:
+          subscriptionDetail:
+            deviceId: "1qazxsw23edc"
+            racmSessionId: "xsmcaum3z4zw4l0cu4w115m0"
+          initialEvent: true
+          subscriptionMaxEvents: 50
+          subscriptionExpireTime: "2024-11-17T13:18:23.682Z"
+    SESSION_SUBSCRIPTION:
+      description: |-
+        A sample of WebRTC `session-status` subscription for a specific
+        `vvoipSessionId` at `acme.opentelco.com`.
+
+        Identified by for `vvoipSessionId`, and validated via a `racmSessionId`
+        the endpoint is able to interact with its own voice-video session.
+        This could be used to remotely control the call or to handle the async
+        session establishment. For instance, updating the user interface for
+        different statuses: InProgress, Ringing, Cancel, etc.
+      value:
+        protocol: HTTP
+        sink: https://notificationServer.opentelco.com
+        types:
+          - org.camaraproject.webrtc-events.v0.session-status
+        config:
+          subscriptionDetail:
+            deviceId: "1qazxsw23edc"
+            racmSessionId: "xsmcaum3z4zw4l0cu4w115m0"
+            vvoipSessionId: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
+          initialEvent: true
+          subscriptionMaxEvents: 50
+          subscriptionExpireTime: "2024-11-17T13:18:23.682Z"
+    # Event examples
+    NEW_SESSION_INCOMING:
+      description: |-
+        Example of `session-invitation` event.
+
+        A new WebRTC session is requested (i.e. incoming call). This event
+        starts a session negotiation. All other events related with this
+        webrtc session will be shared via the `session-status` events, and
+        identified via the unique `vvoipSessionId`.
+
+        The main point to distinguish between a *new session* and an update over
+        an *existing session* is the **type**. A `session-invitation` describes
+        on its content, all information required to initiate a new voice-video call.
+      value:
+        id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
+        source: https://notificationServer.opentelco.com
+        type: org.camaraproject.webrtc-events.v0.session-invitation
+        specversion: "1.0"
+        datacontenttype: application/json
+        time: 2024-11-05T05:40:23.682Z
+        data:
+          subscriptionId: "qs15-h556-rt89-1298"
+          originatorAddress: "tel:+11234567899"
+          originatorName: "Alice"
+          receiverAddress: "tel:+11234998765"
+          receiverName: "Bob"
+          status: "Initial"
+          offer:
+            sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0"
+          clientCorrelator: "79520148-0e79-4bd8-adbf-d04c463de6ba"
+          vvoipSessionId: "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
+          reason: "New subscriber incoming call"
+          sequenceNumber: 1
+    REGISTRATION_REVOKED:
+      description: |-
+        Example of `subscription-ends` events.
+
+        When a re-registration is requested from server, maybe due
+        administrative token revocation or due any other technical reason. It
+        is expected from the endpoint to re-register. No new sessions will be
+        delivered to the user endpoint, as the subscription is not valid
+        anymore.
+
+        Here, an example of how WebRTC GW will communicate to the client that
+        the subscription is not valid anymore, detailing on
+        `terminationDescription` the root cause of the subscription remove.
+      value:
+        id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
+        source: https://notificationServer.opentelco.com
+        type: org.camaraproject.webrtc-events.v0.subscription-ends
+        specversion: "1.0"
+        datacontenttype: application/json
+        time: 2024-11-05T05:40:23.682Z
+        data:
+          subscriptionId: qs15-h556-rt89-1298
+          terminationReason: NETWORK_TERMINATED
+          terminationDescription: "SIP re-registration required"
+    SESSION_UPDATE:
+      description: |-
+        Example of `session-status` events.
+
+        Session status events are produced when there is an update on the
+        session status, due changes on the signaling status of the call (eg.:
+        InProgress, Ringing, Proceeding, Connected, Terminated, ...) or due
+        SDP changes on any involved party.
+
+        This example, presents an SDP update due change on call status (to
+        Progress) and including answer SDP data. Customer client now, can
+        establish a voice-video channel and start transmitting and receiving
+        media.
+      value:
+        id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
+        source: https://notificationServer.opentelco.com
+        type: org.camaraproject.webrtc-events.v0.session-status
+        specversion: "1.0"
+        datacontenttype: application/json
+        time: 2024-11-05T05:40:23.682Z
+        data:
+          subscriptionId: "qs15-h556-rt89-1298"
+          originatorAddress: "tel:+11234567899"
+          originatorName: "Alice"
+          receiverAddress: "tel:+11234998765"
+          receiverName: "Bob"
+          status: InProgress
+          offer:
+            sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\na=extmap:2 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=sendrecv\r\na=rtcp-mux\r\na=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ruAnBNYnTJqDVZAIJV59VpQ5DxGI6tMX9h9kkHSz\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
+          answer:
+            sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\na=extmap:2 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=sendrecv\r\na=rtcp-mux\r\na=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ruAnBNYnTJqDVZAIJV59VpQ5DxGI6tMX9h9kkHSz\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
+          clientCorrelator: "79520148-0e79-4bd8-adbf-d04c463de6ba"
+          vvoipSessionId: "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
+          reason: "Answer SDP update"
+          sequenceNumber: 3
