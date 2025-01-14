@@ -1,7 +1,17 @@
 openapi: 3.0.3
 info:
-  title: Bring Your Own Number (BYON) Registration and Connectivity Management (RACM) Service APIs
-  description: This API provide REST API for clients to manage Registration and Connectivity (RACM) towards MNO's IMS Network.
+  title: WebRTC Registration and Connectivity Management (RACM) Service API
+  description: |-
+    ## 1. Introduction
+    This API provide REST API for clients to manage Registration and Connectivity (RACM) towards MNO's IMS Network.
+
+    API to create device regsitrations. These, identified by a unique `racmSessionId`
+    can be updated and terminated via this API and its methods.
+    - **POST**: Create a new device registration using a valid authorization token.
+    - **PUT**: Update a device registration via its unique `racmSessionId`
+    - **DELETE**: Finish an existing device registration via its unique `racmSessionId`
+
+    To receive server-side updates about new voice-video sessions, use `webrtc-events` API.
   version: 0.1.2
   contact:
     email: contact@domain.com
@@ -9,15 +19,12 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 servers:
-  - url: '{apiRoot}/racm/{apiVersion}'
+  - url: '{apiRoot}/webrtc-registration/vwip'
     description: APIs to manage Client Registration and Connection
     variables:
       apiRoot:
         description: API Root
         default: http://localhost:9091
-      apiVersion:
-        description: The version of API to be used
-        default: v1
 tags:
   - name: Registration and Connection Management
     description: APIs for Client to Register into MNO's IMS Network
