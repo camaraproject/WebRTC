@@ -96,7 +96,7 @@ info:
     A `org.camaraproject.webrtc-events.v0.session-status` event includes
     session information updates. With the same schema that is used with the
     WebRTC Call Handling API, when retrieving information from the
-    `GET /vvoip/session/{vvoipSessionId}` endpoint.
+    `GET /webrtc-call-handling/session/{vvoipSessionId}` endpoint.
 
     In general lines, it is emitted each time that an event happens within the
     subscribed session. This might happen when SDP updates are included for any
