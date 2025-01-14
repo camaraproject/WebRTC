@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Bring Your Own Number (BYON) call handling API (VVOIP Service)
+  title: WebRTC Call Handling API
   description: |-
-    ## APIs for REST clients for 1-1 calling
+    ## 1. Introduction
 
     API to create 1-1 voice and video sessions. These, identified by a unique `vvoipSessionId`
     can be recovered, updated and terminated via this API and its methods.
@@ -10,6 +10,8 @@ info:
     - **GET**: Recover an existing session via its unique `vvoipSessionId`
     - **DELETE**: Finish an existing session via its unique `vvoipSessionId`
     - **PUT**: Update the status of a session via its unique `vvoipSessionId`
+
+    To receive server-side updates about the session establishment process, use `webrtc-events` API.
   contact:
     email: contact@domain.com
   license:
@@ -17,14 +19,11 @@ info:
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
   version: 0.1.3
 servers:
-  - url: '{apiRoot}/vvoip/{apiVersion}'
+  - url: '{apiRoot}/webrtc-call-handling/vwip'
     variables:
       apiRoot:
         description: API root
         default: 'http://localhost:9091'
-      apiVersion:
-        description: Version of the VVOIP service API
-        default: v1
 tags:
   - name: OneToOneCall
     description: APIs related to 1-1 voice/video call session
