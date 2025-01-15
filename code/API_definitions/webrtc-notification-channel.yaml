@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Bring Your Own Number (BYON) Notification Channel APIs
+  title: WebRTC Notification Channel API
   description: >-
-    This API provide REST API for a client, browser or native application, to
+    This REST API provides functionality for any client, to
     establish notification channel to receive asynchronous notifications from
     MNO's IMS Network.
   version: 0.1.1
@@ -12,15 +12,12 @@ info:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 servers:
-  - url: '{apiRoot}/notificationchannel/{apiVersion}/{deviceId}'
+  - url: '{apiRoot}/webrtc-notification-channel/vwip/{deviceId}'
     description: APIs to create Notification Channels
     variables:
       apiRoot:
         description: API Root
         default: 'http://localhost:9091'
-      apiVersion:
-        description: The version of API to be used
-        default: v1
       deviceId:
         description: >-
           The notification channel creation is specific to a device instance,

@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: BYON WebRTC Event Subscription
+  title: WebRTC Event Subscription
   description: |-
     ## 1. Introduction
 
@@ -44,8 +44,12 @@ info:
       devices using WebRTC sessions.
     - **session**: A media session, an exchange of media between endpoints.
       Typical example of session is a "single one-to-one call".
+    - **vvoipSessionId**: Unique identifier of a Voice and Video **session** using
+      WebRTC technology. Retrieved using the `webrtc-call-handling` API
     - **registration**: An endpoint status were it is properly identified to be
       reachable by the server side of the WebRTC gateway.
+    - **racmSessionId**: Unique identifier of an WebRTC endpoint **registration**.
+      Retrieved using the `webrtc-regsitration` API
 
     ## 3. API functionality
 
@@ -91,8 +95,8 @@ info:
 
     A `org.camaraproject.webrtc-events.v0.session-status` event includes
     session information updates. With the same schema that is used with the
-    WebRTC BYON CallHandling API, when retrieving information from the
-    `GET /vvoip/session/{vvoipSessionId}` endpoint.
+    WebRTC Call Handling API, when retrieving information from the
+    `GET /webrtc-call-handling/session/{vvoipSessionId}` endpoint.
 
     In general lines, it is emitted each time that an event happens within the
     subscribed session. This might happen when SDP updates are included for any
@@ -179,7 +183,9 @@ servers:
         description: API root
 tags:
   - name: webrtc-events Subscription
-    description: Operations to manage event subscriptions for WebRTC APIs (BYON and RACM)
+    description: |-
+      Operations to manage event subscriptions for WebRTC Event APIs (Directly
+      related with webrtc-call-handling and webrtc-registration
 
 paths:
   /subscriptions:
@@ -195,7 +201,7 @@ paths:
 
         To subscribe and receive notifications about new calls, a
         `session-invitation` subscription is required using the `racmSessionId`
-        obtained from BYON-RACM API.
+        obtained from webrtc-registration API.
 
         Once you create a new voice-video session or receive an
         new call event, you can subscribe to `session-status` to receive
@@ -739,7 +745,7 @@ components:
           description: |-
             Event details payload. Depending of the event type, it will will include one of the data structures defined on this specification. Along with the subscription-ends, that is an authomatic event.
 
-            Check the introduction documentation and the CAMARA WebRTC BYON APIs for extra info about data structures included on the events.
+            Check the introduction documentation and the other CAMARA WebRTC APIs for extra info about data structures included on the events.
         time:
           $ref: "#/components/schemas/DateTime"
       discriminator:

@@ -1,23 +1,29 @@
-# WebRTC API definitions
+# WebRTC APIs definitions
 
-This folder contain the OpenAPI v3 definition of the WebRTC API
+This folder contain the OpenAPI v3 definition of the WebRTC subgroup
 
 ## APIs included
 
-* [Registration and Authentication management](BYON-RACM-Service.yaml)
+* `webrtc-registration` [Registration and Authentication management](webrtc-registration.yaml)
   * This API definition provides functionality for a REST client, browser or native application to manage Registration and Connectivity (RACM) towards Internet Multimedia Subsystem (IMS) Network.
-    * [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/main/code/API_definitions/BYON-RACM-Service.yaml&nocors)
-    * [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/main/code/API_definitions/BYON-RACM-Service.yaml)
-  
-* [Notification Channel management](BYON-Notification-Channel.yaml)
-  * This API definition provides functionality for a REST client, browser or native application, to establish notification channel to receive asynchronous notifications from MNO's IMS Network.
-    * [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/main/code/API_definitions/BYON-Notification-Channel.yaml&nocors)
-    * [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/main/code/API_definitions/BYON-Notification-Channel.yaml) 
+    * [View main on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/main/code/API_definitions/webrtc-registration.yaml&nocors)
+    * [View main on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/main/code/API_definitions/webrtc-registration.yaml)
 
-* [CallHandling service](BYON-CallHandling-Service.yaml)
+* `webrtc-call-handling` [Call handling service](webrtc-call-handling.yaml)
   * This API definition provides functionality for REST clients, browser or native application, to create and manage 1-1 calling. Both incoming and outgoing.
-    * [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/main/code/API_definitions/BYON-CallHandling-Service.yaml&nocors)
-    * [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/main/code/API_definitions/BYON-CallHandling-Service.yaml)
+    * [View main on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/main/code/API_definitions/webrtc-call-handling.yaml&nocors)
+    * [View main on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/main/code/API_definitions/webrtc-call-handling.yaml)
+
+* `webrtc-events` [WebRTC Event Subscription](webrtc-events.yaml)
+  * This API definition provides functionality for REST clients, browser or native application, to track session events. This will allow the client to receive server side updates about new incoming calls and other needed updates regarding the media negotiation and session progress (ringing, hangup, etc).
+    * [View main on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/main/code/API_definitions/webrtc-events.yaml&nocors)
+    * [View main on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/main/code/API_definitions/webrtc-events.yaml)
+
+* `webrtc-notification-channel` [Notification Channel management](webrtc-notification-channel.yaml)
+  * **API not included on meta-release**
+  * This API definition provides functionality for a REST client, browser or native application, to establish notification channel to receive asynchronous notifications from MNO's IMS Network.
+    * [View main on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/main/code/API_definitions/webrtc-notification-channel.yaml&nocors)
+    * [View main on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/main/code/API_definitions/webrtc-notification-channel.yaml)
 
 Detailed descriptions, diagrams and more information could be found at [API documentation](../../documentation/API_documentation/) section
 
@@ -33,7 +39,7 @@ Use the previous links to check the DEV main version of the API. Copy & paste an
 
 Build an HTML from sources using a local build OpenAPI v3 compatible like Node `redocly/cli`
 
-Execute redocly for each API document, use -o to 
+Execute redocly for each API document, use -o to
 ```
 $ npx @redocly/cli build-docs API_description_file.yaml
 ```
