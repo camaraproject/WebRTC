@@ -17,9 +17,11 @@ info:
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-  version: 0.1.3
+  version: 0.1.3-rc.1
+  x-camara-commonalities: 0.4.0
+
 servers:
-  - url: '{apiRoot}/webrtc-call-handling/vwip'
+  - url: '{apiRoot}/webrtc-call-handling/v0'
     variables:
       apiRoot:
         description: API root

@@ -12,14 +12,16 @@ info:
     - **DELETE**: Finish an existing device registration via its unique `racmSessionId`
 
     To receive server-side updates about new voice-video sessions, use `webrtc-events` API.
-  version: 0.1.2
   contact:
     email: contact@domain.com
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.1.3-rc.1
+  x-camara-commonalities: 0.4.0
+  
 servers:
-  - url: '{apiRoot}/webrtc-registration/vwip'
+  - url: '{apiRoot}/webrtc-registration/v0'
     description: APIs to manage Client Registration and Connection
     variables:
       apiRoot:
