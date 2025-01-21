@@ -176,7 +176,7 @@ externalDocs:
   description: Product documentation at CAMARA
   url: https://github.com/camaraproject/
 servers:
-  - url: "{apiRoot}/webrtc-events/v0"
+  - url: "{apiRoot}/webrtc-events/v0.1"
     variables:
       apiRoot:
         default: http://localhost:9091
