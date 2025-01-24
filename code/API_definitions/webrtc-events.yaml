@@ -995,7 +995,7 @@ components:
                 code: INVALID_PROTOCOL
                 message: Only HTTP is supported
             GENERIC_400_INVALID_CREDENTIAL:
-              description: Invalid sink credential type 
+              description: Invalid sink credential type
               value:
                 status: 400
                 code: INVALID_CREDENTIAL
