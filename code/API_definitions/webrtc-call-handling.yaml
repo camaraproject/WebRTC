@@ -18,6 +18,7 @@ info:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
   version: vwip
+  x-camara-commonalities: 0.5.0
 servers:
   - url: '{apiRoot}/webrtc-call-handling/vwip'
     variables:
