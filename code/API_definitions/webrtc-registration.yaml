@@ -37,6 +37,9 @@ paths:
       description: Create RACM Session
       parameters:
         - $ref: '#/components/parameters/hdrTransactionId'
+      security:
+        - openId:
+            - webrtc-registration:write
       requestBody:
         content:
           application/json:
@@ -99,10 +102,6 @@ paths:
                     status: 403
                     code: PERMISSION_DENIED
                     message: 'Operation not allowed: ...'
-      security:
-        - BearerAuth:
-            - read
-            - write
   /sessions/{racmSessionId}:
     put:
       tags:
@@ -113,13 +112,12 @@ paths:
         - $ref: '#/components/parameters/hdrTransactionId'
         - $ref: '#/components/parameters/hdrClientId'
         - $ref: '#/components/parameters/pathParamRacmSessionId'
+      security:
+        - openId:
+            - webrtc-registration:write
       responses:
         '200':
           description: No Content
-      security:
-        - BearerAuth:
-            - read
-            - write
     delete:
       tags:
         - RACM
@@ -129,15 +127,14 @@ paths:
         - $ref: '#/components/parameters/hdrTransactionId'
         - $ref: '#/components/parameters/hdrClientId'
         - $ref: '#/components/parameters/pathParamRacmSessionId'
+      security:
+        - openId:
+            - webrtc-registration:delete
       responses:
         '204':
           description: No Content
         '400':
           $ref: '#/components/responses/NotFound404'
-      security:
-        - BearerAuth:
-            - read
-            - write
 components:
   schemas:
     RacmRequest:
@@ -225,9 +222,9 @@ components:
       schema:
         type: string
   securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
+    openId:
+      type: openIdConnect
+      openIdConnectUrl: https://example.com/.well-known/openid-configuration
   responses:
     Generic400:
       description: Bad request

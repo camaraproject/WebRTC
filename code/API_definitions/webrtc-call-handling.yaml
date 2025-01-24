@@ -17,7 +17,7 @@ info:
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-  version: 0.1.3
+  version: vwip
 servers:
   - url: '{apiRoot}/webrtc-call-handling/vwip'
     variables:
@@ -38,6 +38,9 @@ paths:
       parameters:
         - $ref: '#/components/parameters/hdrTransactionId'
         - $ref: '#/components/parameters/hdrClientId'
+      security:
+        - openId:
+            - webrtc-call-handling:org.camaraproject.webrtc-call-handling.v0.session-status:create
       requestBody:
         description: Provide the information required for session creation
         content:
@@ -65,10 +68,6 @@ paths:
           $ref: '#/components/responses/Generic500'
         '503':
           $ref: '#/components/responses/Generic503'
-      security:
-        - BearerAuth:
-            - read
-            - write
   /sessions/{vvoipSessionId}:
     get:
       tags:
@@ -85,6 +84,9 @@ paths:
         - $ref: '#/components/parameters/hdrTransactionId'
         - $ref: '#/components/parameters/hdrClientId'
         - $ref: '#/components/parameters/pathParamVvoipSessionId'
+      security:
+        - openId:
+            - webrtc-call-handling:read
       responses:
         '200':
           description: A session information
@@ -102,10 +104,6 @@ paths:
           $ref: '#/components/responses/Generic500'
         '503':
           $ref: '#/components/responses/Generic503'
-      security:
-        - BearerAuth:
-            - read
-            - write
     delete:
       tags:
         - OneToOneCall
@@ -123,6 +121,9 @@ paths:
         - $ref: '#/components/parameters/hdrTransactionId'
         - $ref: '#/components/parameters/hdrClientId'
         - $ref: '#/components/parameters/pathParamVvoipSessionId'
+      security:
+        - openId:
+            - webrtc-call-handling:delete
       responses:
         '204':
           description: Session deleted
@@ -136,10 +137,6 @@ paths:
           $ref: '#/components/responses/Generic500'
         '503':
           $ref: '#/components/responses/Generic503'
-      security:
-        - BearerAuth:
-            - read
-            - write
   /sessions/{vvoipSessionId}/status:
     put:
       tags:
@@ -154,6 +151,9 @@ paths:
         - $ref: '#/components/parameters/hdrTransactionId'
         - $ref: '#/components/parameters/hdrClientId'
         - $ref: '#/components/parameters/pathParamVvoipSessionId'
+      security:
+        - openId:
+            - webrtc-call-handling:write
       requestBody:
         content:
           application/json:
@@ -194,10 +194,6 @@ paths:
           $ref: '#/components/responses/Generic500'
         '503':
           $ref: '#/components/responses/Generic503'
-      security:
-        - BearerAuth:
-            - read
-            - write
 components:
   schemas:
     VvoipSessionInformation:
@@ -457,9 +453,9 @@ components:
           answer:
             sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\na=extmap:2 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=sendrecv\r\na=rtcp-mux\r\na=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ruAnBNYnTJqDVZAIJV59VpQ5DxGI6tMX9h9kkHSz\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
   securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
+    openId:
+      type: openIdConnect
+      openIdConnectUrl: https://example.com/.well-known/openid-configuration
   responses:
     Generic400:
       description: Invalid input
