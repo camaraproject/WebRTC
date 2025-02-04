@@ -41,7 +41,7 @@ paths:
         - $ref: '#/components/parameters/hdrClientId'
       security:
         - openId:
-            - webrtc-call-handling:org.camaraproject.webrtc-call-handling.v0.session-status:create
+            - webrtc-call-handling:sessions:create
       requestBody:
         description: Provide the information required for session creation
         content:
@@ -87,7 +87,7 @@ paths:
         - $ref: '#/components/parameters/pathParamVvoipSessionId'
       security:
         - openId:
-            - webrtc-call-handling:read
+            - webrtc-call-handling:sessions:read
       responses:
         '200':
           description: A session information
@@ -124,7 +124,7 @@ paths:
         - $ref: '#/components/parameters/pathParamVvoipSessionId'
       security:
         - openId:
-            - webrtc-call-handling:delete
+            - webrtc-call-handling:sessions:delete
       responses:
         '204':
           description: Session deleted
@@ -154,7 +154,7 @@ paths:
         - $ref: '#/components/parameters/pathParamVvoipSessionId'
       security:
         - openId:
-            - webrtc-call-handling:write
+            - webrtc-call-handling:sessions:write
       requestBody:
         content:
           application/json:
