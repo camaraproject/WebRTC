@@ -100,7 +100,7 @@ paths:
         '403':
           $ref: '#/components/responses/Generic403'
         '404':
-          $ref: '#/components/responses/SessionNotFound404'
+          $ref: '#/components/responses/Generic404'
         '500':
           $ref: '#/components/responses/Generic500'
         '503':
@@ -133,7 +133,7 @@ paths:
         '403':
           $ref: '#/components/responses/Generic403'
         '404':
-          $ref: '#/components/responses/SessionNotFound404'
+          $ref: '#/components/responses/Generic404'
         '500':
           $ref: '#/components/responses/Generic500'
         '503':
@@ -190,12 +190,58 @@ paths:
         '403':
           $ref: '#/components/responses/Generic403'
         '404':
-          $ref: '#/components/responses/SessionNotFound404'
+          $ref: '#/components/responses/Generic404'
         '500':
           $ref: '#/components/responses/Generic500'
         '503':
           $ref: '#/components/responses/Generic503'
 components:
+  securitySchemes:
+    openId:
+      type: openIdConnect
+      openIdConnectUrl: https://example.com/.well-known/openid-configuration
+  headers:
+    x-correlator:
+      description: Correlation id for the different services
+      schema:
+        type: string
+        pattern: ^[a-zA-Z0-9-]{0,55}$
+  parameters:
+    hdrClientId:
+      name: clientId
+      in: header
+      description: The Client Id assigned by WebRTC GW
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    hdrTransactionId:
+      name: transactionId
+      in: header
+      description: Transaction Id associated with the request
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    pathParamVvoipSessionId:
+      name: vvoipSessionId
+      in: path
+      description: The sessionId assigned by the WebRTC GW for the vvoip session
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    x-correlator:
+      name: x-correlator
+      in: header
+      description: Correlation id for the different services
+      schema:
+        type: string
+        pattern: ^[a-zA-Z0-9-]{0,55}$
+        example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
   schemas:
     VvoipSessionInformation:
       type: object
@@ -303,53 +349,25 @@ components:
       example: Ringing
     ErrorInfo:
       type: object
-      properties:
-        status:
-          type: integer
-          description: HTTP status code returned along with this error response
-        code:
-          type: string
-          description: Code given to this error
-        message:
-          type: string
-          description: Detailed error description
       required:
+        - message
         - status
         - code
-        - message
+      properties:
+        message:
+          type: string
+          description: A human readable description of what the event represent
+        status:
+          type: integer
+          description: HTTP response status code
+        code:
+          type: string
+          description: Friendly Code to describe the error
     Address:
       type: string
       description: Subscriber address (Sender or Receiver)
       pattern: '^(tel:+[0-9]{5,15}|sip:.+@.+|.+)$'
       example: 'tel:+11234567899'
-  parameters:
-    hdrClientId:
-      name: clientId
-      in: header
-      description: The Client Id assigned by WebRTC GW
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
-    hdrTransactionId:
-      name: transactionId
-      in: header
-      description: Transaction Id associated with the request
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
-    pathParamVvoipSessionId:
-      name: vvoipSessionId
-      in: path
-      description: The sessionId assigned by the WebRTC GW for the vvoip session
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
   examples:
     exVSIRequest:
       value:
@@ -453,78 +471,207 @@ components:
           status: Resume
           answer:
             sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\na=extmap:2 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=sendrecv\r\na=rtcp-mux\r\na=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ruAnBNYnTJqDVZAIJV59VpQ5DxGI6tMX9h9kkHSz\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
-  securitySchemes:
-    openId:
-      type: openIdConnect
-      openIdConnectUrl: https://example.com/.well-known/openid-configuration
   responses:
     Generic400:
-      description: Invalid input
+      description: Bad Request
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorInfo'
-          example:
-            status: 400
-            code: INVALID_ARGUMENT
-            message: Schema validation failed at  ...
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 400
+                  code:
+                    enum:
+                      - INVALID_ARGUMENT
+                      - OUT_OF_RANGE
+          examples:
+            GENERIC_400_INVALID_ARGUMENT:
+              description: Invalid Argument. Generic Syntax Exception
+              value:
+                status: 400
+                code: INVALID_ARGUMENT
+                message: Client specified an invalid argument, request body or query param.
+            GENERIC_400_OUT_OF_RANGE:
+              description: Out of Range. Specific Syntax Exception used when a given field has a pre-defined range or a invalid filter criteria combination is requested
+              value:
+                status: 400
+                code: OUT_OF_RANGE
+                message: Client specified an invalid range.
     Generic401:
       description: Unauthorized
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorInfo'
-          example:
-            status: 401
-            code: UNAUTHENTICATED
-            message: 'Authorization failed: ...'
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 401
+                  code:
+                    enum:
+                      - UNAUTHENTICATED
+                      - AUTHENTICATION_REQUIRED
+          examples:
+            GENERIC_401_UNAUTHENTICATED:
+              description: Request cannot be authenticated
+              value:
+                status: 401
+                code: UNAUTHENTICATED
+                message: Request not authenticated due to missing, invalid, or expired credentials.
+            GENERIC_401_AUTHENTICATION_REQUIRED:
+              description: New authentication is needed, authentication is no longer valid
+              value:
+                status: 401
+                code: AUTHENTICATION_REQUIRED
+                message: New authentication is required.
     Generic403:
       description: Forbidden
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorInfo'
-          example:
-            status: 403
-            code: PERMISSION_DENIED
-            message: 'Operation not allowed: ...'
-    SessionNotFound404:
-      description: Session not found
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 403
+                  code:
+                    enum:
+                      - PERMISSION_DENIED
+                      - INVALID_TOKEN_CONTEXT
+          examples:
+            GENERIC_403_PERMISSION_DENIED:
+              description: Permission denied. OAuth2 token access does not have the required scope or when the user fails operational security
+              value:
+                status: 403
+                code: PERMISSION_DENIED
+                message: Client does not have sufficient permissions to perform this action.
+            GENERIC_403_INVALID_TOKEN_CONTEXT:
+              description: Reflect some inconsistency between information in some field of the API and the related OAuth2 Token
+              value:
+                status: 403
+                code: INVALID_TOKEN_CONTEXT
+                message: "{{field}} is not consistent with access token."
+    Generic404:
+      description: Not found
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorInfo'
-          example:
-            status: 404
-            code: NOT_FOUND
-            message: Session Id does not exist
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 404
+                  code:
+                    enum:
+                      - NOT_FOUND
+                      - IDENTIFIER_NOT_FOUND
+          examples:
+            GENERIC_404_NOT_FOUND:
+              description: Resource is not found
+              value:
+                status: 404
+                code: NOT_FOUND
+                message: The specified resource is not found.
+            GENERIC_404_IDENTIFIER_NOT_FOUND:
+              description: Some identifier cannot be matched to a device
+              value:
+                status: 404
+                code: IDENTIFIER_NOT_FOUND
+                message: Device identifier not found.
     Generic500:
-      description: Internal server error
+      description: Internal Server Error
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorInfo'
-          example:
-            status: 500
-            code: INTERNAL
-            message: 'Internal server error: ...'
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 500
+                  code:
+                    enum:
+                      - INTERNAL
+          examples:
+            GENERIC_500_INTERNAL:
+              description: Problem in Server side. Regular Server Exception
+              value:
+                status: 500
+                code: INTERNAL
+                message: Unknown server error. Typically a server bug.
     Generic501:
       description: Not Implemented
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorInfo'
-          example:
-            status: 501
-            code: NOT_IMPLEMENTED
-            message: Service not implemented for the specified user device
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 501
+                  code:
+                    enum:
+                      - NOT_IMPLEMENTED
+          examples:
+            GENERIC_501_NOT_IMPLEMENTED:
+              description: Service not implemented. The use of this code should be avoided as far as possible to get the objective to reach aligned implementations
+              value:
+                status: 501
+                code: NOT_IMPLEMENTED
+                message: This functionality is not implemented yet.
     Generic503:
-      description: Service unavailable
+      description: Service Unavailable
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorInfo'
-          example:
-            status: 503
-            code: UNAVAILABLE
-            message: Service unavailable
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 503
+                  code:
+                    enum:
+                      - UNAVAILABLE
+          examples:
+            GENERIC_503_UNAVAILABLE:
+              description: Service is not available. Temporary situation usually related to maintenance process in the server side
+              value:
+                status: 503
+                code: UNAVAILABLE
+                message: Service Unavailable.
