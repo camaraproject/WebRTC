@@ -3,15 +3,64 @@ info:
   title: WebRTC Registration and Connectivity Management (RACM) Service API
   description: |-
     ## 1. Introduction
-    This API provide REST API for clients to manage Registration and Connectivity (RACM) towards MNO's IMS Network.
+    This API provide REST API for clients to manage Registration and Connectivity
+    (RACM) towards MNO's IMS Network.
 
-    API to create device regsitrations. These, identified by a unique `racmSessionId`
-    can be updated and terminated via this API and its methods.
+    The network requires that endpoints create a session, this will enable and
+    activate services on the network in order to allow users to create audio and
+    video sessions using the telco network.
+    
+    All telco services are based on subscriptions, this API allows the user to
+    create a session where you can consume the audio/video part of the telco services.
+
+    **Use cases to cover:**
+      - Functional:
+        - Ability to create Registration sessions on the network, this grants
+          access to create new audio and video sessions.
+        - Ability to update or remove Registration sessions on the network
+      - An additional subscription to webrtc-events API is required to receive incoming calls.
+    
+    ## 2. Relevant terms and definitions
+
+    - **RACM**: Acronym of Registration and Connectivity Management, a network
+      concept related with REGSITRATION and permissions of the user.
+    - **racmSession** A registration session. A valid client running on a valid
+      device, with permission to use the network capabilities to create and receive
+      calls (audio/video sessions).
+    - **racmSessionId**: Unique identifier of an WebRTC endpoint **registration**.
+      Retrieved using the `webrtc-regsitration` API
+    - **deviceId**: A unique identifier for the physical device where a WebRTC
+      session is initiated. It is provided by the WebRTC application, it remains
+      consistent across multiple installations or logins on the same device. Its
+      primary function is to ensure that only one WebRTC session (**racmSession**)
+      is active per device at a time, enabling the gateway to clean up any stale
+      sessions if a new session is initiated on the same device.
+    - **clientId**: A unique identifier, assigned by the network, for each client
+      instance or **racmSession**. It is best practice for the gateway to issue a new
+      clientId for each login or session. This approach helps the gateway maintain
+      clear indexing or mapping for quicker processing and simplifies troubleshooting
+      by clearly distinguishing one session from another.
+
+
+    ## 3. API functionality
+
+    This API allows to create device regsitrations. These, identified by a unique
+    `racmSessionId` can be updated and terminated via this API and its methods.
     - **POST**: Create a new device registration using a valid authorization token.
     - **PUT**: Update a device registration via its unique `racmSessionId`
     - **DELETE**: Finish an existing device registration via its unique `racmSessionId`
+    To receive server-side updates about new voice-video sessions, you need to use `webrtc-events` API.
 
-    To receive server-side updates about new voice-video sessions, use `webrtc-events` API.
+    Base use case expected is that the application, when activated and intended to
+    create audio/video sessions or to receive them, it must be _registered_ into
+    the network. To achieve that, it must gather a valid authorization token and
+    use it along with a unique deviceId to obtain a `racmSessionId` using the POST
+    command over the `/sessions` path.
+
+    This registration must be refreshed periodically usign the PUT command, until
+    it is not required anymore. When required, it can be removed using the DELETE
+    command along the `racmSessionId`
+
   version: 0.1.2
   contact:
     email: contact@domain.com
