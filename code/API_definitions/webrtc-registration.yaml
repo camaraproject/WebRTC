@@ -195,10 +195,6 @@ components:
         deviceId:
           type: string
           description: The device-id of the client in UUID format.
-        channelId:
-          type: string
-          description: ID of an existing notification channel.
-          example: "channel_id_123"
     RacmResponse:
       type: object
       properties:
