@@ -170,13 +170,13 @@ info:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: 0.1.0-rc.1
-  x-camara-commonalities: 0.4.0
+  x-camara-commonalities: 0.5
 
 externalDocs:
   description: Product documentation at CAMARA
   url: https://github.com/camaraproject/
 servers:
-  - url: "{apiRoot}/webrtc-events/v0.1"
+  - url: "{apiRoot}/webrtc-events/v0.1rc1"
     variables:
       apiRoot:
         default: http://localhost:9091

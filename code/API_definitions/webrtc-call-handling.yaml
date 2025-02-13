@@ -12,16 +12,14 @@ info:
     - **PUT**: Update the status of a session via its unique `vvoipSessionId`
 
     To receive server-side updates about the session establishment process, use `webrtc-events` API.
-  contact:
-    email: contact@domain.com
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-  version: 0.2-rc.1
-  x-camara-commonalities: 0.4.0
+  version: 0.2.0-rc.1
+  x-camara-commonalities: 0.5
 
 servers:
-  - url: '{apiRoot}/webrtc-call-handling/v0.2'
+  - url: '{apiRoot}/webrtc-call-handling/v0.2rc1'
     variables:
       apiRoot:
         description: API root
