@@ -4,35 +4,201 @@ info:
   description: |-
     ## 1. Introduction
 
-    API to create 1-1 voice and video sessions. These, identified by a unique `vvoipSessionId`
-    can be recovered, updated and terminated via this API and its methods.
+    This API provides REST API for clients to manage live audio and video sessions
+    towards the operator's network (IMS network).
+
+    To handle audio/video sessions, what we usually known as *calls*, the network
+    requires to identify both involved parties: caller, the origin, and the callee,
+    the destination. Once identified the endpoints required to be connected, then
+    it is required to define *how* to send media from one endpoint to the other.
+
+    The first point, *identify the endpoints* is solved in CAMARA via direct API
+    parameters on the API request. The later, *negotiate how to connect* is solved
+    sharing SDP information between peers.
+
+    In that point, the WebRTC technology is used to simplify the access to the
+    media, and get a simple and well-known protocol to solve the media transmission
+    requirement.
+
+    Let's dig on it on section 3: API functionality
+
+    **Use cases to cover:**
+      - Functional:
+        - Ability to create audio and video sessions on the network, this grants
+          ability to reach any phone number on the public network using your telco
+          provider rights.
+        - Ability to retrieve any session, to recover for a network disconnection
+          or to check current status for any reason.
+        - Ability to upgrade to video, change sending audio/video parameters, or
+          notify the network about any modification on your side of the calls.
+        - Ability to hangup the call. Stop the transmision, and delete your audio
+          and video session.
+      - An additional subscription to webrtc-events API is required to receive
+        incoming events from network side (ex. remote hangup event).
+
+    ## 2. Relevant terms and definitions
+
+    - **clientId**: A unique identifier, assigned by the network, for each client
+      instance or **racmSession**. It is best practice for the gateway to issue a new
+      clientId for each login or session. This approach helps the gateway maintain
+      clear indexing or mapping for quicker processing and simplifies troubleshooting
+      by clearly distinguishing one session from another.
+    - **transactionId**: Unique ID associated to the REST _transaction_ created by the
+      REST client. It is used to correlate requests and responses and help debugging.
+    - **clientCorrelator**: A unique correlation ID that the client can use to tag
+      a particular resource representation during a request to create a resource on
+      the server. This allows the client to ***recover*** from communication failures
+      during resource creation and therefore avoids re-sending the message in such
+      situations.
+    - **WebRTC**: WebRTC is a free and open-source project providing web browsers
+      and mobile applications with real-time communication via application programming
+      interfaces. It allows audio and video communication and streaming to work
+      inside web pages by allowing direct peer-to-peer communication
+    - **SDP**: Acronym for Session Description Protocol. The SDP is a format for
+      describing multimedia communication sessions for the purposes of announcement
+      and invitation.
+    - **WrtcSDPDescriptor**: Schema to include inside a JSON, a SDP body. You can
+      obtain an SDP for WebRTC calling using the WebRTC API provided by the browser
+      or any other media library.
+
+    ## 3. API functionality
+
+    This API allows to create 1-1 voice and video sessions. These, identified by a
+    unique `vvoipSessionId` can be recovered, updated and terminated via this API
+    and its methods.
     - **POST**: Create a new session using a valid `clientId` from RACM API
     - **GET**: Recover an existing session via its unique `vvoipSessionId`
     - **DELETE**: Finish an existing session via its unique `vvoipSessionId`
     - **PUT**: Update the status of a session via its unique `vvoipSessionId`
 
-    To receive server-side updates about the session establishment process, use `webrtc-events` API.
+    To receive server-side updates about the session establishment process, you
+    must use `webrtc-events` API.
+
+    ### 3.1. Creating a call
+
+    To call someone, you need, previously a valid registration on the network.
+    You must check the webrtc-registration API to retrieve a valid registration
+    on the network that allows you to send calls (IMS registration).
+
+    Once this is completed, you can consume the POST /sessions/ endpoint to call
+    to a remote destination.
+
+    ```
+    POST /webrtc-call-handling/vwip/sessions
+    {
+      "originatorAddress": "tel:+17085852753",
+      "receiverAddress": "tel:+17085854000",
+      "clientCorrelator": "fda6e26d-e7c8-4596-870c-c083c0d39b2c"
+    }
+    ```
+
+    This will create a call, but without local media you will have a problem, or
+    maybe the network will reject your call. You need to add a local SDP offer.
+
+    > **The WebRTC SDP local candidate**
+    >
+    > What is usually done, before attempt to create a call, is to solve the SDP local
+    description. This is, how you are going to send the media. To explain it briefly,
+    browsers offer the
+    [WebRTC API](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API) that
+    include `getUserMedia()` and `RTCPeerConnection` interfaces that will simplify
+    the process.
+    >
+    > In summary, we need to obtain the media, create the `RTCPeerConnection`
+    and use it's SDP on our CAMARA webrtc-call-handling API as the offer. There
+    is extra information about this concept on the SupportingDocuments folder.
+
+    Once you retrieve you local SDP offer, you modify your session including it,
+    or maybe you prefer to solve the local candidate before attempt the call, in
+    that case, you will include your local offer on the audio/video session creation.
+
+    ```
+    POST /webrtc-call-handling/vwip/sessions
+    {
+        "originatorAddress": "tel:+17085852753",
+        "receiverAddress": "tel:+17085854000",
+        "offer": {
+            "sdp": "v=0\r\no=- 4808447918291752114 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=extmap-allow-mixed\r\na=msid-semantic: WMS 0893fb9b-23c2-4571-a26d-13cb0f4fed9f\r\nm=audio 13765 UDP/TLS/RTP/SAVPF 111 63 9 0 8 13 110 126\r\nc=IN IP4 123.123.123.123\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:959305279 1 udp 2113937151 26e1f6e6-f0cb-47fb-a1b4-afa62b6a7f29.local 50745 typ host generation 0 network-cost 999\r\na=candidate:3375440286 1 udp 1677729535 123.123.123.123 13765 typ srflx raddr 0.0.0.0 rport 0 generation 0 network-cost 999\r\na=ice-ufrag:YoUo\r\na=ice-pwd:kK5J6IAgiKFDFU+2rC+FyZal\r\na=ice-options:trickle\r\na=fingerprint:sha-256 CF:56:D8:57:9B:68:B2:1C:F6:ED:6C:CO:02:7C:96:C2:88:A3:C2:38:AD:A2:CA:F5:0D:47:BB:81:74:7B:75:17\r\na=setup:actpass\r\na=mid:0\r\na=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level\r\na=extmap:2 http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time\r\na=extmap:3 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=extmap:4 urn:ietf:params:rtp-hdrext:sdes:mid\r\na=sendrecv\r\na=msid:0893fb9b-23c2-4571-a26d-13cb0f4fed9f 2daf5a1e-d3bf-4d4e-95db-b8623fce4176\r\na=rtcp-mux\r\na=rtcp-rsize\r\na=rtpmap:111 opus/48000/2\r\na=rtcp-fb:111 transport-cc\r\na=fmtp:111 minptime=10;useinbandfec=1\r\na=rtpmap:63 red/48000/2\r\na=fmtp:63 111/111\r\na=rtpmap:9 G722/8000\r\na=rtpmap:0 PCMU/8000\r\na=rtpmap:8 PCMA/8000\r\na=rtpmap:13 CN/8000\r\na=rtpmap:110 telephone-event/48000\r\na=rtpmap:126 telephone-event/8000\r\na=ssrc:932268938 cname:mzxQSFSDV3JpfIJY\r\na=ssrc:932268938 msid:0893fb9b-23c2-4571-a26d-13ccof4fed9f 2daf5a1e-d3bf-4d4e-95db-b8623fce4176\r\n"
+            },
+        "clientCorrelator": "fda6e26d-e7c8-4596-870c-c083c0d39b2c"
+    }
+    ```
+
+    Following this point, your call is progressing and the network will inform
+    about extra information required and connection status via de the
+    webrtc-events API.
+
+    Check inline webrtc-events API inline documentation and supporting documents
+    for further information.
+
+    ### 3.2. Hanging up a call
+
+    When you have a voice/video session in progress, you can decide to finish the
+    call, to do so, simply execute a DELETE command over the endpoint using the
+    `vvoipSessionId` obtained on call creation.
+
+    This action will trigger all necessary action on the network side to properly
+    hangup and drop the call.
+
+    ### 3.3. Picking up a call
+
+    Using the `webrtc-events` API, you can receive events from the network, these
+    events could include the `session-invitation` event. This means that someone
+    is calling you.
+
+    To *hook off*, we need to retrieve the session based on the `vvoipSessionId`
+    using the GET command, afterwards, you can present to the user some
+    confirmation option to accept the call.
+
+    Final step is to include a local offer. We already seen at 3.1 that a local
+    SDP is required, in this case, we will use the PUT command to modify the
+    audio/video session and include the information about the responding endpoint.
+
+    Let's say that we are responding this session `0AEE1B58BAEEDA3EABA42B32EBB3DFE0DEAD`:
+    ```
+    PUT /webrtc-call-handling/vwip/sessions/0AEE1B58BAEEDA3EABA42B32EBB3DFE0DEAD
+    {
+        "status": "InProgress",
+        "answer": {
+            "sdp": "v=0\r\no=- 4808447918291752114 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=extmap-allow-mixed\r\na=msid-semantic: WMS 0893fb9b-23c2-4571-a26d-13cb0f4fed9f\r\nm=audio 13765 UDP/TLS/RTP/SAVPF 111 63 9 0 8 13 110 126\r\nc=IN IP4 123.123.123.123\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:959305279 1 udp 2113937151 26e1f6e6-f0cb-47fb-a1b4-afa62b6a7f29.local 50745 typ host generation 0 network-cost 999\r\na=candidate:3375440286 1 udp 1677729535 123.123.123.123 13765 typ srflx raddr 0.0.0.0 rport 0 generation 0 network-cost 999\r\na=ice-ufrag:YoUo\r\na=ice-pwd:kK5J6IAgiKFDFU+2rC+FyZal\r\na=ice-options:trickle\r\na=fingerprint:sha-256 CF:56:D8:57:9B:68:B2:1C:F6:ED:6C:CO:02:7C:96:C2:88:A3:C2:38:AD:A2:CA:F5:0D:47:BB:81:74:7B:75:17\r\na=setup:actpass\r\na=mid:0\r\na=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level\r\na=extmap:2 http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time\r\na=extmap:3 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=extmap:4 urn:ietf:params:rtp-hdrext:sdes:mid\r\na=sendrecv\r\na=msid:0893fb9b-23c2-4571-a26d-13cb0f4fed9f 2daf5a1e-d3bf-4d4e-95db-b8623fce4176\r\na=rtcp-mux\r\na=rtcp-rsize\r\na=rtpmap:111 opus/48000/2\r\na=rtcp-fb:111 transport-cc\r\na=fmtp:111 minptime=10;useinbandfec=1\r\na=rtpmap:63 red/48000/2\r\na=fmtp:63 111/111\r\na=rtpmap:9 G722/8000\r\na=rtpmap:0 PCMU/8000\r\na=rtpmap:8 PCMA/8000\r\na=rtpmap:13 CN/8000\r\na=rtpmap:110 telephone-event/48000\r\na=rtpmap:126 telephone-event/8000\r\na=ssrc:932268938 cname:mzxQSFSDV3JpfIJY\r\na=ssrc:932268938 msid:0893fb9b-23c2-4571-a26d-13ccof4fed9f 2daf5a1e-d3bf-4d4e-95db-b8623fce4176\r\n"
+            }
+    }
+    ```
+
+    ## 4. Authorization and authentication
+
+    The "Camara Security and Interoperability Profile" provides details of how an
+    API consumer requests an access token. Please refer to Identity and Consent
+    Management (https://github.com/camaraproject/IdentityAndConsentManagement/)
+    for the released version of the profile.
+
+    The specific authorization flows to be used will be agreed upon during the
+    onboarding process, happening between the API consumer and the API provider,
+    taking into account the declared purpose for accessing the API, whilst also
+    being subject to the prevailing legal framework dictated by local legislation.
+
+    In cases where personal data is processed by the API and users can exercise
+    their rights through mechanisms such as opt-in and/or opt-out, the use of
+    three-legged access tokens is mandatory. This ensures that the API remains
+    in compliance with privacy regulations, upholding the principles of
+    transparency and user-centric privacy-by-design.
+
   contact:
     email: contact@domain.com
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
   version: vwip
-  x-camara-commonalities: 0.5.0
+  x-camara-commonalities: 0.5
 servers:
   - url: '{apiRoot}/webrtc-call-handling/vwip'
     variables:
       apiRoot:
         description: API root
         default: 'http://localhost:9091'
-tags:
-  - name: OneToOneCall
-    description: APIs related to 1-1 voice/video call session
 paths:
   /sessions:
     post:
-      tags:
-        - OneToOneCall
       summary: Creates voice and/or video session
       description: Creates a voice and/or video session
       operationId: postSessions
@@ -71,8 +237,6 @@ paths:
           $ref: '#/components/responses/Generic503'
   /sessions/{vvoipSessionId}:
     get:
-      tags:
-        - OneToOneCall
       summary: Get the vvoip session information
       description: |
         Get the VVoIP Session description based on `vvoipSessionId`.
@@ -106,8 +270,6 @@ paths:
         '503':
           $ref: '#/components/responses/Generic503'
     delete:
-      tags:
-        - OneToOneCall
       summary: Cancel or Terminate the vvoip session
       description: >
         Cancel a 1-1 vvoip session (as originator),
@@ -140,8 +302,6 @@ paths:
           $ref: '#/components/responses/Generic503'
   /sessions/{vvoipSessionId}/status:
     put:
-      tags:
-        - OneToOneCall
       summary: Update the status of the vvoip session
       description: |
         Update the status of the vvoip session, this may include updating SDP media
