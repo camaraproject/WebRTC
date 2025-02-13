@@ -1,24 +1,107 @@
 openapi: 3.0.3
 info:
-  title: WebRTC Registration and Connectivity Management (RACM) Service API
+  title: WebRTC Registration Service API
   description: |-
     ## 1. Introduction
-    This API provide REST API for clients to manage Registration and Connectivity (RACM) towards MNO's IMS Network.
+    This API provide REST API for clients to manage Registration and Connectivity
+    (RACM) towards network operator (IMS Network).
 
-    API to create device regsitrations. These, identified by a unique `racmSessionId`
-    can be updated and terminated via this API and its methods.
+    The network requires that all endpoints identify the subscriber and create a
+    session before enable or activate any service. In order to create audio and
+    video sessions, you device (or endpoint) need to have a valid registration on
+    the network. This API provide that feature, and allow users to create audio and
+    video sessions using the telco network.
+
+    All telco services are based on subscriptions, this API allows the user to
+    create a session where you can consume the audio/video part of the telco services.
+
+    **Use cases to cover:**
+      - Functional:
+        - Ability to create Registration sessions on the network, this grants
+          access to create new audio and video sessions.
+        - Ability to update or remove Registration sessions on the network
+      - An additional subscription to webrtc-events API is required to receive
+        incoming calls.
+
+    ## 2. Relevant terms and definitions
+
+    - **RACM**: Acronym of Registration and Connectivity Management. In the realm
+      of mobile networks, Registration Management (RM) serves as a crucial process
+      for establishing and maintaining user equipment (UE) connectivity within the
+      network. It ensures that UEs (your smartphone or mobile device) are properly
+      identified, authenticated, and authorized to access network services.
+    - **racmSession** A registration session. A valid client running on a valid
+      device, with permission to use the network capabilities to create and receive
+      calls (audio/video sessions).
+    - **racmSessionId**: Unique identifier of an WebRTC endpoint **registration**.
+      Retrieved using the `webrtc-registration` API
+    - **deviceId**: A unique identifier for the physical device where a WebRTC
+      session is initiated. It is provided by the WebRTC application, it remains
+      consistent across multiple installations or logins on the same device. Its
+      primary function is to ensure that only one WebRTC session (**racmSession**)
+      is active per device at a time, enabling the gateway to clean up any stale
+      sessions if a new session is initiated on the same device.
+    - **clientId**: A unique identifier, assigned by the network, for each client
+      instance or **racmSession**. It is best practice for the gateway to issue a new
+      clientId for each login or session. This approach helps the gateway maintain
+      clear indexing or mapping for quicker processing and simplifies troubleshooting
+      by clearly distinguishing one session from another.
+    - **WebRTC**: WebRTC is a free and open-source project providing web browsers
+      and mobile applications with real-time communication via application programming
+      interfaces. It allows audio and video communication and streaming to work
+      inside web pages by allowing direct peer-to-peer communication
+    - **SDP**: Acronym for Session Description Protocol. The SDP is a format for
+      describing multimedia communication sessions for the purposes of announcement
+      and invitation.
+
+    ## 3. API functionality
+
+    This API allows to create device registrations. These, identified by a unique
+    `racmSessionId` can be updated and terminated via this API and its methods.
     - **POST**: Create a new device registration using a valid authorization token.
     - **PUT**: Update a device registration via its unique `racmSessionId`
     - **DELETE**: Finish an existing device registration via its unique `racmSessionId`
+    To receive server-side updates about new voice-video sessions, you need to
+    use `webrtc-events` API.
 
-    To receive server-side updates about new voice-video sessions, use `webrtc-events` API.
+    The main concept of the API is pretty straightforward: a subscriber needs a
+    session to create calls, so you will need a subscription on your device before
+    attempt any audio/video call.
+
+    Once you create a session, you can:
+    - Use `webrtc-events` API to create a subscription and receive incoming calls.
+    - Use `webrtc-call-handling` API to create a audio/video session and create
+      an outgoing call.
+
+    Check for extra details on each of these APIs already present on the WebRTC
+    repository.
+
+    ## 4. Authorization and authentication
+
+    The "Camara Security and Interoperability Profile" provides details of how an
+    API consumer requests an access token. Please refer to Identity and Consent
+    Management (https://github.com/camaraproject/IdentityAndConsentManagement/)
+    for the released version of the profile.
+
+    The specific authorization flows to be used will be agreed upon during the
+    onboarding process, happening between the API consumer and the API provider,
+    taking into account the declared purpose for accessing the API, whilst also
+    being subject to the prevailing legal framework dictated by local legislation.
+
+    In cases where personal data is processed by the API and users can exercise
+    their rights through mechanisms such as opt-in and/or opt-out, the use of
+    three-legged access tokens is mandatory. This ensures that the API remains
+    in compliance with privacy regulations, upholding the principles of
+    transparency and user-centric privacy-by-design.
+
   contact:
     email: contact@domain.com
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: vwip
-  x-camara-commonalities: 0.5.0
+  x-camara-commonalities: 0.5
+
 servers:
   - url: '{apiRoot}/webrtc-registration/vwip'
     description: APIs to manage Client Registration and Connection
@@ -144,10 +227,6 @@ components:
         deviceId:
           type: string
           description: The device-id of the client in UUID format.
-        channelId:
-          type: string
-          description: ID of an existing notification channel.
-          example: "channel_id_123"
     RacmResponse:
       type: object
       properties:
