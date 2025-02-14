@@ -183,15 +183,14 @@ info:
     in compliance with privacy regulations, upholding the principles of
     transparency and user-centric privacy-by-design.
 
-  contact:
-    email: contact@domain.com
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-  version: vwip
+  version: 0.2.0-rc.1
   x-camara-commonalities: 0.5
+
 servers:
-  - url: '{apiRoot}/webrtc-call-handling/vwip'
+  - url: '{apiRoot}/webrtc-call-handling/v0.2rc1'
     variables:
       apiRoot:
         description: API root
