@@ -166,8 +166,8 @@ paths:
         - openId:
             - webrtc-registration:sessions:write
       responses:
-        '200':
-          description: No Content
+        '204':
+          description: Updated the registration status (no content)
     delete:
       tags:
         - Registration
