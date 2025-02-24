@@ -174,7 +174,7 @@ info:
 
 externalDocs:
   description: Product documentation at CAMARA
-  url: https://github.com/camaraproject/
+  url: https://github.com/camaraproject/WebRTC
 servers:
   - url: "{apiRoot}/webrtc-events/v0.1rc1"
     variables:
@@ -184,9 +184,8 @@ servers:
 tags:
   - name: Webrtc-events Subscription
     description: |-
-      Operations to manage event subscriptions for WebRTC Event APIs (Directly
-      related with webrtc-call-handling and webrtc-registration
-
+      Operations to manage event subscriptions for WebRTC Event APIs.
+      Directly related with webrtc-call-handling and webrtc-registration.
 paths:
   /subscriptions:
     post:
@@ -306,7 +305,9 @@ paths:
       tags:
         - Webrtc-events Subscription
       summary: "Retrieve a list of webrtc-events event subscription"
-      description: Retrieve a list of webrtc-events event subscription(s)
+      description:
+        Retrieve **a list** of webrtc-events subscription(s) with detailed
+        information. Including configuration data and current status.
       operationId: retrieveNotificationChannelSubscriptionList
       parameters:
         - $ref: "#/components/parameters/x-correlator"
@@ -337,7 +338,9 @@ paths:
       tags:
         - Webrtc-events Subscription
       summary: "Retrieve a webrtc-events event subscription"
-      description: retrieve webrtc-events subscription information for a given subscription.
+      description: |
+        Retrieve webrtc-events subscription detailed information for a given
+        subscription. Including configuration data and current status.
       operationId: retrieveNotificationChannelSubscription
       security:
         - openId:
@@ -368,7 +371,9 @@ paths:
         - Webrtc-events Subscription
       summary: "Delete a webrtc-events event subscription"
       operationId: deleteNotificationChannelSubscription
-      description: delete a given webrtc-events subscription.
+      description: |
+        API endpoint to delete a given webrtc-events subscription. Action done
+        to stop receiving notifications about this event subscription.
       security:
         - openId:
             - webrtc-events:delete
@@ -564,9 +569,9 @@ components:
       description: |-
         The detail of the requested event subscription.
         - org.camaraproject.webrtc-events.v0.session-invitation requires a
-          valid `racmSessionId` obtained via RACM endpoint.
+          valid `racmSessionId` obtained via registration endpoint.
         - org.camaraproject.webrtc-events.v0.session-status requires both, a
-          valid `racmSessionId` obtained via RACM endpoint and a valid
+          valid `racmSessionId` obtained via registration endpoint and a valid
           `sessionId` obtained via session-invitation event or via CallHandling
           API
       type: object
@@ -590,8 +595,8 @@ components:
           type: string
           example: xsmcaum3z4zw4l0cu4w115m0
           description: |-
-            The RACM session ID created by WebRTC Gateway.
-            Obtained via RACM API.
+            The resgitration session ID created by WebRTC Gateway.
+            Obtained via registration API.
 
     SubscriptionEventTypeNotification:
       type: string

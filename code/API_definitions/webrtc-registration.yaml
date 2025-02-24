@@ -3,8 +3,8 @@ info:
   title: WebRTC Registration Service API
   description: |-
     ## 1. Introduction
-    This API provide REST API for clients to manage Registration and Connectivity
-    (RACM) towards network operator (IMS Network).
+    This API provides the API consumer with the capabilities to manage
+    Registration and Connectivity towards network.
 
     The network requires that all endpoints identify the subscriber and create a
     session before enable or activate any service. In order to create audio and
@@ -100,6 +100,9 @@ info:
   version: 0.2.0-rc.1
   x-camara-commonalities: 0.5
 
+externalDocs:
+  description: Product documentation at CAMARA
+  url: https://github.com/camaraproject/WebRTC
 servers:
   - url: '{apiRoot}/webrtc-registration/v0.2rc1'
     description: APIs to manage Client Registration and Connection
@@ -108,15 +111,20 @@ servers:
         description: API Root
         default: http://localhost:9091
 tags:
-  - name: Registration and Connection Management
-    description: APIs for Client to Register into MNO's IMS Network
+  - name: Registration
+    description: Operations to manage client registration into the network
 paths:
   /sessions:
     post:
       tags:
-        - RACM
-      summary: Create RACM Session
-      description: Create RACM Session
+        - Registration
+      summary: Create a registration
+      description: |-
+        Endpoint used to create a new registration on the network. This action
+        creates a valid communications session on the network system identified
+        by a `racmSessionId'. This unique ID is used for each action where the
+        endpoint has been involved in connecting to the network.
+      operationId: createRegistration
       parameters:
         - $ref: '#/components/parameters/hdrTransactionId'
       security:
@@ -141,9 +149,15 @@ paths:
   /sessions/{racmSessionId}:
     put:
       tags:
-        - RACM
-      summary: For sharing new AccessToken with WebRTC GW, the AccessToken is expected to be received from the Auth server.
-      description: '**The client shall use the racmSessionId to construct the API path.**'
+        - Registration
+      summary: Refresh access token and network registration.
+      description: |
+        API Endpoint used to refresh the resgitration on the network. Sharing a
+        new AccessToken with network if it corresponds. The AccessToken
+        is expected to be received from the Auth server.
+
+        **The client shall use the racmSessionId to construct the API path.**
+      operationId: updateRegistrationById
       parameters:
         - $ref: '#/components/parameters/hdrTransactionId'
         - $ref: '#/components/parameters/hdrClientId'
@@ -156,9 +170,15 @@ paths:
           description: No Content
     delete:
       tags:
-        - RACM
+        - Registration
       summary: Delete Registration Session.
-      description: '**The client shall use the racmSessionId to construct the API path.**'
+      description: |-
+        API endpoint used to remove a valid registration on the network. This action
+        frees any resource and invalidates future actions that involves this
+        registration between the endpoint and the network.
+
+        **The client shall use the racmSessionId to construct the API path.**
+      operationId: deleteRegistrationById
       parameters:
         - $ref: '#/components/parameters/hdrTransactionId'
         - $ref: '#/components/parameters/hdrClientId'
@@ -212,7 +232,7 @@ components:
     pathParamRacmSessionId:
       name: racmSessionId
       in: path
-      description: The sessionId assigned by the RACM service
+      description: The sessionId assigned by the registration service
       required: true
       style: simple
       explode: false
@@ -236,7 +256,7 @@ components:
             $ref: '#/components/schemas/RegistrationInformation'
         racmSessionId:
           type: string
-          description: The RACM session ID created by WebRTC Gateway. Clients must utilize this ID to construct the API path.
+          description: The resgistratrion session ID created by WebRTC Gateway. Clients must utilize this ID to construct the API path.
     ConnectionInformation:
       type: object
       properties:
