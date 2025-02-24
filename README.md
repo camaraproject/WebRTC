@@ -6,15 +6,15 @@
 <a href="https://github.com/camaraproject/WebRTC/blob/main/LICENSE" title="License"><img src="https://img.shields.io/badge/License-Apache%202.0-green.svg?style=plastic"></a>
 
 # WebRTC
-Repository to describe, develop, document and test the WebRTC API family
+Repository to describe, develop, document and test the WebRTC APIs
 
 ## Scope
 * Service APIs for “WebRTC” (see APIBacklog.md)  
-* It provides the customer with the ability to:  
+* It provides the API consumer with the ability to:  
   * Add real-time communication capabilities to their applications like video, voice, and generic data.
   * Enable a web endpoint to register for telco services (IMS) through a WebRTC Gateway using Oauth 2.0 and the Operator provided Identity Provider (IDP)
-  * Create subscriptions to receive telco call events using CloudEvents
-  * Make calls from the endpoint (client) side establishing a realiable and media WebSocket channel to exchange secure media.
+  * Create subscriptions to receive telco call events using CloudEvents: Ability to follow call estalishment process and to receive new incoming calls.
+  * Make and receive calls from the endpoint (client) side establishing a realiable media WebSocket channel to exchange secure media.
 * Describe, develop, document and test the APIs (with 1-2 Telcos)  
 * Started: September 2023
 * Location: virtually  
@@ -56,7 +56,6 @@ Repository to describe, develop, document and test the WebRTC API family
   * Find meeting notes at https://wiki.camaraproject.org/display/CAM/WebRTC+Meeting+Minutes
 * Schedule:
   * Tuesdays 4pm CEST (Madrid, Paris, Berlin, Rome), each 15 days
-* Meeting link: [LFX Zoom](https://zoom-lfx.platform.linuxfoundation.org/meeting/99827941663?password=ac67c375-4795-4389-93b5-bb5ed5ef0977).
   
 ## Contributorship and mailing list
 
