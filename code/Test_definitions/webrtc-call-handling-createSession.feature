@@ -5,7 +5,7 @@ Feature: CAMARA WebRTC Call Handling, v0.2.0-rc.1 - Operation createSession
     And the resource "/webrtc-call-handling/v0.2rc1/sessions"                                                              |
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
-    And the header "transactionId" is set to a UUID value
+    And the header "x-correlator" is set to a UUID value
     And the header "clientId" is set to a UUID value
 
   @webrtc_call_handling_createSession_01_generic_success_scenario
@@ -22,6 +22,7 @@ Feature: CAMARA WebRTC Call Handling, v0.2.0-rc.1 - Operation createSession
       }
       """
     Then the response status code should be 201
+    And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response body complies with the OAS schema at "/components/schemas/VvoipSessionInformation"
     And the response body should contain a "mediaSessionId"
 

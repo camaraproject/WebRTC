@@ -5,7 +5,9 @@ Feature: CAMARA WebRTC Registration, v0.2.0-rc.1 - Operation createSession
     And the resource "/webrtc-registration/v0.2rc1/sessions"                                                              |
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
-    And the header "transactionId" is set to a UUID value
+    And the header "x-correlator" is set to a UUID value
+    # Properties not explicitly overwitten in the Scenarios can take any values compliant with the schema
+    And the request body is set by default to a request body compliant with the schema at "/components/schemas/regSessionRequest"
  
   @webrtc_registration_createSession_01_generic_success_scenario
   Scenario: Create a new registration session
@@ -16,6 +18,7 @@ Feature: CAMARA WebRTC Registration, v0.2.0-rc.1 - Operation createSession
       }
       """
     Then the response status code should be 200
+    And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response body should contain a "regSessionId"
 
   # Error scenarios

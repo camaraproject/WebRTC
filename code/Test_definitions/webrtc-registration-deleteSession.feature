@@ -5,7 +5,7 @@ Feature: CAMARA WebRTC Registration, v0.2.0-rc.1 - Operation deleteSession
     And the resource "/webrtc-registration/v0.2rc1/sessions/{regSessionId}"                                                              |
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
-    And the header "transactionId" is set to a UUID value
+    And the header "x-correlator" is set to a UUID value
     And the header "clientId" is set to a UUID value
     And the path parameter "regSessionId" is set by default to a existing register session
  
@@ -14,6 +14,7 @@ Feature: CAMARA WebRTC Registration, v0.2.0-rc.1 - Operation deleteSession
     Given an existing registration session with "regSessionId" as "existing-session-id"
     When the client sends a DELETE request to "/registrations/existing-session-id"
     Then the response status code should be 204
+    And the response header "x-correlator" has same value as the request header "x-correlator"
     And the registration session should no longer exist
 
   # Error scenarios

@@ -121,7 +121,7 @@ paths:
         endpoint has been involved in connecting to the network.
       operationId: createRegistration
       parameters:
-        - $ref: '#/components/parameters/hdrTransactionId'
+        - $ref: '#/components/parameters/x-correlator'
       security:
         - openId:
             - webrtc-registration:sessions:create
@@ -133,6 +133,9 @@ paths:
       responses:
         '200':
           description: Ok
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
           content:
             application/json:
               schema:
@@ -156,7 +159,7 @@ paths:
         **The client shall use the regSessionId to construct the API path.**
       operationId: updateRegistrationById
       parameters:
-        - $ref: '#/components/parameters/hdrTransactionId'
+        - $ref: '#/components/parameters/x-correlator'
         - $ref: '#/components/parameters/hdrClientId'
         - $ref: '#/components/parameters/pathParamRegSessionId'
       security:
@@ -165,6 +168,9 @@ paths:
       responses:
         '204':
           description: Updated the registration status (no content)
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
         '400':
           $ref: "#/components/responses/Generic400"
         '401':
@@ -185,15 +191,18 @@ paths:
         **The client shall use the regSessionId to construct the API path.**
       operationId: deleteRegistrationById
       parameters:
-        - $ref: '#/components/parameters/hdrTransactionId'
+        - $ref: '#/components/parameters/x-correlator'
         - $ref: '#/components/parameters/hdrClientId'
-        - $ref: '#/components/parameters/pathParamregSessionId'
+        - $ref: '#/components/parameters/pathParamRegSessionId'
       security:
         - openId:
             - webrtc-registration:sessions:delete
       responses:
         '204':
           description: No Content
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
         '400':
           $ref: "#/components/responses/Generic400"
         '401':
@@ -226,15 +235,6 @@ components:
       name: clientId
       in: header
       description: The Client ID assigned by WebRTC GW
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
-    hdrTransactionId:
-      name: transactionId
-      in: header
-      description: The Transaction ID associated with the request
       required: true
       style: simple
       explode: false

@@ -43,7 +43,7 @@ info:
       clientId for each login or session. This approach helps the gateway maintain
       clear indexing or mapping for quicker processing and simplifies troubleshooting
       by clearly distinguishing one session from another.
-    - **transactionId**: Unique ID associated to the REST _transaction_ created by the
+    - **x-correlator**: Unique ID associated to the REST _transaction_ created by the
       REST client. It is used to correlate requests and responses and help debugging.
     - **clientCorrelator**: A unique correlation ID that the client can use to tag
       a particular resource representation during a request to create a resource on
@@ -210,7 +210,7 @@ paths:
       description: Creates a voice and/or video session
       operationId: createSession
       parameters:
-        - $ref: '#/components/parameters/hdrTransactionId'
+        - $ref: "#/components/parameters/x-correlator"
         - $ref: '#/components/parameters/hdrClientId'
       security:
         - openId:
@@ -227,6 +227,9 @@ paths:
       responses:
         '201':
           description: Created
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
           content:
             application/json:
               schema:
@@ -253,7 +256,7 @@ paths:
         (termination). **
       operationId: getSessionDetailsById
       parameters:
-        - $ref: '#/components/parameters/hdrTransactionId'
+        - $ref: '#/components/parameters/x-correlator'
         - $ref: '#/components/parameters/hdrClientId'
         - $ref: '#/components/parameters/pathParamMediaSessionId'
       security:
@@ -262,6 +265,9 @@ paths:
       responses:
         '200':
           description: A session information
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
           content:
             application/json:
               schema:
@@ -286,7 +292,7 @@ paths:
         ** The client shall construct the API path using the mediaSessionId supplied in the session creation response (origination) or in the invitation notification (termination). **'
       operationId: deleteSessionById
       parameters:
-        - $ref: '#/components/parameters/hdrTransactionId'
+        - $ref: '#/components/parameters/x-correlator'
         - $ref: '#/components/parameters/hdrClientId'
         - $ref: '#/components/parameters/pathParamMediaSessionId'
       security:
@@ -295,6 +301,9 @@ paths:
       responses:
         '204':
           description: Session deleted
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
         '401':
           $ref: '#/components/responses/Generic401'
         '403':
@@ -312,7 +321,7 @@ paths:
         The API consumer shall construct the API path using the `mediaSessionId` supplied in the session creation response (origination) or in the invitation notification (termination).
       operationId: updateSessionStatus
       parameters:
-        - $ref: '#/components/parameters/hdrTransactionId'
+        - $ref: '#/components/parameters/x-correlator'
         - $ref: '#/components/parameters/hdrClientId'
         - $ref: '#/components/parameters/pathParamMediaSessionId'
       security:
@@ -383,15 +392,7 @@ components:
       explode: false
       schema:
         type: string
-    hdrTransactionId:
-      name: transactionId
-      in: header
-      description: Transaction Id associated with the request
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
+
     pathParamMediaSessionId:
       name: mediaSessionId
       in: path
