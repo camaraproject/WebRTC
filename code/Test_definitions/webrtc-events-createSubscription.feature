@@ -34,3 +34,58 @@ Feature: CAMARA WebRTC Events, v0.1.0-rc.1 - Operation createSubscription
     Then the response status code should be 201 or 202
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response body complies with the OAS schema at "/components/schemas/Subscription"
+
+  # Error scenarios
+
+  # Generic 400 errors
+
+  @webrtc_events_createSubscription_400.1_no_request_body
+  Scenario: Missing request body
+    Given the request body is not included
+    When the HTTP "POST" request is sent
+    Then the response status code is 400
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_events_createSubscription_400.2_empty_request_body
+  Scenario: Empty object as request body
+    Given the request body is set to "{}"
+    When the HTTP "POST" request is sent
+    Then the response status code is 400
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  # Generic 401 errors
+
+  @webrtc_events_createSubscription_401.1_no_authorization_header
+  Scenario: No Authorization header
+    Given the header "Authorization" is removed
+    And the request body is set to a valid request body
+    When the HTTP "POST" request is sent
+    Then the response status code is 401
+    And the response property "$.status" is 401
+    And the response property "$.code" is "UNAUTHENTICATED"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_events_createSubscription_401.2_expired_access_token
+  Scenario: Expired access token
+    Given the header "Authorization" is set to an expired access token
+    And the request body is set to a valid request body
+    When the HTTP "POST" request is sent
+    Then the response status code is 401
+    And the response property "$.status" is 401
+    And the response property "$.code" is "UNAUTHENTICATED"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_events_createSubscription_401.3_invalid_access_token
+  Scenario: Invalid access token
+    Given the header "Authorization" is set to an invalid access token
+    And the request body is set to a valid request body
+    When the HTTP "POST" request is sent
+    Then the response status code is 401
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 401
+    And the response property "$.code" is "UNAUTHENTICATED"
+    And the response property "$.message" contains a user friendly text
