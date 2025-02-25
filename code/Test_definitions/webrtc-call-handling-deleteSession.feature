@@ -2,7 +2,7 @@ Feature: CAMARA WebRTC Call Handling, v0.2.0-rc.1 - Operation deleteSession
 
   Background: Common deleteSession setup
     Given an environment at "apiRoot"
-    And the resource "/webrtc-call-handling/v0.2rc1/sessions/{vvoipSessionId}"                                                              |
+    And the resource "/webrtc-call-handling/v0.2rc1/sessions/{mediaSessionId}"                                                              |
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
     And the header "transactionId" is set to a UUID value
@@ -10,8 +10,8 @@ Feature: CAMARA WebRTC Call Handling, v0.2.0-rc.1 - Operation deleteSession
 
   @webrtc_call_handling_deleteSession_01_generic_success_scenario
   Scenario: Cancel or terminate the vvoip session
-    Given an existing voice-video session with "vvoipSessionId" as "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
-    And the path parameter "vvoipSessionId" is set to the value for that voice-video session
+    Given an existing voice-video session with "mediaSessionId" as "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
+    And the path parameter "mediaSessionId" is set to the value for that voice-video session
     When the client sends a DELETE request to "/sessions/0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
     Then the response status code should be 204
 
@@ -19,7 +19,7 @@ Feature: CAMARA WebRTC Call Handling, v0.2.0-rc.1 - Operation deleteSession
 
   @webrtc_call_handling_deleteSession_404_session_not_found
   Scenario: Session identifier cannot be matched to a device
-    Given the path parameter "vvoipSessionId" is compliant with the parameter schema but does not identify a valid session
+    Given the path parameter "mediaSessionId" is compliant with the parameter schema but does not identify a valid session
     When the HTTP "DELETE" request is sent
     Then the response status code is 404
     And the response property "$.status" is 404
@@ -30,7 +30,7 @@ Feature: CAMARA WebRTC Call Handling, v0.2.0-rc.1 - Operation deleteSession
 
   @webrtc_call_handling_deleteSession_400.1_no_request
   Scenario: Missing request path
-    Given the path parameter "vvoipSessionId" is not included
+    Given the path parameter "mediaSessionId" is not included
     When the HTTP "DELETE" request is sent
     Then the response status code is 400
     And the response property "$.status" is 400
@@ -39,7 +39,7 @@ Feature: CAMARA WebRTC Call Handling, v0.2.0-rc.1 - Operation deleteSession
 
   @webrtc_call_handling_getSession_400.2_empty_request
   Scenario: Empty object as request path
-    Given the path parameter "vvoipSessionId" is set to ""
+    Given the path parameter "mediaSessionId" is set to ""
     When the HTTP "GET" request is sent
     Then the response status code is 400
     And the response property "$.status" is 400
@@ -51,7 +51,7 @@ Feature: CAMARA WebRTC Call Handling, v0.2.0-rc.1 - Operation deleteSession
   @webrtc_call_handling_deleteSession_401.1_no_authorization_header
   Scenario: No Authorization header
     Given the header "Authorization" is removed
-    And the path parameter "vvoipSessionId" is valid
+    And the path parameter "mediaSessionId" is valid
     When the HTTP "DELETE" request is sent
     Then the response status code is 401
     And the response property "$.status" is 401
@@ -61,7 +61,7 @@ Feature: CAMARA WebRTC Call Handling, v0.2.0-rc.1 - Operation deleteSession
   @webrtc_call_handling_deleteSession_401.2_expired_access_token
   Scenario: Expired access token
     Given the header "Authorization" is set to an expired access token
-    And the path parameter "vvoipSessionId" is valid
+    And the path parameter "mediaSessionId" is valid
     When the HTTP "DELETE" request is sent
     Then the response status code is 401
     And the response property "$.status" is 401
@@ -71,7 +71,7 @@ Feature: CAMARA WebRTC Call Handling, v0.2.0-rc.1 - Operation deleteSession
   @webrtc_call_handling_deleteSession_401.3_invalid_access_token
   Scenario: Invalid access token
     Given the header "Authorization" is set to an invalid access token
-    And the path parameter "vvoipSessionId" is valid
+    And the path parameter "mediaSessionId" is valid
     When the HTTP "DELETE" request is sent
     Then the response status code is 401
     And the response header "Content-Type" is "application/json"

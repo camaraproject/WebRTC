@@ -23,7 +23,7 @@ Feature: CAMARA WebRTC Events, v0.1.0-rc.1 - Operation createSubscription
         "config": {
           "subscriptionDetail": {
             "deviceId": "1qazxsw23edc",
-            "racmSessionId": "xsmcaum3z4zw4l0cu4w115m0"
+            "regSessionId": "xsmcaum3z4zw4l0cu4w115m0"
           },
           "initialEvent": true,
           "subscriptionMaxEvents": 50,

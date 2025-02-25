@@ -25,24 +25,19 @@ info:
 
     ## 2. Relevant terms and definitions
 
-    - **RACM**: Acronym of Registration and Connectivity Management. In the realm
-      of mobile networks, Registration Management (RM) serves as a crucial process
-      for establishing and maintaining user equipment (UE) connectivity within the
-      network. It ensures that UEs (your smartphone or mobile device) are properly
-      identified, authenticated, and authorized to access network services.
-    - **racmSession** A registration session. A valid client running on a valid
+    - **regSession** A registration session. A valid client running on a valid
       device, with permission to use the network capabilities to create and receive
       calls (audio/video sessions).
-    - **racmSessionId**: Unique identifier of an WebRTC endpoint **registration**.
+    - **regSessionId**: Unique identifier of an WebRTC endpoint **registration**.
       Retrieved using the `webrtc-registration` API
     - **deviceId**: A unique identifier for the physical device where a WebRTC
       session is initiated. It is provided by the WebRTC application, it remains
       consistent across multiple installations or logins on the same device. Its
-      primary function is to ensure that only one WebRTC session (**racmSession**)
+      primary function is to ensure that only one WebRTC session (**regSession**)
       is active per device at a time, enabling the gateway to clean up any stale
       sessions if a new session is initiated on the same device.
     - **clientId**: A unique identifier, assigned by the network, for each client
-      instance or **racmSession**. It is best practice for the gateway to issue a new
+      instance or **regSession**. It is best practice for the gateway to issue a new
       clientId for each login or session. This approach helps the gateway maintain
       clear indexing or mapping for quicker processing and simplifies troubleshooting
       by clearly distinguishing one session from another.
@@ -57,10 +52,10 @@ info:
     ## 3. API functionality
 
     This API allows to create device registrations. These, identified by a unique
-    `racmSessionId` can be updated and terminated via this API and its methods.
+    `regSessionId` can be updated and terminated via this API and its methods.
     - **POST**: Create a new device registration using a valid authorization token.
-    - **PUT**: Update a device registration via its unique `racmSessionId`
-    - **DELETE**: Finish an existing device registration via its unique `racmSessionId`
+    - **PUT**: Update a device registration via its unique `regSessionId`
+    - **DELETE**: Finish an existing device registration via its unique `regSessionId`
     To receive server-side updates about new voice-video sessions, you need to
     use `webrtc-events` API.
 
@@ -122,7 +117,7 @@ paths:
       description: |-
         Endpoint used to create a new registration on the network. This action
         creates a valid communications session on the network system identified
-        by a `racmSessionId'. This unique ID is used for each action where the
+        by a `regSessionId'. This unique ID is used for each action where the
         endpoint has been involved in connecting to the network.
       operationId: createRegistration
       parameters:
@@ -134,21 +129,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RacmRequest'
+              $ref: '#/components/schemas/regSessionRequest'
       responses:
         '200':
           description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RacmResponse'
+                $ref: '#/components/schemas/regSessionResponse'
         '400':
           $ref: "#/components/responses/CreateSessionBadRequest400"
         '401':
           $ref: "#/components/responses/Generic401"
         '403':
           $ref: "#/components/responses/CreateSessionForbidden403"
-  /sessions/{racmSessionId}:
+  /sessions/{regSessionId}:
     put:
       tags:
         - Registration
@@ -158,12 +153,12 @@ paths:
         new AccessToken with network if it corresponds. The AccessToken
         is expected to be received from the Auth server.
 
-        **The client shall use the racmSessionId to construct the API path.**
+        **The client shall use the regSessionId to construct the API path.**
       operationId: updateRegistrationById
       parameters:
         - $ref: '#/components/parameters/hdrTransactionId'
         - $ref: '#/components/parameters/hdrClientId'
-        - $ref: '#/components/parameters/pathParamRacmSessionId'
+        - $ref: '#/components/parameters/pathParamRegSessionId'
       security:
         - openId:
             - webrtc-registration:sessions:write
@@ -187,12 +182,12 @@ paths:
         frees any resource and invalidates future actions that involves this
         registration between the endpoint and the network.
 
-        **The client shall use the racmSessionId to construct the API path.**
+        **The client shall use the regSessionId to construct the API path.**
       operationId: deleteRegistrationById
       parameters:
         - $ref: '#/components/parameters/hdrTransactionId'
         - $ref: '#/components/parameters/hdrClientId'
-        - $ref: '#/components/parameters/pathParamRacmSessionId'
+        - $ref: '#/components/parameters/pathParamregSessionId'
       security:
         - openId:
             - webrtc-registration:sessions:delete
@@ -245,8 +240,8 @@ components:
       explode: false
       schema:
         type: string
-    pathParamRacmSessionId:
-      name: racmSessionId
+    pathParamRegSessionId:
+      name: regSessionId
       in: path
       description: The sessionId assigned by the registration service
       required: true
@@ -255,13 +250,13 @@ components:
       schema:
         type: string
   schemas:
-    RacmRequest:
+    regSessionRequest:
       type: object
       properties:
         deviceId:
           type: string
           description: The device-id of the client in UUID format.
-    RacmResponse:
+    regSessionResponse:
       type: object
       properties:
         connectionInformation:
@@ -270,7 +265,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RegistrationInformation'
-        racmSessionId:
+        regSessionId:
           type: string
           description: The resgistratrion session ID created by WebRTC Gateway. Clients must utilize this ID to construct the API path.
     ConnectionInformation:

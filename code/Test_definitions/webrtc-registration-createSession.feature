@@ -16,7 +16,7 @@ Feature: CAMARA WebRTC Registration, v0.2.0-rc.1 - Operation createSession
       }
       """
     Then the response status code should be 200
-    And the response body should contain a "racmSessionId"
+    And the response body should contain a "regSessionId"
 
   # Error scenarios
 
