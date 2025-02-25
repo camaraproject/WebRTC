@@ -144,6 +144,8 @@ paths:
                 $ref: '#/components/schemas/RacmResponse'
         '400':
           $ref: "#/components/responses/CreateSessionBadRequest400"
+        '401':
+          $ref: "#/components/responses/Generic401"
         '403':
           $ref: "#/components/responses/CreateSessionForbidden403"
   /sessions/{racmSessionId}:
@@ -168,6 +170,14 @@ paths:
       responses:
         '204':
           description: Updated the registration status (no content)
+        '400':
+          $ref: "#/components/responses/Generic400"
+        '401':
+          $ref: "#/components/responses/Generic401"
+        '403':
+          $ref: "#/components/responses/Generic403"
+        '404':
+          $ref: '#/components/responses/Generic404'
     delete:
       tags:
         - Registration
@@ -189,6 +199,12 @@ paths:
       responses:
         '204':
           description: No Content
+        '400':
+          $ref: "#/components/responses/Generic400"
+        '401':
+          $ref: "#/components/responses/Generic401"
+        '403':
+          $ref: "#/components/responses/Generic403"
         '404':
           $ref: '#/components/responses/Generic404'
 components:

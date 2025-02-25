@@ -236,6 +236,8 @@ paths:
                   $ref: '#/components/examples/exampleVoiceVideoSessionResponse'
         '400':
           $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: "#/components/responses/Generic401"
         '403':
           $ref: '#/components/responses/Generic403'
   /sessions/{vvoipSessionId}:
