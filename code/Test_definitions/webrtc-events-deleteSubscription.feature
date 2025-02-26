@@ -1,4 +1,4 @@
-Feature: CAMARA WebRTC Events, v0.1.0-rc.1 - Operation deleteSubscription
+Feature: CAMARA WebRTC Events, v0.1.0 - Operation deleteSubscription
 
   Background: Common deleteSubscription setup
     Given an environment at "apiRoot"

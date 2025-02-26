@@ -1,4 +1,4 @@
-Feature: CAMARA WebRTC Call Handling, v0.2.0-rc.1 - Operation updateSession
+Feature: CAMARA WebRTC Call Handling, v0.2.0 - Operation updateSession
 
   Background: Common updateSession setup
     Given an environment at "apiRoot"

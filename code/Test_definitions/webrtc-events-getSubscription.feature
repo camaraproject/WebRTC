@@ -1,4 +1,4 @@
-Feature: CAMARA WebRTC Events, v0.1.0-rc.1 - Operation getSubscription
+Feature: CAMARA WebRTC Events, v0.1.0 - Operation getSubscription
 
   Background: Common getSubscription setup
     Given an environment at "apiRoot"

@@ -1,4 +1,4 @@
-Feature: CAMARA WebRTC Call Handling, v0.2.0-rc.1 - Operation deleteSession
+Feature: CAMARA WebRTC Call Handling, v0.2.0 - Operation deleteSession
 
   Background: Common deleteSession setup
     Given an environment at "apiRoot"

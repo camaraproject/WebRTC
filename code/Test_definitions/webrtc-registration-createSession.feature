@@ -1,4 +1,4 @@
-Feature: CAMARA WebRTC Registration, v0.2.0-rc.1 - Operation createSession
+Feature: CAMARA WebRTC Registration, v0.2.0 - Operation createSession
 
   Background: Common createSession setup
     Given an environment at "apiRoot"

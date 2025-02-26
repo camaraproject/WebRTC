@@ -1,4 +1,4 @@
-Feature: CAMARA WebRTC Call Handling, v0.2.0-rc.1 - Operation getSession
+Feature: CAMARA WebRTC Call Handling, v0.2.0 - Operation getSession
 
   Background: Common getSession setup
     Given an environment at "apiRoot"
