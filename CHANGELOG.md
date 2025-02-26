@@ -3,17 +3,85 @@
 
 ## Table of contents
 
+- **[r1.2](#r12)**
 - **[r1.1](#r11)**
 - **[v0.1.1](#v011)**
 - **[v0.1.0](#v010)**
 
-**Please be aware that the project will have frequent updates to the main branch. There are no compatibility guarantees associated with code in any branch, including main, until it has been released. For example, changes may be reverted before a release is published. For the best results, use the latest published release.**
+**Please be aware that the project will have frequent updates to the main branch. There are no compatibility guarantees associated with code in any branch, including main, until it has been released. For example, changes may be reverted before a release is published. For the best results, use the [latest](https://github.com/camaraproject/WebRTC/releases/latest) published release.**
 
 The below sections record the changes for each API version in each release as follows:
 
 * for each first alpha or release-candidate API version, all changes since the release of the previous public API version
 * for subsequent alpha or release-candidate API versions, the delta with respect to the previous pre-release
 * for a public API version, the consolidated changes since the release of the previous public API version
+
+# r1.2
+
+## Release Notes
+
+This public release contains the definition and documentation of
+
+* webrtc-registration v0.2.0
+* webrtc-call-handling v0.2.0
+* webrtc-events v0.1.0
+
+The API definition(s) are based on
+
+* Commonalities r2.2
+* Identity and Consent Management r2.2
+
+Changelog since r1.1
+
+* Full Changelog with the list of PRs and contributors: https://github.com/camaraproject/DeviceLocation/compare/r1.1...r1.2
+
+## WebRTC Registration v0.2.0
+
+### Added
+* Included basic error testing
+
+### Changed
+* Term `RACM` is replaced by `Registration` or `reg` suffix
+* TransactionId header (required) was replaced by x-correlator header (optional)
+
+### Fixed
+* Descriptions updates and references
+* Commonalities aligment with r2.2 (Responses and documentation)
+* Responses review : 400, 401, 403 included
+* PUT registration responds with 204 No content instead of 200
+
+### Removed
+* Removed generic 5xx reponses
+
+## WebRTC Call Handling v0.2.0
+
+### Added
+* Included basic error testing
+
+### Changed
+* Term `RACM` is replaced by `Registration` or `reg` suffix
+* Suffix `vvoip` is replaced by `media` to identify media sessions, like calls, video-calls or any media session
+* TransactionId header (required) was replaced by x-correlator header (optional)
+
+### Fixed
+* Descriptions updates and references
+* Commonalities aligment with r2.2 (Responses and documentation)
+* Responses review : 400, 401, 403 included
+
+### Removed
+* Removed generic 5xx reponses
+
+## WebRTC Events v0.1.0
+
+### Added
+* Included basic error testing
+
+### Changed
+* Term `RACM` is replaced by `Registration` or `reg` suffix
+* Suffix `vvoip` is replaced by `media` to identify media sessions, like calls, video-calls or any media session
+
+### Fixed
+* Commonalities aligment with r2.2 (Responses and documentation)
 
 # r1.1
 
@@ -27,8 +95,8 @@ This pre-release contains the definition and documentation of
 
 The API definition(s) are based on
 
-* Commonalities v0.5.0-rc.1
-* Identity and Consent Management v0.3.0-rc.1
+* Commonalities r2.1 (v0.5.0-rc.1)
+* Identity and Consent Management r2.1 (v0.3.0-rc.1)
   
 ## WebRTC Registration v0.2.0-rc.1
 
