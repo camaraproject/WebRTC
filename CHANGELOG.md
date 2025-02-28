@@ -28,8 +28,10 @@ This public release contains the definition and documentation of
 
 The API definition(s) are based on
 
-* Commonalities r2.2
-* Identity and Consent Management r2.2
+* Commonalities r2.3
+
+* Identity and Consent Management r2.3
+
 
 Changelog since r1.1
 
