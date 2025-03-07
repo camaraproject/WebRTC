@@ -2,7 +2,7 @@ Feature: CAMARA WebRTC Registration, v0.2.0 - Operation createSession
 
   Background: Common createSession setup
     Given an environment at "apiRoot"
-    And the resource "/webrtc-registration/v0.2rc1/sessions"                                                              |
+    And the resource "/webrtc-registration/v0.2/sessions"                                                              |
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" is set to a UUID value

@@ -4,10 +4,14 @@ info:
   description: |-
     ## 1. Introduction
     This API provides the API consumer with the capabilities to manage
-    Registration and Connectivity towards network.
+    registration and connectivity towards the network.
 
-    The network requires that all endpoints identify the subscriber and create a
-    session before enable or activate any service. In order to create audio and
+    The network requires that the API consumer application registers and identifies an end user device  (its MSISDN) before enabling any media session services provided by the WebRTC APIs. 
+A registration returns 
+
+* a `registrationId` to manage a registration later
+* a `clientId` (in the `connectivityInformation`) that must be subsequently used in all webrtc service API calls to the network for that end user.
+    session before enabling or activating any service. In order to create audio and
     video sessions, you device (or endpoint) need to have a valid registration on
     the network. This API provide that feature, and allow users to create audio and
     video sessions using the telco network.
@@ -99,7 +103,7 @@ externalDocs:
   description: Product documentation at CAMARA
   url: https://github.com/camaraproject/WebRTC
 servers:
-  - url: '{apiRoot}/webrtc-registration/v0.2rc1'
+  - url: '{apiRoot}/webrtc-registration/v0.2'
     description: APIs to manage Client Registration and Connection
     variables:
       apiRoot:
@@ -115,7 +119,7 @@ paths:
         - Registration
       summary: Create a registration
       description: |-
-        Endpoint used to create a new registration on the network. This action
+        API used to create a new registration of a device with the network identified by a registrationId (in UUID format).
         creates a valid communications session on the network system identified
         by a `regSessionId'. This unique ID is used for each action where the
         endpoint has been involved in connecting to the network.
@@ -152,7 +156,7 @@ paths:
         - Registration
       summary: Refresh access token and network registration.
       description: |
-        API Endpoint used to refresh the resgitration on the network. Sharing a
+        API Endpoint used to refresh the registration on the network. Sharing a
         new AccessToken with network if it corresponds. The AccessToken
         is expected to be received from the Auth server.
 
@@ -267,7 +271,7 @@ components:
             $ref: '#/components/schemas/RegistrationInformation'
         regSessionId:
           type: string
-          description: The resgistratrion session ID created by WebRTC Gateway. Clients must utilize this ID to construct the API path.
+          description: The registration session ID is returned when registering a device with the network . Clients must utilize this ID to as a parameter in the call-handling and subscription APIs.
     ConnectionInformation:
       type: object
       properties:

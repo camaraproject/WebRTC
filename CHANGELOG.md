@@ -48,7 +48,8 @@ Changelog since r1.1
 
 ### Fixed
 * Descriptions updates and references
-* Commonalities aligment with r2.2 (Responses and documentation)
+* Commonalities alignment with r2.3 (Responses and documentation)
+
 * Responses review : 400, 401, 403 included
 * PUT registration responds with 204 No content instead of 200
 
@@ -67,7 +68,8 @@ Changelog since r1.1
 
 ### Fixed
 * Descriptions updates and references
-* Commonalities aligment with r2.2 (Responses and documentation)
+* Commonalities alignment with r2.3 (Responses and documentation)
+
 * Responses review : 400, 401, 403 included
 
 ### Removed
@@ -83,7 +85,8 @@ Changelog since r1.1
 * Suffix `vvoip` is replaced by `media` to identify media sessions, like calls, video-calls or any media session
 
 ### Fixed
-* Commonalities aligment with r2.2 (Responses and documentation)
+* Commonalities alignment with r2.3 (Responses and documentation)
+
 
 # r1.1
 
