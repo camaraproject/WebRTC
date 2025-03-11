@@ -15,7 +15,7 @@ Feature: CAMARA WebRTC Call Handling, v0.2.0 - Operation updateSession
     When the client sends a PUT request to "/sessions/0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
     Then the response status code should be 200
     And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/schemas/VvoipSessionInformation"
+    And the response body complies with the OAS schema at "/components/schemas/MediaSessionInformation"
 
   # Error scenarios
 

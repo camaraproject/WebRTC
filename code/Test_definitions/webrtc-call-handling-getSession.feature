@@ -9,13 +9,13 @@ Feature: CAMARA WebRTC Call Handling, v0.2.0 - Operation getSession
     And the header "clientId" is set to a UUID value
 
   @webrtc_call_handling_getSession_01_generic_success_scenario
-  Scenario: Get the vvoip session information
+  Scenario: Get the media session information
     Given an existing voice-video session with "mediaSessionId" as "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
     And the path parameter "mediaSessionId" is set to the value for that voice-video session
     When the client sends a GET request to "/sessions/0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
     Then the response status code should be 200
     And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/schemas/VvoipSessionInformation"
+    And the response body complies with the OAS schema at "/components/schemas/MediaSessionInformation"
 
   # Error scenarios
 

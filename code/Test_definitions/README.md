@@ -3,7 +3,7 @@ There is a separate Feature file per API operation.
 
 The test plan has to be enhanced
 
-WebRTC Regsitration
+WebRTC Registration
 
 * webrtc-registration-createSession.feature
 * webrtc-registration-updateSession.feature

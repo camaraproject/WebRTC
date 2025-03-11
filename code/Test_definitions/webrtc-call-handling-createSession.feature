@@ -23,7 +23,7 @@ Feature: CAMARA WebRTC Call Handling, v0.2.0 - Operation createSession
       """
     Then the response status code should be 201
     And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/schemas/VvoipSessionInformation"
+    And the response body complies with the OAS schema at "/components/schemas/MediaSessionInformation"
     And the response body should contain a "mediaSessionId"
 
   # Error scenarios

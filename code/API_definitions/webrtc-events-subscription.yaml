@@ -8,18 +8,18 @@ info:
     receive events about updates of an active session or new sessions requests
     (incoming calls).
 
-    Any device can subscribe for events its own active sessions using the
-    `sessionId` to identify the session to track. And using a valid
-    `regSessionId` it can subscribe to new sessions events. This allows them
-    to update the UI while WebRTC sessions are progressing and also, allows
-    them to receive new session request, generating incoming call scenarios for
-    non SIM devices.
+    Any device can subscribe to media session events for accessible active media sessions using the
+    `sessionId` to identify the media session to track. Using a valid
+    `registrationId` it can subscribe to new media sessions events (new calls).
+    This allows the device applications to update the UI while media sessions
+    are progressing and also, allows the device to receive new session request,
+    generating incoming call scenarios for non-SIM devices.
 
-    A classic use case is the negotiation of a live WebRTC session (call), that
+    A classic use case is the negotiation of a live media session (call), that
     requires multiple asynchronous events from server side. Other classic
     example, is to notify that a subscriber is not logged into the network
     anymore and requires refresh, for example, when the IMS expires the
-    endpoint registration.
+    device registration.
 
     In addition, this API, allows to an external service to create "notification
     channels" for other systems that does no support the async event mechanisms.
@@ -30,26 +30,26 @@ info:
       - Functional:
         - A push notification service based on an external webhook
         - A browser that requires a WS to receive events from the server side.
-          - This will require to create a dedicated endpoint using the
-            NotificationChannel API
+          - This will require to create a dedicated endpoint using another
+            network API or external system.
       - Observability:
         - A monitoring system that wants to monitor registration status of
-          endpoints
+          devices
         - A call audit application that requires to remotely monitor call status
 
     ## 2. Relevant terms and definitions
 
     - **BYON**: Bring Your Own Number. A commercial name for the functionality
-      to use your network credentials and phone number identity to no-SIM
-      devices using WebRTC sessions.
-    - **session**: A media session, an exchange of media between endpoints.
+      to use your network credentials and phone number identity to non-SIM
+      devices using media sessions.
+    - **media session**: An exchange of media between devices.
       Typical example of session is a "single one-to-one call".
-    - **mediaSessionId**: Unique identifier of a Voice and Video **session** using
-      WebRTC technology. Retrieved using the `webrtc-call-handling` API
-    - **registration**: An endpoint status were it is properly identified to be
-      reachable by the server side of the WebRTC gateway.
-    - **regSessionId**: Unique identifier of an WebRTC endpoint **registration**.
-      Retrieved using the `webrtc-regsitration` API
+    - **mediaSessionId**: Unique identifier of a Voice or Video **session** using
+      webrtc-call-handling API. Retrieved using the `webrtc-call-handling` API
+    - **registration**: A device status in which the device is properly
+    identified and recognized as reachable by the server side of the network.
+    - **registrationId**: Unique identifier of an device **registration**.
+      Retrieved using the `webrtc-registration` API
 
     ## 3. API functionality
 
@@ -58,7 +58,7 @@ info:
 
     This API allows to create an explicit notification channel for two types of
     events. It is mandatory in the subscription to provide the event type for
-    which the client would like to subscribe. Per CAMARA Commonalities v0.4,
+    which the client would like to subscribe. Per CAMARA Commonalities,
     **each subscription only can be dedicated to a single event type**. You
     usually will need one per endpoint registration and one per session in
     progress.
@@ -125,7 +125,7 @@ info:
 
     This event is triggered each time that the endpoint is requested to join
     an incoming new session. This is done, usually, to indicate that a new
-    WebRTC "call" is incoming. In practical terms, this is a new WebRTC
+    media "call" is incoming. In practical terms, this is a new media
     session that requests the endpoint presence. The event include all
     functional information required to join the session (media info, caller).
 
@@ -176,7 +176,7 @@ externalDocs:
   description: Product documentation at CAMARA
   url: https://github.com/camaraproject/WebRTC
 servers:
-  - url: "{apiRoot}/webrtc-events/v0.1rc1"
+  - url: "{apiRoot}/webrtc-events/v0.1"
     variables:
       apiRoot:
         default: http://localhost:9091
@@ -199,12 +199,12 @@ paths:
         - `org.camaraproject.webrtc-events.v0.session-status`: updates on specific call
 
         To subscribe and receive notifications about new calls, a
-        `session-invitation` subscription is required using the `regSessionId`
+        `session-invitation` subscription is required using the `registrationId`
         obtained from webrtc-registration API.
 
-        Once you create a new voice-video session or receive an
+        Once you create a new media session or receive an
         new call event, you can subscribe to `session-status` to receive
-        updates about the voice-video session in progress using the
+        updates about the media session in progress using the
         `mediaSessionId` unique identifier.
       operationId: createNotificationChannelSubscription
       parameters:
@@ -234,7 +234,7 @@ paths:
                 consumer. The webrtc-events server will call this endpoint
                 whenever a webrtc-events event occurs. `operationId` value will
                 have to be replaced accordingly with WG API specific semantic.
-              operationId: postNotification
+              operationId: createNotificationChannelSubscription
               parameters:
                 - $ref: "#/components/parameters/x-correlator"
               requestBody:
@@ -577,33 +577,35 @@ components:
       description: |-
         The detail of the requested event subscription.
         - org.camaraproject.webrtc-events.v0.session-invitation requires a
-          valid `regSessionId` obtained via registration endpoint.
+          valid `registrationId` obtained via registration endpoint.
         - org.camaraproject.webrtc-events.v0.session-status requires both, a
-          valid `regSessionId` obtained via registration endpoint and a valid
+          valid `registrationId` obtained via registration endpoint and a valid
           `sessionId` obtained via session-invitation event or via CallHandling
           API
       type: object
       required:
         - deviceId
-        - regSessionId
+        - registrationId
       properties:
         deviceId:
           type: string
           example: 1qazxsw23edc
-          description: The device-id of the client in UUID format.
+          description: |-
+            The device-id of the client in UUID format. A unique identifier for
+            the physical device where a registration is initiated. Generated
+            by the WebRTC application, and consistent within the same device.
         sessionId:
           type: string
           example: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EFAAF209EE52FD0BECC5B7CDE645F50DE7D
           description: |-
-            The VVOIP session ID created by WebRTC Gateway.
-            The sessionID will identify a unique session between the WebRTC
-            Gateway and the device client.
+            The media session ID created by the network.
+            The sessionID will identify a unique session between the network and the device client.
             It will be included on the events generated.
-        regSessionId:
+        registrationId:
           type: string
           example: xsmcaum3z4zw4l0cu4w115m0
           description: |-
-            The resgitration session ID created by WebRTC Gateway.
+            The registration session ID created by the network.
             Obtained via registration API.
 
     SubscriptionEventTypeNotification:
@@ -794,7 +796,7 @@ components:
             - mediaSessionId
           properties:
             data:
-              $ref: "#/components/schemas/VvoipSessionInformation"
+              $ref: "#/components/schemas/MediaSessionInformation"
 
     ############################################
     EventSessionStatus:
@@ -814,10 +816,10 @@ components:
             - status
           properties:
             data:
-              $ref: "#/components/schemas/VvoipSessionInformation"
+              $ref: "#/components/schemas/MediaSessionInformation"
 
     ############################################
-    VvoipSessionInformation:
+    MediaSessionInformation:
       description: |-
         A prototype for Webrtc events. Used at `SessionStatusEvent` and `SessionInvitationEvent` schemas
       type: object
@@ -845,7 +847,7 @@ components:
         status:
           type: string
           description: |-
-            Provides the status of the VVOIP session. During the session creation,
+            Provides the status of the media session. During the session creation,
             this attribute contains 'Initial' value
           example: Initial
           enum:
@@ -873,7 +875,7 @@ components:
           description: A correlator that the client can use to tag this particular resource representation during a request to create a resource on the server. Note - This allows the client to recover from communication failures during resource creation and therefore avoids re-sending the message in such situations. In case the element is present, the WebRTC GW shall not alter its value, and shall provide it as part of the representation of this resource.
         mediaSessionId:
           type: string
-          description: The VVOIP session ID created by WebRTC Gateway. The mediaSessionId shall not be included in POST requests by the client, but must be included in the notifications from the WebRTC GW to client.
+          description: The media session ID created by the network. The mediaSessionId shall not be included in POST requests by the client, but must be included in the notifications from the network to client.
           example: '0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF'
         callObjectRef:
           type: string
@@ -1355,7 +1357,7 @@ components:
     # Subscription examples
     INVITE_SUBSCRIPTION:
       description: |-
-        A sample of WebRTC `session-invitation` subscription for phone number
+        A sample of media `session-invitation` subscription for phone number
         `+1234567890` at `acme.opentelco.com`.
 
         This will be used to receive incoming sessions (incoming
@@ -1377,17 +1379,17 @@ components:
         config:
           subscriptionDetail:
             deviceId: "1qazxsw23edc"
-            regSessionId: "xsmcaum3z4zw4l0cu4w115m0"
+            registrationId: "xsmcaum3z4zw4l0cu4w115m0"
           initialEvent: true
           subscriptionMaxEvents: 50
           subscriptionExpireTime: "2024-11-17T13:18:23.682Z"
     SESSION_SUBSCRIPTION:
       description: |-
-        A sample of WebRTC `session-status` subscription for a specific
+        A sample of media `session-status` subscription for a specific
         `mediaSessionId` at `acme.opentelco.com`.
 
-        Identified by for `mediaSessionId`, and validated via a `regSessionId`
-        the endpoint is able to interact with its own voice-video session.
+        Identified by for `mediaSessionId`, and validated via a `registrationId`
+        the endpoint is able to interact with its own media session.
         This could be used to remotely control the call or to handle the async
         session establishment. For instance, updating the user interface for
         different statuses: InProgress, Ringing, Cancel, etc.
@@ -1399,7 +1401,7 @@ components:
         config:
           subscriptionDetail:
             deviceId: "1qazxsw23edc"
-            regSessionId: "xsmcaum3z4zw4l0cu4w115m0"
+            registrationId: "xsmcaum3z4zw4l0cu4w115m0"
             mediaSessionId: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
           initialEvent: true
           subscriptionMaxEvents: 50
@@ -1409,9 +1411,9 @@ components:
       description: |-
         Example of `session-invitation` event.
 
-        A new WebRTC session is requested (i.e. incoming call). This event
+        A new media session is requested (i.e. incoming call). This event
         starts a session negotiation. All other events related with this
-        webrtc session will be shared via the `session-status` events, and
+        media session will be shared via the `session-status` events, and
         identified via the unique `mediaSessionId`.
 
         The main point to distinguish between a *new session* and an update over
@@ -1447,7 +1449,7 @@ components:
         delivered to the user endpoint, as the subscription is not valid
         anymore.
 
-        Here, an example of how WebRTC GW will communicate to the client that
+        Here, an example of how the network will communicate to the client that
         the subscription is not valid anymore, detailing on
         `terminationDescription` the root cause of the subscription remove.
       value:

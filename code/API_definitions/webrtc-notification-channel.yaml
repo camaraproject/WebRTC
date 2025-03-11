@@ -35,7 +35,7 @@ paths:
       tags:
         - Notification Channel
       summary: Retrieves Notification Channel
-      description: '**The client shall use the regSessionId to construct the API path**'
+      description: '**The client shall use the registrationId to construct the API path**'
       parameters:
         - $ref: '#/components/parameters/hdrTransactionId'
         - $ref: '#/components/parameters/hdrClientId'
@@ -65,7 +65,7 @@ paths:
       tags:
         - Notification Channel
       summary: Update Notification Channel properties e.g., expire time, tokens
-      description: '**The client shall use regSessionId to construct API path**'
+      description: '**The client shall use registrationId to construct API path**'
       parameters:
         - $ref: '#/components/parameters/hdrTransactionId'
         - $ref: '#/components/parameters/hdrClientId'
@@ -95,7 +95,7 @@ paths:
       tags:
         - Notification Channel
       summary: Delete Notification Channel
-      description: '**The client shall use regSessionId to construct API path**'
+      description: '**The client shall use registrationId to construct API path**'
       parameters:
         - $ref: '#/components/parameters/hdrTransactionId'
         - $ref: '#/components/parameters/hdrClientId'

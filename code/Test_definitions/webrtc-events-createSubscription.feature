@@ -2,11 +2,11 @@ Feature: CAMARA WebRTC Events, v0.1.0 - Operation createSubscription
 
   Background: Common createSubscription setup
     Given an environment at "apiRoot"
-    And the resource "/webrtc-events/v0.1rc1/subscriptions"                                                              |
+    And the resource "/webrtc-events/v0.1/subscriptions"                                                              |
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" is set to a UUID value
-    # Properties not explicitly overwitten in the Scenarios can take any values compliant with the schema
+    # Properties not explicitly overwritten in the Scenarios can take any values compliant with the schema
     And the request body is set by default to a request body compliant with the schema at "/components/schemas/SubscriptionRequest"
 
 
@@ -23,7 +23,7 @@ Feature: CAMARA WebRTC Events, v0.1.0 - Operation createSubscription
         "config": {
           "subscriptionDetail": {
             "deviceId": "1qazxsw23edc",
-            "regSessionId": "xsmcaum3z4zw4l0cu4w115m0"
+            "registrationId": "xsmcaum3z4zw4l0cu4w115m0"
           },
           "initialEvent": true,
           "subscriptionMaxEvents": 50,

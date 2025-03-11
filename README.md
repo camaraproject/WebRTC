@@ -17,7 +17,6 @@ Repository to describe, develop, document and test the WebRTC APIs
   * Make and receive calls from the endpoint (client) side establishing a realiable media WebSocket channel to exchange secure media.
 * Describe, develop, document and test the APIs (with 1-2 Telcos)  
 * Started: September 2023
-* Location: virtually  
 
 ## Release Information
 

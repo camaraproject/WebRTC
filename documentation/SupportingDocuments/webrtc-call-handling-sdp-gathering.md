@@ -83,7 +83,7 @@ Here an example of **call creation** using the CAMARA webrtc-call-handling API
 with the local `SDP` description gathered on the previous example:
 
 ```
-POST /webrtc-call-handling/vwip/sessions
+POST /webrtc-call-handling/v0.2/sessions
 {
     "originatorAddress": "tel:+17085852753",
     "receiverAddress": "tel:+17085854000",

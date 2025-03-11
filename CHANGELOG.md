@@ -12,9 +12,10 @@
 
 The below sections record the changes for each API version in each release as follows:
 
-* for each first alpha or release-candidate API version, all changes since the release of the previous public API version
-* for subsequent alpha or release-candidate API versions, the delta with respect to the previous pre-release
-* for a public API version, the consolidated changes since the release of the previous public API version
+* for an alpha release, the delta with respect to the previous release
+* for the first release-candidate, all changes since the last public release
+* for subsequent release-candidate(s), only the delta to the previous release-candidate
+* for a public release, the consolidated changes since the previous public release
 
 # r1.2
 
@@ -29,55 +30,110 @@ This public release contains the definition and documentation of
 The API definition(s) are based on
 
 * Commonalities r2.3
-
 * Identity and Consent Management r2.3
 
+Changelog since latest public v0.1.1
 
-Changelog since r1.1
-
-* Full Changelog with the list of PRs and contributors: https://github.com/camaraproject/DeviceLocation/compare/r1.1...r1.2
+* Full Changelog with the list of PRs and contributors: https://github.com/camaraproject/WebRTC/compare/v0.1.1...r1.2
 
 ## WebRTC Registration v0.2.0
 
+**There are breaking changes compared to v0.1.1.**: the API use has been simplified for API consumers using a three-legged access token to invoke the API. In these cases the optional `device` parameter MUST NOT be provided, as the subject will be uniquely identified from the access token. In this context also some error response codes have been renamed or replaced to comply with latests Commonalities.
+
+- API definition **with inline documentation**:
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-registration.yaml&nocors)
+  - [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-registration.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r1.2/code/API_definitions/webrtc-registration.yaml)
+
 ### Added
-* Included basic error testing
+* YAML inline documentation at PR #67
+* Commonalites aligment 0.5 at PR #65
+* Included base testing scenarios at PR #69
+* Included basic error testing at PR #71
 
 ### Changed
+* API naming to WebRTC Registarion and filename `webrtc-registration.yaml` PR #59
+* Server `url` based on Commonalities 0.5 at PR #59
+* Security schema `openId` based on Commonalities 0.5 at PR #65
+* Response code based on Commonalities 0.5 at PR #65
 * Term `RACM` is replaced by `Registration` or `reg` suffix
 * TransactionId header (required) was replaced by x-correlator header (optional)
 
 ### Fixed
+* Descriptions and relevant information for all documentation and schemas
 * Descriptions updates and references
 * Commonalities alignment with r2.3 (Responses and documentation)
-
 * Responses review : 400, 401, 403 included
 * PUT registration responds with 204 No content instead of 200
 
 ### Removed
+* `BYON` terminology and API naming
+* `notificationChannel` API related paramter `channelId` at PR #67
+* `BearerAuth` in favor of `openId` as security schema at PR #65
 * Removed generic 5xx reponses
 
 ## WebRTC Call Handling v0.2.0
 
+**There are breaking changes compared to v0.1.1.**: the API use has been simplified for API consumers using a three-legged access token to invoke the API. In these cases the optional `device` parameter MUST NOT be provided, as the subject will be uniquely identified from the access token. In this context also some error response codes have been renamed or replaced to comply with Commonalities 0.5.
+
+- API definition **with inline documentation**:
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-call-handling.yaml&nocors)
+  - [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-call-handling.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r1.2/code/API_definitions/webrtc-call-handling.yaml)
+
 ### Added
+* YAML inline documentation at PR #68
+* Commonalites aligment 0.5 at PR #65
+* Included base testing scenarios at PR #69
 * Included basic error testing
 
 ### Changed
+* API naming to WebRTC Call Handling and filename `webrtc-call-handling.yaml` PR #59
+* Server `url` based on Commonalities 0.5 at PR #59
+* Security schema `openId` based on Commonalities 0.5 at PR #65
+* Response code based on Commonalities 0.5 at PR #65
+* `MediaSessionInformation` schema expanded, to include all fields used related to a single voice-video session at PR #56
+* `SessionNotification` schema updated at PR #56
+  * It aligns this API with the WebRTC Event notification service. So `SessionNotification` schema, now, its just a wrapper for `MediaSessionInformation` schema. This way, the developer only need to use one object for notification and voice-video session updates (POST / PUT operations).
 * Term `RACM` is replaced by `Registration` or `reg` suffix
 * Suffix `vvoip` is replaced by `media` to identify media sessions, like calls, video-calls or any media session
 * TransactionId header (required) was replaced by x-correlator header (optional)
 
 ### Fixed
+* Descriptions and relevant information for all documentation and schemas
 * Descriptions updates and references
 * Commonalities alignment with r2.3 (Responses and documentation)
-
 * Responses review : 400, 401, 403 included
 
 ### Removed
+* `BYON` terminology and API naming
+* `BearerAuth` in favor of `openId` as security schema at PR #65
+* `SessionNotification` schema updated at PR #56
+  * `SessionInvitationNotification` - Became part of `SessionNotification` 
+  * `SessionStatusNotification` - Became part of `SessionNotification` 
 * Removed generic 5xx reponses
 
 ## WebRTC Events v0.1.0
 
+**This version defines a new API:**
+
+Initial version covering the following functionality and related endpoints:
+
+* API to subscribe to call events. Bringing server-side updates about a voice video session in progress or during negotiation.
+
+- API definition **with inline documentation**:
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-events.yaml&nocors)
+  - [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-events.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r1.2/code/API_definitions/webrtc-events.yaml)
+
 ### Added
+* YAML inline documentation at PR #53
+* Commonalites aligment 0.5 at PR #66
+* Included `subscriptions` endpoint to create CloudEvents subscrition at PR #53
+  * Endpoints can now define a callback and receive server-side events using CloudEvents
+  * Endpoints can now receive callback events regarding new available audio-video sessions (call incomming)
+  * Endpoints can now receive callback events regarding session establishment updates like network changes and remote session termination (call progress and call hangup)
+* Included base testing scenarios at PR #69
 * Included basic error testing
 
 ### Changed
@@ -86,7 +142,6 @@ Changelog since r1.1
 
 ### Fixed
 * Commonalities alignment with r2.3 (Responses and documentation)
-
 
 # r1.1
 
@@ -154,9 +209,9 @@ webrtc-call-handling v0.2.0-rc.1 is the release candidate of the version 0.2.0 o
 * Server `url` based on Commonalities 0.5 at PR #59
 * Security schema `openId` based on Commonalities 0.5 at PR #65
 * Response code based on Commonalities 0.5 at PR #65
-* `VvoipSessionInformation` schema expanded, to include all fields used related to a single voice-video session at PR #56
+* `MediaSessionInformation` schema expanded, to include all fields used related to a single voice-video session at PR #56
 * `SessionNotification` schema updated at PR #56
-  * It aligns this API with the WebRTC Event notification service. So `SessionNotification` schema, now, its just a wrapper for `VvoipSessionInformation` schema. This way, the developer only need to use one object for notification and voice-video session updates (POST / PUT operations).
+  * It aligns this API with the WebRTC Event notification service. So `SessionNotification` schema, now, its just a wrapper for `MediaSessionInformation` schema. This way, the developer only need to use one object for notification and voice-video session updates (POST / PUT operations).
 
 ### Fixed
 * Descriptions and relevant information for all documentation and schemas
