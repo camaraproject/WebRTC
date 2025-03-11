@@ -58,6 +58,8 @@ Changelog since latest public v0.1.1
 * Response code based on Commonalities 0.5 at PR #65
 * Term `RACM` is replaced by `Registration` or `reg` suffix
 * TransactionId header (required) was replaced by x-correlator header (optional)
+* `msisdn` response is now `phoneNumber`
+* `racmSessionId` becomes now `regsitrationId`
 
 ### Fixed
 * Descriptions and relevant information for all documentation and schemas
@@ -68,9 +70,10 @@ Changelog since latest public v0.1.1
 
 ### Removed
 * `BYON` terminology and API naming
-* `notificationChannel` API related paramter `channelId` at PR #67
+* `notificationChannel` API related parameter `channelId` at PR #67
 * `BearerAuth` in favor of `openId` as security schema at PR #65
 * Removed generic 5xx reponses
+* `clientId` header is removed
 
 ## WebRTC Call Handling v0.2.0
 
@@ -109,9 +112,10 @@ Changelog since latest public v0.1.1
 * `BYON` terminology and API naming
 * `BearerAuth` in favor of `openId` as security schema at PR #65
 * `SessionNotification` schema updated at PR #56
-  * `SessionInvitationNotification` - Became part of `SessionNotification` 
-  * `SessionStatusNotification` - Became part of `SessionNotification` 
+  * `SessionInvitationNotification` - Became part of `SessionNotification`
+  * `SessionStatusNotification` - Became part of `SessionNotification`
 * Removed generic 5xx reponses
+* `clientId` header is removed
 
 ## WebRTC Events v0.1.0
 
@@ -157,7 +161,7 @@ The API definition(s) are based on
 
 * Commonalities r2.1 (v0.5.0-rc.1)
 * Identity and Consent Management r2.1 (v0.3.0-rc.1)
-  
+
 ## WebRTC Registration v0.2.0-rc.1
 
 webrtc-registration v0.2.0-rc.1 is the release candidate of the version 0.2.0 of the API
@@ -220,8 +224,8 @@ webrtc-call-handling v0.2.0-rc.1 is the release candidate of the version 0.2.0 o
 * `BYON` terminology and API naming
 * `BearerAuth` in favor of `openId` as security schema at PR #65
 * `SessionNotification` schema updated at PR #56
-  * `SessionInvitationNotification` - Became part of `SessionNotification` 
-  * `SessionStatusNotification` - Became part of `SessionNotification` 
+  * `SessionInvitationNotification` - Became part of `SessionNotification`
+  * `SessionStatusNotification` - Became part of `SessionNotification`
 
 ## WebRTC Events v0.1.0-rc.1
 
@@ -246,7 +250,7 @@ Initial version covering the following functionality and related endpoints:
   * Endpoints can now receive callback events regarding new available audio-video sessions (call incomming)
   * Endpoints can now receive callback events regarding session establishment updates like network changes and remote session termination (call progress and call hangup)
 * Included base testing scenarios at PR #69
-  
+
 ### Changed
 * n/a
 
@@ -276,7 +280,7 @@ The API definition(s) are based on
 
 **BYON API v0.1.1 is a pre-relese version**
 
-- [API definition](https://github.com/camaraproject/WebRTC/tree/v0.1.1/code/API_definitions) 
+- [API definition](https://github.com/camaraproject/WebRTC/tree/v0.1.1/code/API_definitions)
 - [API Documentation](https://github.com/camaraproject/WebRTC/blob/v0.1.1/documentation/API_documentation/webrtc%20voice%20api.md)
 
 ### Please note
@@ -317,7 +321,7 @@ The API definition(s) are based on
 
 **BYON API v0.1.0 is a pre-relese version**
 
-- [API definition](https://github.com/camaraproject/WebRTC/tree/v0.1.0/code/API_definitions) 
+- [API definition](https://github.com/camaraproject/WebRTC/tree/v0.1.0/code/API_definitions)
 - [API Documentation](https://github.com/camaraproject/WebRTC/blob/v0.1.0/documentation/API_documentation/webrtc%20voice%20api.md)
 
 ### Please note

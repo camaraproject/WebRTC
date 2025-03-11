@@ -1172,7 +1172,7 @@ components:
               value:
                 status: 403
                 code: INVALID_TOKEN_CONTEXT
-                message: "{{field}} is not consistent with access token."
+                message: "config.subscriptionDetail is not consistent with access token."
             GENERIC_403_SUBSCRIPTION_MISMATCH:
               description: Inconsistent access token for requested subscription
               value:

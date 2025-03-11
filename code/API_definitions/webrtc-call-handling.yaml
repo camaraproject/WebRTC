@@ -48,11 +48,10 @@ info:
       primary function is to ensure that only one WebRTC session (**registration**)
       is active per device at a time, enabling the gateway to clean up any stale
       sessions if a new session is initiated on the same device.
-    - **clientId**: A unique identifier, assigned by the network, for each client
-      instance or **regSession**. It is best practice for the gateway to issue a new
-      clientId for each login or session. This approach helps the gateway maintain
-      clear indexing or mapping for quicker processing and simplifies troubleshooting
-      by clearly distinguishing one session from another.
+    - **registration**: A device status in which the device is properly
+      identified and recognized as reachable by the server side of the network.
+    - **registrationId**: Unique identifier of an device **registration**.
+      Retrieved using the `webrtc-registration` API
     - **x-correlator**: Unique ID associated to the REST _transaction_ created by the
       REST client. It is used to correlate requests and responses and help debugging.
     - **clientCorrelator**: A unique correlation ID that the client can use to tag
@@ -76,7 +75,7 @@ info:
     This API allows to create 1-1 voice and video sessions. These, identified by a
     unique `mediaSessionId` can be recovered, updated and terminated via this API
     and its methods.
-    - **POST**: Create a new session using a valid `clientId` from registration API
+    - **POST**: Create a new session using a valid `registrationId` from registration API
     - **GET**: Recover an existing session via its unique `mediaSessionId`
     - **DELETE**: Finish an existing session via its unique `mediaSessionId`
     - **PUT**: Update the status of a session via its unique `mediaSessionId`
@@ -221,7 +220,7 @@ paths:
       operationId: createSession
       parameters:
         - $ref: "#/components/parameters/x-correlator"
-        - $ref: '#/components/parameters/hdrClientId'
+        - $ref: '#/components/parameters/hdrRegistrationId'
       security:
         - openId:
             - webrtc-call-handling:sessions:create
@@ -267,7 +266,6 @@ paths:
       operationId: getSessionDetailsById
       parameters:
         - $ref: '#/components/parameters/x-correlator'
-        - $ref: '#/components/parameters/hdrClientId'
         - $ref: '#/components/parameters/pathParamMediaSessionId'
       security:
         - openId:
@@ -303,7 +301,6 @@ paths:
       operationId: deleteSessionById
       parameters:
         - $ref: '#/components/parameters/x-correlator'
-        - $ref: '#/components/parameters/hdrClientId'
         - $ref: '#/components/parameters/pathParamMediaSessionId'
       security:
         - openId:
@@ -332,7 +329,6 @@ paths:
       operationId: updateSessionStatus
       parameters:
         - $ref: '#/components/parameters/x-correlator'
-        - $ref: '#/components/parameters/hdrClientId'
         - $ref: '#/components/parameters/pathParamMediaSessionId'
       security:
         - openId:
@@ -393,16 +389,15 @@ components:
         type: string
         pattern: ^[a-zA-Z0-9-]{0,55}$
   parameters:
-    hdrClientId:
-      name: clientId
+    hdrRegistrationId:
+      name: registrationId
       in: header
-      description: The Client Id assigned by the network
+      description: The device registration identifier assigned by the network
       required: true
       style: simple
       explode: false
       schema:
         type: string
-
     pathParamMediaSessionId:
       name: mediaSessionId
       in: path
@@ -745,7 +740,7 @@ components:
               value:
                 status: 403
                 code: INVALID_TOKEN_CONTEXT
-                message: "{{field}} is not consistent with access token."
+                message: "originator info is not consistent with access token."
     Generic404:
       description: Not found
       headers:

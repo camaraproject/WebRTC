@@ -6,7 +6,7 @@ Feature: CAMARA WebRTC Call Handling, v0.2.0 - Operation getSession
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" is set to a UUID value
-    And the header "clientId" is set to a UUID value
+    And the path parameter "mediaSessionId" is set by default to a existing register session
 
   @webrtc_call_handling_getSession_01_generic_success_scenario
   Scenario: Get the media session information
