@@ -12,9 +12,9 @@ Repository to describe, develop, document and test the WebRTC APIs
 * Service APIs for “WebRTC” (see APIBacklog.md)  
 * It provides the API consumer with the ability to:  
   * Add real-time communication capabilities to their applications like video, voice, and generic data.
-  * Enable a web endpoint to register for telco services (IMS) through a WebRTC Gateway using Oauth 2.0 and the Operator provided Identity Provider (IDP)
-  * Create subscriptions to receive telco call events using CloudEvents: Ability to follow call estalishment process and to receive new incoming calls.
-  * Make and receive calls from the endpoint (client) side establishing a realiable media WebSocket channel to exchange secure media.
+  * Enable an API consumer to register for communication services through a network using Oauth 2.0 and OIDC.
+  * Create subscriptions to receive call notifications using CloudEvents: Ability to follow the call establishment process and to receive new incoming calls.
+  * Make and receive calls from the API consumer (client) side establishing a realiable media session to securely exchange media.
 * Describe, develop, document and test the APIs (with 1-2 Telcos)  
 * Started: September 2023
 

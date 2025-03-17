@@ -9,18 +9,18 @@ info:
 
     To handle audio/video sessions, what we usually known as *calls*, the network
     requires to identify both involved parties: caller, the origin, and the callee,
-    the destination. Once identified the involved communication endpoints, then
-    it is required to define *how* to send media from one endpoint to the other.
+    the destination. Once the involved communication endpoints are identified,
+    the endpoints need to negotiate *how* to send media from one endpoint to the other.
 
-    The first point, *identify the endpoints* is solved in CAMARA via direct API
-    parameters on the API request. The later, *negotiate how to connect*, is solved
-    sharing SDP information between peers.
+    The first step, *identify the endpoints* is handled through
+    parameters in the API request. The latter step, *negotiate how to connect*, is done by
+    sharing media transmission requirements (called SDP information) between the involved endpoints.
 
-    In that point, the WebRTC technology is used to simplify the access to the
-    media, and get a simple and well-known protocol to solve the media transmission
+    In this step, the WebRTC technology is used to simplify the access to the
+    media, and get a simple and well-known protocol to negotiate the media transmission
     requirements.
 
-    Let's dig on it on section 3: API functionality
+    Let's dig into more details on section 3: API functionality
 
     **Use cases to cover:**
       - Functional:
@@ -46,14 +46,14 @@ info:
       session is initiated. It is provided by the WebRTC application, it remains
       consistent across multiple installations or logins on the same device. Its
       primary function is to ensure that only one WebRTC session (**registration**)
-      is active per device at a time, enabling the gateway to clean up any stale
+      is active per device at a time, enabling the network to clean up any stale
       sessions if a new session is initiated on the same device.
     - **registration**: A device status in which the device is properly
       identified and recognized as reachable by the server side of the network.
     - **registrationId**: Unique identifier of an device **registration**.
       Retrieved using the `webrtc-registration` API
-    - **x-correlator**: Unique ID associated to the REST _transaction_ created by the
-      REST client. It is used to correlate requests and responses and help debugging.
+    - **x-correlator**: Unique ID included in the API request created by the API consumer.
+      It is used to correlate an API request with its response and help in debugging.
     - **clientCorrelator**: A unique correlation ID that the client can use to tag
       a particular resource representation during a request to create a resource on
       the server. This allows the client to ***recover*** from communication failures
@@ -80,7 +80,7 @@ info:
     - **DELETE**: Finish an existing session via its unique `mediaSessionId`
     - **PUT**: Update the status of a session via its unique `mediaSessionId`
 
-    To receive server-side updates about the session establishment process, you
+    To receive updates from the network about the session establishment process, you
     must use `webrtc-events` API.
 
     ### 3.1. Creating a call
@@ -90,7 +90,7 @@ info:
     on the network that allows you to send calls (IMS registration).
 
     Once this is completed, you can consume the POST /sessions/ endpoint to call
-    to a remote destination.
+    a remote destination.
 
     ```
     POST /webrtc-call-handling/v0.2/sessions
@@ -143,7 +143,7 @@ info:
     ### 3.2. Hanging up a call
 
     When you have a voice/video session in progress, you can decide to finish the
-    call, to do so, simply execute a DELETE command over the endpoint using the
+    call, to do so, simply execute a DELETE request of the session using the
     `mediaSessionId` obtained on call creation.
 
     This action will trigger all necessary action on the network side to properly
@@ -156,11 +156,11 @@ info:
     is calling you.
 
     To *hook off*, we need to retrieve the session based on the `mediaSessionId`
-    using the GET command, afterwards, you can present to the user some
+    using the GET request, afterwards, you can present to the user some
     confirmation option to accept the call.
 
     Final step is to include a local offer. We already seen at 3.1 that a local
-    SDP is required, in this case, we will use the PUT command to modify the
+    SDP is required, in this case, we will use the PUT request to modify the
     audio/video session and include the information about the responding device.
 
     Let's say that we are responding this session `0AEE1B58BAEEDA3EABA42B32EBB3DFE0DEAD`:

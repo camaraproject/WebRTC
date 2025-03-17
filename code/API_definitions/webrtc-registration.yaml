@@ -45,8 +45,8 @@ info:
       Typical example of session is a "single one-to-one call".
     - **mediaSessionId**: Unique identifier of a Voice or Video **session** using
       webrtc-call-handling API. Retrieved using the `webrtc-call-handling` API
-    - **x-correlator**: Unique ID associated to the REST _transaction_ created by the
-      REST client. It is used to correlate requests and responses and help debugging.
+    - **x-correlator**: Unique ID included in the API request created by the API consumer.
+      It is used to correlate an API request with its response and help in debugging.
     - **WebRTC**: WebRTC is a free and open-source project providing web browsers
       and mobile applications with real-time communication via application programming
       interfaces. It allows audio and video communication and streaming to work
@@ -106,14 +106,14 @@ externalDocs:
   url: https://github.com/camaraproject/WebRTC
 servers:
   - url: '{apiRoot}/webrtc-registration/v0.2'
-    description: APIs to manage Client Registration and Connection
+    description: APIs to manage device registration and connection
     variables:
       apiRoot:
         description: API Root
         default: http://localhost:9091
 tags:
   - name: Registration
-    description: Operations to manage client registration into the network
+    description: Operations to manage device registration with the network
 paths:
   /sessions:
     post:
@@ -122,7 +122,7 @@ paths:
       summary: Create a registration
       description: |-
         API endpoint used to create a new registration of a device in the network.
-        It uses as main body data the `deviceId` to store its reference.
+        It uses the `deviceId` in the request body.
         In response, a `registrationId` (in UUID format) is provided to identify
         this device registration within the network.
       operationId: createRegistration
