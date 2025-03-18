@@ -6,39 +6,40 @@
 <a href="https://github.com/camaraproject/WebRTC/blob/main/LICENSE" title="License"><img src="https://img.shields.io/badge/License-Apache%202.0-green.svg?style=plastic"></a>
 
 # WebRTC
-Repository to describe, develop, document and test the WebRTC API family
+Repository to describe, develop, document and test the WebRTC APIs
 
 ## Scope
 * Service APIs for “WebRTC” (see APIBacklog.md)  
-* It provides the customer with the ability to:  
+* It provides the API consumer with the ability to:  
   * Add real-time communication capabilities to their applications like video, voice, and generic data.
-  * Enable a web endpoint to register for telco services (IMS) through a WebRTC Gateway using Oauth 2.0 and the Operator provided Identity Provider (IDP)
-  * Create subscriptions to receive telco call events using CloudEvents
-  * Make calls from the endpoint (client) side establishing a realiable and media WebSocket channel to exchange secure media.
+  * Enable an API consumer to register for communication services through a network using Oauth 2.0 and OIDC.
+  * Create subscriptions to receive call notifications using CloudEvents: Ability to follow the call establishment process and to receive new incoming calls.
+  * Make and receive calls from the API consumer (client) side establishing a realiable media session to securely exchange media.
 * Describe, develop, document and test the APIs (with 1-2 Telcos)  
 * Started: September 2023
-* Location: virtually  
 
 ## Release Information
 
+* The latest public release is available here: https://github.com/camaraproject/WebRTC/releases/latest
+* For changes see [CHANGELOG.md](CHANGELOG.md)
 * Note: Please be aware that the project will have frequent updates to the main branch. There are no compatibility guarantees associated with code in any branch, including main, until a new release is created. For example, changes may be reverted before a release is created. **For best results, use the latest public release**.
 
-* **The pre-release [r1.1](https://github.com/camaraproject/WebRTC/tree/r1.1) contains the release-candidate versions for the Spring25 meta-release.**
+* The latest release is **[r1.2](https://github.com/camaraproject/WebRTC/tree/r1.2) (Spring25 meta-release)** with the following API definitions:
   
   * **webrtc-registration v0.2.0**
-  [[YAML]](https://github.com/camaraproject/WebRTC/blob/r1.1/code/API_definitions/webrtc-registration.yaml)
-  [[View it on ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.1/code/API_definitions/webrtc-registration.yaml&nocors)
-  [[View it on Swagger Editor]](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.1/code/API_definitions/webrtc-registration.yaml)
+  [[YAML]](https://github.com/camaraproject/WebRTC/blob/r1.2/code/API_definitions/webrtc-registration.yaml)
+  [[View it on ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-registration.yaml&nocors)
+  [[View it on Swagger Editor]](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-registration.yaml)
 
   * **webrtc-call-handling v0.2.0**
-  [[YAML]](https://github.com/camaraproject/WebRTC/blob/r1.1/code/API_definitions/webrtc-call-handling.yaml)
-  [[View it on ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.1/code/API_definitions/webrtc-call-handling.yaml&nocors)
-  [[View it on Swagger Editor]](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.1/code/API_definitions/webrtc-call-handling.yaml)
+  [[YAML]](https://github.com/camaraproject/WebRTC/blob/r1.2/code/API_definitions/webrtc-call-handling.yaml)
+  [[View it on ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-call-handling.yaml&nocors)
+  [[View it on Swagger Editor]](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-call-handling.yaml)
 
   * **webrtc-events v0.1.0**
-  [[YAML]](https://github.com/camaraproject/WebRTC/blob/r1.1/code/API_definitions/webrtc-events.yaml)
-  [[View it on ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.1/code/API_definitions/webrtc-events.yaml&nocors)
-  [[View it on Swagger Editor]](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.1/code/API_definitions/webrtc-events.yaml)
+  [[YAML]](https://github.com/camaraproject/WebRTC/blob/r1.2/code/API_definitions/webrtc-events.yaml)
+  [[View it on ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-events.yaml&nocors)
+  [[View it on Swagger Editor]](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-events.yaml)
 
 * Previous releases and pre-releases are available here: https://github.com/camaraproject/WebRTC/releases
 * For changes see [CHANGELOG.md](https://github.com/camaraproject/WebRTC/blob/main/CHANGELOG.md)
@@ -56,7 +57,6 @@ Repository to describe, develop, document and test the WebRTC API family
   * Find meeting notes at https://wiki.camaraproject.org/display/CAM/WebRTC+Meeting+Minutes
 * Schedule:
   * Tuesdays 4pm CEST (Madrid, Paris, Berlin, Rome), each 15 days
-* Meeting link: [LFX Zoom](https://zoom-lfx.platform.linuxfoundation.org/meeting/99827941663?password=ac67c375-4795-4389-93b5-bb5ed5ef0977).
   
 ## Contributorship and mailing list
 

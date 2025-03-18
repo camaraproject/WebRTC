@@ -3,17 +3,22 @@ info:
   title: WebRTC Registration Service API
   description: |-
     ## 1. Introduction
-    This API provide REST API for clients to manage Registration and Connectivity
-    (RACM) towards network operator (IMS Network).
+    This API provides the API consumer with the capabilities to manage
+    registration and connectivity towards the network.
 
-    The network requires that all endpoints identify the subscriber and create a
-    session before enable or activate any service. In order to create audio and
-    video sessions, you device (or endpoint) need to have a valid registration on
-    the network. This API provide that feature, and allow users to create audio and
-    video sessions using the telco network.
+    The network requires that the API consumer application registers and
+    identifies an end user device before enabling any media
+    session services provided by the WebRTC APIs.
 
-    All telco services are based on subscriptions, this API allows the user to
-    create a session where you can consume the audio/video part of the telco services.
+    A device registration created via this API will register a unique `deviceId`
+    created by the API consumer (WebRTC application) and it will will provide a
+    `registrationId` to manage a registration later.
+    Any subsequent request from the API consumer must include the unique
+    `registrationId` that will be linked to the registration previously defined.
+
+    All operator network services are based on device registrations, this API
+    allows the user to create a registration session that enable the audio/video
+    functionalities exposed by the operator network.
 
     **Use cases to cover:**
       - Functional:
@@ -25,27 +30,23 @@ info:
 
     ## 2. Relevant terms and definitions
 
-    - **RACM**: Acronym of Registration and Connectivity Management. In the realm
-      of mobile networks, Registration Management (RM) serves as a crucial process
-      for establishing and maintaining user equipment (UE) connectivity within the
-      network. It ensures that UEs (your smartphone or mobile device) are properly
-      identified, authenticated, and authorized to access network services.
-    - **racmSession** A registration session. A valid client running on a valid
+    - **registration** A media device session. A valid client running on a valid
       device, with permission to use the network capabilities to create and receive
-      calls (audio/video sessions).
-    - **racmSessionId**: Unique identifier of an WebRTC endpoint **registration**.
+      (audio/video) calls (media sessions).
+    - **registrationId**: Unique identifier of an WebRTC device **registration**.
       Retrieved using the `webrtc-registration` API
-    - **deviceId**: A unique identifier for the physical device where a WebRTC
+    - **deviceId**: A unique identifier for the physical device where a media
       session is initiated. It is provided by the WebRTC application, it remains
       consistent across multiple installations or logins on the same device. Its
-      primary function is to ensure that only one WebRTC session (**racmSession**)
+      primary function is to ensure that only one WebRTC session (**registration**)
       is active per device at a time, enabling the gateway to clean up any stale
       sessions if a new session is initiated on the same device.
-    - **clientId**: A unique identifier, assigned by the network, for each client
-      instance or **racmSession**. It is best practice for the gateway to issue a new
-      clientId for each login or session. This approach helps the gateway maintain
-      clear indexing or mapping for quicker processing and simplifies troubleshooting
-      by clearly distinguishing one session from another.
+    - **media session**: An exchange of media between devices.
+      Typical example of session is a "single one-to-one call".
+    - **mediaSessionId**: Unique identifier of a Voice or Video **session** using
+      webrtc-call-handling API. Retrieved using the `webrtc-call-handling` API
+    - **x-correlator**: Unique ID included in the API request created by the API consumer.
+      It is used to correlate an API request with its response and help in debugging.
     - **WebRTC**: WebRTC is a free and open-source project providing web browsers
       and mobile applications with real-time communication via application programming
       interfaces. It allows audio and video communication and streaming to work
@@ -57,10 +58,10 @@ info:
     ## 3. API functionality
 
     This API allows to create device registrations. These, identified by a unique
-    `racmSessionId` can be updated and terminated via this API and its methods.
+    `registrationId` can be updated and terminated via this API and its methods.
     - **POST**: Create a new device registration using a valid authorization token.
-    - **PUT**: Update a device registration via its unique `racmSessionId`
-    - **DELETE**: Finish an existing device registration via its unique `racmSessionId`
+    - **PUT**: Update a device registration via its unique `registrationId`
+    - **DELETE**: Finish an existing device registration via its unique `registrationId`
     To receive server-side updates about new voice-video sessions, you need to
     use `webrtc-events` API.
 
@@ -97,28 +98,36 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 0.2.0-rc.1
+  version: 0.2.0
   x-camara-commonalities: 0.5
 
+externalDocs:
+  description: Product documentation at CAMARA
+  url: https://github.com/camaraproject/WebRTC
 servers:
-  - url: '{apiRoot}/webrtc-registration/v0.2rc1'
-    description: APIs to manage Client Registration and Connection
+  - url: '{apiRoot}/webrtc-registration/v0.2'
+    description: APIs to manage device registration and connection
     variables:
       apiRoot:
         description: API Root
         default: http://localhost:9091
 tags:
-  - name: Registration and Connection Management
-    description: APIs for Client to Register into MNO's IMS Network
+  - name: Registration
+    description: Operations to manage device registration with the network
 paths:
   /sessions:
     post:
       tags:
-        - RACM
-      summary: Create RACM Session
-      description: Create RACM Session
+        - Registration
+      summary: Create a registration
+      description: |-
+        API endpoint used to create a new registration of a device in the network.
+        It uses the `deviceId` in the request body.
+        In response, a `registrationId` (in UUID format) is provided to identify
+        this device registration within the network.
+      operationId: createRegistration
       parameters:
-        - $ref: '#/components/parameters/hdrTransactionId'
+        - $ref: '#/components/parameters/x-correlator'
       security:
         - openId:
             - webrtc-registration:sessions:create
@@ -126,49 +135,83 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RacmRequest'
+              $ref: '#/components/schemas/regSessionRequest'
       responses:
         '200':
           description: Ok
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RacmResponse'
+                $ref: '#/components/schemas/regSessionResponse'
         '400':
           $ref: "#/components/responses/CreateSessionBadRequest400"
+        '401':
+          $ref: "#/components/responses/Generic401"
         '403':
           $ref: "#/components/responses/CreateSessionForbidden403"
-  /sessions/{racmSessionId}:
+  /sessions/{registrationId}:
     put:
       tags:
-        - RACM
-      summary: For sharing new AccessToken with WebRTC GW, the AccessToken is expected to be received from the Auth server.
-      description: '**The client shall use the racmSessionId to construct the API path.**'
+        - Registration
+      summary: Refresh network registration.
+      description: |
+        API Endpoint used to renew or refresh the registration on the network.
+        It is possible to renew the registration before it expires. This API
+        endpoint will trigger a network registration refresh based on a
+        pre-existing registration.
+      operationId: updateRegistrationById
       parameters:
-        - $ref: '#/components/parameters/hdrTransactionId'
-        - $ref: '#/components/parameters/hdrClientId'
-        - $ref: '#/components/parameters/pathParamRacmSessionId'
+        - $ref: '#/components/parameters/x-correlator'
+        - $ref: '#/components/parameters/pathParamRegistrationId'
       security:
         - openId:
             - webrtc-registration:sessions:write
       responses:
-        '200':
-          description: No Content
+        '204':
+          description: Updated the registration status (no content)
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
+        '400':
+          $ref: "#/components/responses/Generic400"
+        '401':
+          $ref: "#/components/responses/Generic401"
+        '403':
+          $ref: "#/components/responses/Generic403"
+        '404':
+          $ref: '#/components/responses/Generic404'
     delete:
       tags:
-        - RACM
+        - Registration
       summary: Delete Registration Session.
-      description: '**The client shall use the racmSessionId to construct the API path.**'
+      description: |-
+        API endpoint used to remove a valid registration on the network. This action
+        frees any resource and invalidates future actions that involves this
+        registration between the device and the network.
+
+        Use the registrationId to identify the registration to delete.
+      operationId: deleteRegistrationById
       parameters:
-        - $ref: '#/components/parameters/hdrTransactionId'
-        - $ref: '#/components/parameters/hdrClientId'
-        - $ref: '#/components/parameters/pathParamRacmSessionId'
+        - $ref: '#/components/parameters/x-correlator'
+        - $ref: '#/components/parameters/pathParamRegistrationId'
       security:
         - openId:
             - webrtc-registration:sessions:delete
       responses:
         '204':
           description: No Content
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
+        '400':
+          $ref: "#/components/responses/Generic400"
+        '401':
+          $ref: "#/components/responses/Generic401"
+        '403':
+          $ref: "#/components/responses/Generic403"
         '404':
           $ref: '#/components/responses/Generic404'
 components:
@@ -191,58 +234,35 @@ components:
         type: string
         pattern: ^[a-zA-Z0-9-]{0,55}$
         example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
-    hdrClientId:
-      name: clientId
-      in: header
-      description: The Client ID assigned by WebRTC GW
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
-    hdrTransactionId:
-      name: transactionId
-      in: header
-      description: The Transaction ID associated with the request
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
-    pathParamRacmSessionId:
-      name: racmSessionId
+    pathParamRegistrationId:
+      name: registrationId
       in: path
-      description: The sessionId assigned by the RACM service
+      description: The registrationId assigned by the registration service
       required: true
       style: simple
       explode: false
       schema:
         type: string
   schemas:
-    RacmRequest:
+    regSessionRequest:
       type: object
+      required:
+        - deviceId
       properties:
         deviceId:
           type: string
-          description: The device-id of the client in UUID format.
-    RacmResponse:
+          description: |-
+            The device-id of the client in UUID format. A unique identifier for
+            the physical device where a registration is initiated. Generated
+            by the WebRTC application, and consistent within the same device.
+    regSessionResponse:
       type: object
       properties:
-        connectionInformation:
-          $ref: '#/components/schemas/ConnectionInformation'
         regInfo:
-          type: array
-          items:
-            $ref: '#/components/schemas/RegistrationInformation'
-        racmSessionId:
+          $ref: '#/components/schemas/RegistrationInformation'
+        registrationId:
           type: string
-          description: The RACM session ID created by WebRTC Gateway. Clients must utilize this ID to construct the API path.
-    ConnectionInformation:
-      type: object
-      properties:
-        clientId:
-          type: string
-          description: The unique id assigned by WebRTC GW for identifying the association of device with WebRTC GW. The clients are required to include this value in clientId header.
+          description: The registration session ID is returned when registering a device with the network . Clients must utilize this ID to as a parameter in the call-handling and subscription APIs.
     RegistrationStatus:
       type: string
       enum:
@@ -250,8 +270,8 @@ components:
     RegistrationInformation:
       type: object
       properties:
-        msisdn:
-          type: string
+        phoneNumber:
+          $ref: '#/components/schemas/PhoneNumber'
         regStatus:
           $ref: '#/components/schemas/RegistrationStatus'
     ErrorInfo:
@@ -270,6 +290,12 @@ components:
         code:
           type: string
           description: Friendly Code to describe the error
+    PhoneNumber:
+      description: A public identifier addressing a telephone subscription. In mobile networks it corresponds to the MSISDN (Mobile Station International Subscriber Directory Number). In order to be globally unique it has to be formatted in international format, according to E.164 standard, prefixed with '+'.
+      type: string
+      pattern: '^\+[1-9][0-9]{4,14}$'
+      example: "+123456789"
+
   responses:
     # Method specific responses
     CreateSessionBadRequest400:
@@ -345,7 +371,7 @@ components:
               value:
                 status: 403
                 code: INVALID_TOKEN_CONTEXT
-                message: "{{field}} is not consistent with access token."
+                message: "device is not consistent with access token."
             CREATE_403_MAX_REGISTRATION_PER_USER:
               # summary: Max registration per user
               value:
@@ -493,78 +519,3 @@ components:
                 status: 404
                 code: IDENTIFIER_NOT_FOUND
                 message: Device identifier not found.
-    Generic500:
-      description: Internal Server Error
-      headers:
-        x-correlator:
-          $ref: "#/components/headers/x-correlator"
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: "#/components/schemas/ErrorInfo"
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 500
-                  code:
-                    enum:
-                      - INTERNAL
-          examples:
-            GENERIC_500_INTERNAL:
-              description: Problem in Server side. Regular Server Exception
-              value:
-                status: 500
-                code: INTERNAL
-                message: Unknown server error. Typically a server bug.
-    Generic501:
-      description: Not Implemented
-      headers:
-        x-correlator:
-          $ref: "#/components/headers/x-correlator"
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: "#/components/schemas/ErrorInfo"
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 501
-                  code:
-                    enum:
-                      - NOT_IMPLEMENTED
-          examples:
-            GENERIC_501_NOT_IMPLEMENTED:
-              description: Service not implemented. The use of this code should be avoided as far as possible to get the objective to reach aligned implementations
-              value:
-                status: 501
-                code: NOT_IMPLEMENTED
-                message: This functionality is not implemented yet.
-    Generic503:
-      description: Service Unavailable
-      headers:
-        x-correlator:
-          $ref: "#/components/headers/x-correlator"
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: "#/components/schemas/ErrorInfo"
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 503
-                  code:
-                    enum:
-                      - UNAVAILABLE
-          examples:
-            GENERIC_503_UNAVAILABLE:
-              description: Service is not available. Temporary situation usually related to maintenance process in the server side
-              value:
-                status: 503
-                code: UNAVAILABLE
-                message: Service Unavailable.

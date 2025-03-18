@@ -1,12 +1,12 @@
-Feature: CAMARA WebRTC Call Handling, v0.2.0-rc.1 - Operation createSession
+Feature: CAMARA WebRTC Call Handling, v0.2.0 - Operation createSession
 
   Background: Common createSession setup
     Given an environment at "apiRoot"
-    And the resource "/webrtc-call-handling/v0.2rc1/sessions"                                                              |
+    And the resource "/webrtc-call-handling/v0.2/sessions"                                                              |
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
-    And the header "transactionId" is set to a UUID value
-    And the header "clientId" is set to a UUID value
+    And the header "x-correlator" is set to a UUID value
+    And the header "registrationId" is set to a UUID value
 
   @webrtc_call_handling_createSession_01_generic_success_scenario
   Scenario: Create a new call session
@@ -22,5 +22,61 @@ Feature: CAMARA WebRTC Call Handling, v0.2.0-rc.1 - Operation createSession
       }
       """
     Then the response status code should be 201
-    And the response body complies with the OAS schema at "/components/schemas/VvoipSessionInformation"
-    And the response body should contain a "callSessionId"
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response body complies with the OAS schema at "/components/schemas/MediaSessionInformation"
+    And the response body should contain a "mediaSessionId"
+
+  # Error scenarios
+
+  # Generic 400 errors
+
+  @webrtc_call_handling_createSession_400.1_no_request_body
+  Scenario: Missing request body
+    Given the request body is not included
+    When the HTTP "POST" request is sent
+    Then the response status code is 400
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_call_handling_createSession_400.2_empty_request_body
+  Scenario: Empty object as request body
+    Given the request body is set to "{}"
+    When the HTTP "POST" request is sent
+    Then the response status code is 400
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  # Generic 401 errors
+
+  @webrtc_call_handling_createSession_401.1_no_authorization_header
+  Scenario: No Authorization header
+    Given the header "Authorization" is removed
+    And the request body is set to a valid request body
+    When the HTTP "POST" request is sent
+    Then the response status code is 401
+    And the response property "$.status" is 401
+    And the response property "$.code" is "UNAUTHENTICATED"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_call_handling_createSession_401.2_expired_access_token
+  Scenario: Expired access token
+    Given the header "Authorization" is set to an expired access token
+    And the request body is set to a valid request body
+    When the HTTP "POST" request is sent
+    Then the response status code is 401
+    And the response property "$.status" is 401
+    And the response property "$.code" is "UNAUTHENTICATED"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_call_handling_createSession_401.3_invalid_access_token
+  Scenario: Invalid access token
+    Given the header "Authorization" is set to an invalid access token
+    And the request body is set to a valid request body
+    When the HTTP "POST" request is sent
+    Then the response status code is 401
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 401
+    And the response property "$.code" is "UNAUTHENTICATED"
+    And the response property "$.message" contains a user friendly text
