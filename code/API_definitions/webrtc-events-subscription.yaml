@@ -77,7 +77,7 @@ info:
 
     - `org.camaraproject.webrtc-events.v0.registration-ends`
 
-      - Events triggered when a webrtc session is terminated (e.g. webrtc registration expired)
+      - Events triggered when a webrtc registration is terminated (e.g. webrtc registration expired)
 
     Note: Additionally to these list, ``org.camaraproject.webrtc-events.v0.subscription-ends``
     notification `type` is sent when the subscription ends.
@@ -725,9 +725,9 @@ components:
       example: qs15-h556-rt89-1298
 
     RegistrationId:
-          type: string
-          description: The unique identifier of the WebRTC registration.
-          example: ln3C-ttOSk-ObcQ7A0-tYO1LXqy
+      type: string
+      description: The unique identifier of the WebRTC registration.
+      example: ln3C-ttOSk-ObcQ7A0-tYO1LXqy
 
     CloudEvent:
       description: The notification callback
