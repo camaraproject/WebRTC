@@ -261,7 +261,7 @@ paths:
                         $ref: "#/components/examples/NEW_SESSION_INCOMING"
                       SESSION_UPDATE (session-status):
                         $ref: "#/components/examples/SESSION_UPDATE"
-                      REGISTRATION_REVOKED (subscription-ends):
+                      REGISTRATION_EXPIRED (registration-ends):
                         $ref: "#/components/examples/REGISTRATION_EXPIRED"
               responses:
                 "204":
@@ -597,7 +597,6 @@ components:
           API
       type: object
       required:
-        - deviceId
         - registrationId
       properties:
         deviceId:
@@ -621,6 +620,7 @@ components:
             The registration session ID created by the network.
             Obtained via registration API.
 
+
     SubscriptionEventTypeNotification:
       type: string
       description: |-
@@ -629,30 +629,16 @@ components:
           - Events triggered for any media session related event (e.g. far end new media endpoints)
         - `org.camaraproject.webrtc-events.v0.session-invitation`
           - Events triggered for any media endpoint registration event (e.g. incoming session)
+        - `org.camaraproject.webrtc-events.v0.registration-ends`
+          - Events triggered for registration termination (e.g. incoming session)
 
         `subscription-ends` is not supported for subscription. Sent by default
       enum:
         - org.camaraproject.webrtc-events.v0.session-status
         - org.camaraproject.webrtc-events.v0.session-invitation
-
-    EventTypeNotification:
-      type: string
-      description: |-
-        event-type - Event triggered when an event-type event occurred
-        - `org.camaraproject.webrtc-events.v0.session-status`
-          - Events triggered for any media session related event (e.g. far end new media endpoints)
-        - `org.camaraproject.webrtc-events.v0.session-invitation`
-          - Events triggered for any media endpoint registration event (e.g. incoming session)
-        - `org.camaraproject.webrtc-events.v0.subscription-ends`
-          - Event triggered when the subscription ends
-        - `org.camaraproject.webrtc-events.v0.registration-ends`
-          - Event triggered when the webrtc registration ends
-      enum:
-        - org.camaraproject.webrtc-events.v0.session-status
-        - org.camaraproject.webrtc-events.v0.session-invitation
-        - org.camaraproject.webrtc-events.v0.subscription-ends
         - org.camaraproject.webrtc-events.v0.registration-ends
 
+#This should be removed
     Subscription:
       description: Represents a event-type subscription.
       type: object
@@ -752,7 +738,9 @@ components:
         source:
           $ref: "#/components/schemas/Source"
         type:
-          $ref: "#/components/schemas/EventTypeNotification"
+          type: string
+          description: |-
+            event-type that describes type of notification
         specversion:
           type: string
           description: Version of the specification to which this event conforms (must be 1.0 if it conforms to cloudevents 1.0.2 version)
@@ -819,6 +807,9 @@ components:
           properties:
             data:
               $ref: "#/components/schemas/MediaSessionInformation"
+            type: 
+              enum:
+                - org.camaraproject.webrtc-events.v0.session-invitation
 
     ############################################
     EventSessionStatus:
@@ -839,6 +830,9 @@ components:
           properties:
             data:
               $ref: "#/components/schemas/MediaSessionInformation"
+            type: 
+              enum:
+                - org.camaraproject.webrtc-events.v0.session-status
 
     ############################################
     MediaSessionInformation:
@@ -932,6 +926,9 @@ components:
           properties:
             data:
               $ref: "#/components/schemas/SubscriptionEnds"
+            type: 
+              enum:
+                - org.camaraproject.webrtc-events.v0.subscription-ends
 
     SubscriptionEnds:
       description: Event detail structure for SUBSCRIPTION_ENDS event
@@ -971,6 +968,9 @@ components:
           properties:
             data:
               $ref: "#/components/schemas/RegistrationEnds"
+            type: 
+              enum:
+                - org.camaraproject.webrtc-events.v0.registration-ends
 
     RegistrationEnds:
       description: Event detail structure for REGISTRATION_ENDS event
