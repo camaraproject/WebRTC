@@ -169,7 +169,21 @@ paths:
       security:
         - openId:
             - webrtc-registration:sessions:write
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/regSessionUpdate'
       responses:
+        '200':
+          description: Ok
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/regSessionResponse'
         '204':
           description: Updated the registration status (no content)
           headers:
@@ -255,6 +269,10 @@ components:
             The device-id of the client in UUID format. A unique identifier for
             the physical device where a registration is initiated. Generated
             by the WebRTC application, and consistent within the same device.
+        registrationExpireTime:
+          type: string
+          format: date-time
+          description: Optional requested expiry time for the registration.
     regSessionResponse:
       type: object
       properties:
@@ -263,6 +281,17 @@ components:
         registrationId:
           type: string
           description: The registration session ID is returned when registering a device with the network . Clients must utilize this ID to as a parameter in the call-handling and subscription APIs.
+        expiresAt:
+          type: string
+          format: date-time
+          description: Expiry time of the registration.
+    regSessionUpdate:
+      type: object
+      properties:
+        registrationExpireTime:
+          type: string
+          format: date-time
+          description: Optional requested expiry time for the registration.
     RegistrationStatus:
       type: string
       enum:

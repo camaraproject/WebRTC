@@ -213,6 +213,7 @@ paths:
         - openId:
             - webrtc-events:org.camaraproject.webrtc-events.v0.session-status:create
             - webrtc-events:org.camaraproject.webrtc-events.v0.session-invitation:create
+            - webrtc-events:org.camaraproject.webrtc-events.v0.registration-ends:create
       requestBody:
         content:
           application/json:
@@ -223,6 +224,8 @@ paths:
                 $ref: "#/components/examples/INVITE_SUBSCRIPTION"
               SESSION_SUBSCRIPTION (session-status):
                 $ref: "#/components/examples/SESSION_SUBSCRIPTION"
+              REGISTRATION_ENDS_SUBSCRIPTION (session-status):
+                $ref: "#/components/examples/REGISTRATION_ENDS_SUBSCRIPTION"
         required: true
       callbacks:
         notifications:
@@ -249,7 +252,7 @@ paths:
                       SESSION_UPDATE (session-status):
                         $ref: "#/components/examples/SESSION_UPDATE"
                       REGISTRATION_REVOKED (subscription-ends):
-                        $ref: "#/components/examples/REGISTRATION_REVOKED"
+                        $ref: "#/components/examples/REGISTRATION_EXPIRED"
               responses:
                 "204":
                   description: Successful notification
@@ -930,6 +933,7 @@ components:
       description: |-
         - NETWORK_TERMINATED - API server stopped sending notification
         - SUBSCRIPTION_EXPIRED - Subscription expire time (optionally set by the requester) has been reached
+        - REGISTRATION_EXPIRED - Registration expire time (optionally set by the requester) has been reached
         - MAX_EVENTS_REACHED - Maximum number of events (optionally set by the requester) has been reached
         - ACCESS_TOKEN_EXPIRED - Access Token sinkCredential (optionally set by the requester) expiration time has been reached
         - SUBSCRIPTION_DELETED - Subscription was deleted by the requester
@@ -939,6 +943,7 @@ components:
         - SUBSCRIPTION_EXPIRED
         - ACCESS_TOKEN_EXPIRED
         - SUBSCRIPTION_DELETED
+        - REGISTRATION_EXPIRED
 
     HTTPSubscriptionRequest:
       allOf:
@@ -1355,6 +1360,25 @@ components:
                 message: Rate limit reached.
   examples:
     # Subscription examples
+    REGISTRATION_ENDS_SUBSCRIPTION:
+      description: |-
+        A sample of `registration-ends` subscription for registrationId
+        `+xsmcaum3z4zw4l0cu4w115m0` at `acme.opentelco.com`.
+
+        This will be used to receive WebRTC registration termination events
+      value:
+        protocol: HTTP
+        sink: https://notificationServer.opentelco.com
+        sinkCredential:
+          credentialType: "ACCESSTOKEN"
+          accessToken: "eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJKV1QiL.."
+          accessTokenExpireUtc: "2024-12-06T14:37:56.147Z"
+          accessTokenType: "bearer"
+        types:
+          - org.camaraproject.webrtc-events.v0.registration-ends
+        config:
+          subscriptionDetail:
+            registrationId: "xsmcaum3z4zw4l0cu4w115m0"
     INVITE_SUBSCRIPTION:
       description: |-
         A sample of media `session-invitation` subscription for phone number
@@ -1439,29 +1463,30 @@ components:
           mediaSessionId: "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
           reason: "New subscriber incoming call"
           sequenceNumber: 1
-    REGISTRATION_REVOKED:
+    REGISTRATION_EXPIRED:
       description: |-
-        Example of `subscription-ends` events.
+        Example of `registration-ends` events.
 
-        When a re-registration is requested from server, maybe due
+        When a re-registration is requested from server, maybe due to expire or
         administrative token revocation or due any other technical reason. It
         is expected from the endpoint to re-register. No new sessions will be
         delivered to the user endpoint, as the subscription is not valid
         anymore.
 
         Here, an example of how the network will communicate to the client that
-        the subscription is not valid anymore, detailing on
-        `terminationDescription` the root cause of the subscription remove.
+        the registration is not valid anymore, detailing on
+        `terminationDescription` the root cause of the registration removal.
       value:
         id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
         source: https://notificationServer.opentelco.com
-        type: org.camaraproject.webrtc-events.v0.subscription-ends
+        type: org.camaraproject.webrtc-events.v0.registration-ends
         specversion: "1.0"
         datacontenttype: application/json
         time: 2024-11-05T05:40:23.682Z
         data:
           subscriptionId: qs15-h556-rt89-1298
-          terminationReason: NETWORK_TERMINATED
+          registrationId: xsmcaum3z4zw4l0cu4w115m0
+          terminationReason: REGISTRATION_EXPIRED
           terminationDescription: "SIP re-registration required"
     SESSION_UPDATE:
       description: |-
