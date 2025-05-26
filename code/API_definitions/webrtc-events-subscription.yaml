@@ -6,7 +6,7 @@ info:
 
     This API provide REST API for a client, browser or native application, to
     receive events about updates of an active session or new sessions requests
-    (incoming calls).
+    (incoming calls) or registration termination.
 
     Any device can subscribe to media session events for accessible active media sessions using the
     `sessionId` to identify the media session to track. Using a valid
@@ -74,6 +74,10 @@ info:
 
       - Events triggered when a new session is requested (e.g. incoming call
         received)
+
+    - `org.camaraproject.webrtc-events.v0.registration-ends`
+
+      - Events triggered when a webrtc session is terminated (e.g. webrtc registration expired)
 
     Note: Additionally to these list, ``org.camaraproject.webrtc-events.v0.subscription-ends``
     notification `type` is sent when the subscription ends.
@@ -197,6 +201,7 @@ paths:
 
         - `org.camaraproject.webrtc-events.v0.session-invitation`: new calls event
         - `org.camaraproject.webrtc-events.v0.session-status`: updates on specific call
+        - `org.camaraproject.webrtc-events.v0.registration-ends`: registration termination event
 
         To subscribe and receive notifications about new calls, a
         `session-invitation` subscription is required using the `registrationId`
@@ -224,7 +229,7 @@ paths:
                 $ref: "#/components/examples/INVITE_SUBSCRIPTION"
               SESSION_SUBSCRIPTION (session-status):
                 $ref: "#/components/examples/SESSION_SUBSCRIPTION"
-              REGISTRATION_ENDS_SUBSCRIPTION (session-status):
+              REGISTRATION_ENDS_SUBSCRIPTION (registration-ends):
                 $ref: "#/components/examples/REGISTRATION_ENDS_SUBSCRIPTION"
         required: true
       callbacks:
@@ -719,6 +724,11 @@ components:
       description: The unique identifier of the subscription in the scope of the subscription manager. When this information is contained within an event notification, this concept SHALL be referred as `subscriptionId` as per [Commonalities Event Notification Model](https://github.com/camaraproject/Commonalities/blob/main/documentation/API-design-guidelines.md#122-event-notification).
       example: qs15-h556-rt89-1298
 
+    RegistrationId:
+          type: string
+          description: The unique identifier of the WebRTC registration.
+          example: ln3C-ttOSk-ObcQ7A0-tYO1LXqy
+
     CloudEvent:
       description: The notification callback
       required:
@@ -759,6 +769,7 @@ components:
           org.camaraproject.webrtc-events.v0.session-invitation: "#/components/schemas/EventSessionInvitation"
           org.camaraproject.webrtc-events.v0.session-status: "#/components/schemas/EventSessionStatus"
           org.camaraproject.webrtc-events.v0.subscription-ends: "#/components/schemas/EventSubscriptionEnds"
+          org.camaraproject.webrtc-events.v0.registration-ends: "#/components/schemas/EventRegistrationEnds"
 
     Source:
       type: string
@@ -933,7 +944,6 @@ components:
       description: |-
         - NETWORK_TERMINATED - API server stopped sending notification
         - SUBSCRIPTION_EXPIRED - Subscription expire time (optionally set by the requester) has been reached
-        - REGISTRATION_EXPIRED - Registration expire time (optionally set by the requester) has been reached
         - MAX_EVENTS_REACHED - Maximum number of events (optionally set by the requester) has been reached
         - ACCESS_TOKEN_EXPIRED - Access Token sinkCredential (optionally set by the requester) expiration time has been reached
         - SUBSCRIPTION_DELETED - Subscription was deleted by the requester
@@ -943,6 +953,38 @@ components:
         - SUBSCRIPTION_EXPIRED
         - ACCESS_TOKEN_EXPIRED
         - SUBSCRIPTION_DELETED
+
+    # WebRTC Registration Ends event
+    EventRegistrationEnds:
+      description: event structure for event subscription ends
+      allOf:
+        - $ref: "#/components/schemas/CloudEvent"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/RegistrationEnds"
+
+    RegistrationEnds:
+      description: Event detail structure for REGISTRATION_ENDS event
+      type: object
+      required:
+        - registrationId
+        - terminationReason
+      properties:
+        registrationId:
+          $ref: "#/components/schemas/RegistrationId"
+        terminationReason:
+          $ref: "#/components/schemas/RegistrationTerminationReason"
+        terminationDescription:
+          type: string
+
+    RegistrationTerminationReason:
+      type: string
+      description: |-
+        - NETWORK_TERMINATED - API server stopped sending notification
+        - REGISTRATION_EXPIRED - Registration expire time (optionally set by the requester) has been reached
+      enum:
+        - NETWORK_TERMINATED
         - REGISTRATION_EXPIRED
 
     HTTPSubscriptionRequest:
