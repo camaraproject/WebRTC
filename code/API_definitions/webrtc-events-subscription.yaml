@@ -146,6 +146,11 @@ info:
     the developer point of view the reception of the `subscription-ends` should
     be an indicator to check the registration status and try to register again.
 
+    ### 3.4. Registration ends (`registration-ends`)
+
+    A `org.camaraproject.webrtc-events.v0.registration-ends` event indicates that a previously active registration has ended and is no longer valid.
+    From a developer's point of view, reception of the `registration-ends` event should be treated as a signal to renew the WebRTC registration in order to continue receiving or initiating calls for the registered phone number.
+
     ## 4. Authorization and authentication
 
     The "Camara Security and Interoperability Profile" provides details on how
@@ -640,10 +645,13 @@ components:
           - Events triggered for any media endpoint registration event (e.g. incoming session)
         - `org.camaraproject.webrtc-events.v0.subscription-ends`
           - Event triggered when the subscription ends
+        - `org.camaraproject.webrtc-events.v0.registration-ends`
+          - Event triggered when the webrtc registration ends
       enum:
         - org.camaraproject.webrtc-events.v0.session-status
         - org.camaraproject.webrtc-events.v0.session-invitation
         - org.camaraproject.webrtc-events.v0.subscription-ends
+        - org.camaraproject.webrtc-events.v0.registration-ends
 
     Subscription:
       description: Represents a event-type subscription.
