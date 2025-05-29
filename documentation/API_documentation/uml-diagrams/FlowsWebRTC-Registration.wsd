@@ -1,0 +1,128 @@
+@startuml WebRTC-Registration-0.2
+
+title "CAMARA WebRTC - Registration - 0.2"
+autonumber "<font color=blue><b>[0]"
+
+
+participant WebClient
+box NETWORK
+participant "Identity\nManager" as IAM #LightGreen
+participant "CAMARA\ngateway" as CAMARA_GW #LightGreen
+participant "IMS\nNetwork" as IMS_Network
+end box
+participant "Remote\nendpoint" as RemoteEndpoint
+
+' --- USER AUTHENTICATION and REGISTRATION
+group USER AUTHENTICATION and REGISTRATION
+
+[-> WebClient: Launch app
+activate WebClient #LightGray
+
+WebClient -> IAM: Authentication/refresh Token
+activate IAM
+return Access/refresh Token
+WebClient -> CAMARA_GW: **POST /webrtc-registration/v0.2/sessions**\n\
+  Headers: \n\
+  - authorization \n\
+  - x-correlator \n\
+  Body: \n\
+  - deviceId
+activate CAMARA_GW
+
+CAMARA_GW -> IAM: Validate Auth-token
+activate IAM
+return 200 OK
+
+note right CAMARA_GW
+  phoneNumber, or MSISDN
+  is stored on the network side
+  linked to a unique identity.
+  ex.: IAM, IMS network or GW
+end note
+
+CAMARA_GW -> IMS_Network: **SIP REGISTER**\nFrom: phoneNumber\nTo:phoneNumber\nContact: CAMARA_GW
+activate IMS_Network
+IMS_Network -> CAMARA_GW: 100 Trying
+IMS_Network -> CAMARA_GW: 200 OK
+CAMARA_GW -> WebClient: **200 OK**\n\
+  Headers: \n\
+  - x-correlator \n\
+  Body:\n\
+  - regInfo/phoneNumber\n\
+  - regInfo/regStatus\n\
+  - registrationId
+note over WebClient
+  Registrations will be valid while
+  auth-token is still valid, or due
+  network request to refresh. This
+  event will be notitified via the
+  webrtc-events API
+end note
+end
+
+' --- Refreshing of registration
+group REGISTRATION REFRESH
+  note over CAMARA_GW
+   While the registration is still valid,
+   (ex.: while Auth-Token still valid)
+   the CAMARA gateway on the network
+   side must refresh the IMS REGISTER
+  end note
+  CAMARA_GW -> IMS_Network: SIP RE-REGISTER
+  IMS_Network -> CAMARA_GW: 200 OK
+
+else
+note over WebClient
+  When auth-token is about to
+  expire, it is needed to refresh
+  and update the WebRTC registration.
+  Use **registrationId** to specify
+  the registration to refresh
+end note
+WebClient -> CAMARA_GW: **PUT /webrtc-registration/v0.2/sessions/{registrationId}** \n\
+ Headers: \n\
+ - authorization \n\
+ - x-correlator
+
+note over CAMARA_GW
+  Auth-token refresh and check
+end note
+CAMARA_GW -> IMS_Network: SIP RE-REGISTER
+IMS_Network -> CAMARA_GW: 200 OK
+CAMARA_GW -> WebClient: **204 No content**\n\
+ Headers: \n\
+ - x-correlator
+end
+
+' --- DE-REGISTRATION
+group DE-REGISTRATION
+
+[-> WebClient: Closes session
+
+note over WebClient
+  Graceful logout
+end note
+WebClient -> CAMARA_GW: **DELETE /webrtc-registration/v0.2/sessions/{registrationId}** \n\
+ Headers: \n\
+ - authorization \n\
+ - x-correlator
+CAMARA_GW -> IMS_Network: SIP DE-REGISTER
+IMS_Network -> CAMARA_GW: 200 OK
+deactivate IMS_Network
+
+CAMARA_GW -> WebClient: **204 No content**\n\
+ Headers: \n\
+ - x-correlator
+
+deactivate CAMARA_GW      
+deactivate WebClient
+
+note over WebClient
+  Non-graceful logout will let the
+  auth token to expire, leading to
+  a SIP DE-REGISTRATION on the
+  WebRTC gateway
+end note
+end 
+
+@enduml
