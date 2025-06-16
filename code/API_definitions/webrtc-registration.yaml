@@ -165,12 +165,12 @@ paths:
 
         1. Let `t_req` be the server-side receipt time of the request and
            `t_prev` the previously stored `registrationExpireTime`.
-        2. Compute the remaining lifetime  
+        2. Compute the remaining lifetime
               remaining = t_prev – t_req
            (values ≤ 0 indicate the client is late; operators MAY reject or
            treat it as a new registration).
         3. Apply the operator’s configured TTL (`TTL_cfg`, e.g. 3600 s) **from
-           `t_req`, not from `t_prev`**:  
+           `t_req`, not from `t_prev`**:
               newExpire = t_req + TTL_cfg
         4. Persist `newExpire` and return it in `expiresAt` inside the
            response body.
@@ -319,7 +319,7 @@ components:
             refresh logic. Clients MUST treat this value as the new upper-bound
             and schedule their next refresh accordingly.
 
-            Client applications should compute the remaining time before expiry (expiresAt - currentTime) 
+            Client applications should compute the remaining time before expiry (expiresAt - currentTime)
             and plan to refresh well in advance to avoid race conditions. A suggested margin is 120 seconds before expiry.
     regSessionUpdate:
       type: object
