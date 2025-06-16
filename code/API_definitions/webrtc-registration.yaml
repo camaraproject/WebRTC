@@ -157,11 +157,26 @@ paths:
       tags:
         - Registration
       summary: Refresh network registration.
-      description: |
-        API Endpoint used to renew or refresh the registration on the network.
-        It is possible to renew the registration before it expires. This API
-        endpoint will trigger a network registration refresh based on a
-        pre-existing registration.
+      description: |-
+        API endpoint used to **refresh** an existing registration *before* it
+        expires.
+
+        **Server behaviour on refresh**
+
+        1. Let `t_req` be the server-side receipt time of the request and
+           `t_prev` the previously stored `registrationExpireTime`.
+        2. Compute the remaining lifetime  
+              remaining = t_prev – t_req
+           (values ≤ 0 indicate the client is late; operators MAY reject or
+           treat it as a new registration).
+        3. Apply the operator’s configured TTL (`TTL_cfg`, e.g. 3600 s) **from
+           `t_req`, not from `t_prev`**:  
+              newExpire = t_req + TTL_cfg
+        4. Persist `newExpire` and return it in `expiresAt` inside the
+           response body.
+
+        Clients SHOULD plan to refresh well **before** `newExpire` to avoid
+        race conditions.
       operationId: updateRegistrationById
       parameters:
         - $ref: '#/components/parameters/x-correlator'
@@ -272,7 +287,22 @@ components:
         registrationExpireTime:
           type: string
           format: date-time
-          description: Optional requested expiry time for the registration.
+          description: |-
+            Optional **absolute** expiry moment for this registration,
+            expressed as an RFC 3339/UTC timestamp.
+
+            ▸ **Devices without a trustworthy clock** (e.g. Wi-Fi-only tablets
+              or other non-SIM hardware) SHOULD treat the value as an
+              **upper bound**.  Such devices MAY derive a local time-to-live:
+
+                  ttl = registrationExpireTime – now()
+
+              and initiate a refresh *before* `ttl` elapses (a safety margin
+              of ~120 s is recommended).
+
+            ▸ If the client omits this field, the server will set the expiry
+              according to its own TTL policy and return the resulting
+              `registrationExpireTime` in the response.
     regSessionResponse:
       type: object
       properties:
@@ -284,14 +314,28 @@ components:
         expiresAt:
           type: string
           format: date-time
-          description: Expiry time of the registration.
+          description: |-
+            Authoritative expiry timestamp calculated **after** applying the
+            refresh logic. Clients MUST treat this value as the new upper-bound
+            and schedule their next refresh accordingly.
+
+            Client applications should compute the remaining time before expiry (expiresAt - currentTime) 
+            and plan to refresh well in advance to avoid race conditions. A suggested margin is 120 seconds before expiry.
     regSessionUpdate:
       type: object
       properties:
         registrationExpireTime:
           type: string
           format: date-time
-          description: Optional requested expiry time for the registration.
+          description: |-
+            Optional **absolute** UTC timestamp that *requests* a new expiry.
+            The server will honour the value only if it is **later than the
+            operator’s minimum TTL** and **earlier than operator maximum TTL**;
+            otherwise it falls back to its own policy (see refresh algorithm
+            above).
+
+            If omitted, the server always extends the expiry by its configured
+            TTL, measured from the moment the refresh is received.
     RegistrationStatus:
       type: string
       enum:

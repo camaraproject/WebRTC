@@ -262,7 +262,7 @@ paths:
                       SESSION_UPDATE (session-status):
                         $ref: "#/components/examples/SESSION_UPDATE"
                       REGISTRATION_EXPIRED (registration-ends):
-                        $ref: "#/components/examples/REGISTRATION_EXPIRED"
+                        $ref: "#/components/examples/REGISTRATION_ENDS"
               responses:
                 "204":
                   description: Successful notification
@@ -492,7 +492,7 @@ components:
           minItems: 1
           maxItems: 1
           items:
-            $ref: "#/components/schemas/SubscriptionEventTypeNotification"
+            $ref: "#/components/schemas/SubscriptionEventType"
         config:
           $ref: "#/components/schemas/Config"
       discriminator:
@@ -574,7 +574,7 @@ components:
                 In the case of an ACCESS_TOKEN_EXPIRED termination reason, implementation should notify the client before the expiration date.
                 If the access token is a JWT and registered "exp" (Expiration Time) claim is present, the two expiry times should match.
                 It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-                Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
+                Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
               example: "2023-07-03T12:27:08.312Z"
             accessTokenType:
               description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)).
@@ -614,14 +614,10 @@ components:
             The sessionID will identify a unique session between the network and the device client.
             It will be included on the events generated.
         registrationId:
-          type: string
-          example: xsmcaum3z4zw4l0cu4w115m0
-          description: |-
-            The registration session ID created by the network.
-            Obtained via registration API.
+          $ref: "#/components/schemas/RegistrationId"
 
 
-    SubscriptionEventTypeNotification:
+    SubscriptionEventType:
       type: string
       description: |-
         event-type - Event triggered when an event-type event occurred
@@ -638,7 +634,6 @@ components:
         - org.camaraproject.webrtc-events.v0.session-invitation
         - org.camaraproject.webrtc-events.v0.registration-ends
 
-#This should be removed
     Subscription:
       description: Represents a event-type subscription.
       type: object
@@ -676,7 +671,7 @@ components:
           description: |
             Date when the event subscription will begin/began
             It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-            Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
+            Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ 
           example: "2023-07-03T12:27:08.312Z"
         expiresAt:
           type: string
@@ -684,7 +679,7 @@ components:
           description: |
             Date when the event subscription will expire. Only provided when `subscriptionExpireTime` is indicated by API client or Telco Operator has specific policy about that.
             It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-            Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
+            Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ 
           example: "2023-07-03T12:27:08.312Z"
         status:
           type: string
@@ -807,7 +802,7 @@ components:
           properties:
             data:
               $ref: "#/components/schemas/MediaSessionInformation"
-            type: 
+            type:
               enum:
                 - org.camaraproject.webrtc-events.v0.session-invitation
 
@@ -830,7 +825,7 @@ components:
           properties:
             data:
               $ref: "#/components/schemas/MediaSessionInformation"
-            type: 
+            type:
               enum:
                 - org.camaraproject.webrtc-events.v0.session-status
 
@@ -926,7 +921,7 @@ components:
           properties:
             data:
               $ref: "#/components/schemas/SubscriptionEnds"
-            type: 
+            type:
               enum:
                 - org.camaraproject.webrtc-events.v0.subscription-ends
 
@@ -968,12 +963,12 @@ components:
           properties:
             data:
               $ref: "#/components/schemas/RegistrationEnds"
-            type: 
+            type:
               enum:
                 - org.camaraproject.webrtc-events.v0.registration-ends
 
     RegistrationEnds:
-      description: Event detail structure for REGISTRATION_ENDS event
+      description: Event detail structure for REGISTRATION_ENDS event. registrationExpireTime is absolute UTC. Clients SHOULD refresh in advance; otherwise a REGISTRATION_EXPIRED terminationReason will be emitted.
       type: object
       required:
         - registrationId
@@ -981,16 +976,16 @@ components:
       properties:
         registrationId:
           $ref: "#/components/schemas/RegistrationId"
-        terminationReason:
-          $ref: "#/components/schemas/RegistrationTerminationReason"
         terminationDescription:
           type: string
+        terminationReason:
+          $ref: "#/components/schemas/RegistrationTerminationReason"
 
     RegistrationTerminationReason:
       type: string
       description: |-
         - NETWORK_TERMINATED - API server stopped sending notification
-        - REGISTRATION_EXPIRED - Registration expire time (optionally set by the requester) has been reached
+        - REGISTRATION_EXPIRED - Registration expire time (optionally set by the requester) has been reached. REGISTRATION_EXPIRED is triggered exactly when the set registrationExpireTime has passed.
       enum:
         - NETWORK_TERMINATED
         - REGISTRATION_EXPIRED
@@ -1513,10 +1508,11 @@ components:
           mediaSessionId: "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
           reason: "New subscriber incoming call"
           sequenceNumber: 1
-    REGISTRATION_EXPIRED:
+    REGISTRATION_ENDS:
       description: |-
         Example of `registration-ends` events.
 
+        This scenario occurs when the device did not refresh before the registration expiry time (registrationExpireTime).
         When a re-registration is requested from server, maybe due to expire or
         administrative token revocation or due any other technical reason. It
         is expected from the endpoint to re-register. No new sessions will be
