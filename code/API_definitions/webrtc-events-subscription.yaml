@@ -140,11 +140,12 @@ info:
     about the session itself and its status progressing inside the network.
 
     ### 3.3. Subscription ends (subscription-ends)
-
-    A `org.camaraproject.webrtc-events.v0.subscription-ends` event will indicate
-    that the endpoint will not be notified if a new session is received. From
-    the developer point of view the reception of the `subscription-ends` should
-    be an indicator to check the registration status and try to register again.
+    
+    A `org.camaraproject.webrtc-events.v0.subscription-ends` event indicates that 
+    the endpoint will no longer be notified when a new event occurs. From 
+    the developer's point of view, receiving the subscription-ends event should 
+    signal the need to check the event subscription status and attempt to refresh 
+    it in order to continue receiving new event notifications.
 
     ### 3.4. Registration ends (`registration-ends`)
 
@@ -263,6 +264,8 @@ paths:
                         $ref: "#/components/examples/SESSION_UPDATE"
                       REGISTRATION_EXPIRED (registration-ends):
                         $ref: "#/components/examples/REGISTRATION_ENDS"
+                      SUBSCRIPTION_REVOKED (subscription-ends):
+                        $ref: "#/components/examples/SUBSCRIPTION_REVOKED"
               responses:
                 "204":
                   description: Successful notification
@@ -1569,3 +1572,27 @@ components:
           mediaSessionId: "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
           reason: "Answer SDP update"
           sequenceNumber: 3
+    SUBSCRIPTION_REVOKED:
+      description: |-
+        Example of `subscription-ends` events.
+
+        When a re-registration is requested from server, maybe due
+        administrative token revocation or due any other technical reason. It
+        is expected from the endpoint to re-register. No new sessions will be
+        delivered to the user endpoint, as the subscription is not valid
+        anymore.
+
+        Here, an example of how the network will communicate to the client that
+        the subscription is not valid anymore, detailing on
+        `terminationDescription` the root cause of the subscription remove.
+      value:
+        id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
+        source: https://notificationServer.opentelco.com
+        type: org.camaraproject.webrtc-events.v0.subscription-ends
+        specversion: "1.0"
+        datacontenttype: application/json
+        time: 2024-11-05T05:40:23.682Z
+        data:
+          subscriptionId: qs15-h556-rt89-1298
+          terminationReason: NETWORK_TERMINATED
+          terminationDescription: "SIP re-registration required"
