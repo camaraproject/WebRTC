@@ -140,11 +140,11 @@ info:
     about the session itself and its status progressing inside the network.
 
     ### 3.3. Subscription ends (subscription-ends)
-    
-    A `org.camaraproject.webrtc-events.v0.subscription-ends` event indicates that 
-    the endpoint will no longer be notified when a new event occurs. From 
-    the developer's point of view, receiving the subscription-ends event should 
-    signal the need to check the event subscription status and attempt to refresh 
+
+    A `org.camaraproject.webrtc-events.v0.subscription-ends` event indicates that
+    the endpoint will no longer be notified when a new event occurs. From
+    the developer's point of view, receiving the subscription-ends event should
+    signal the need to check the event subscription status and attempt to refresh
     it in order to continue receiving new event notifications.
 
     ### 3.4. Registration ends (`registration-ends`)
