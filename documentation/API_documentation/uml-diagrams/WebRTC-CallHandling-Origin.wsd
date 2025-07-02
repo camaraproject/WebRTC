@@ -1,0 +1,206 @@
+@startuml WebRTC-CallHandling-ORIG-0.2
+
+title "CAMARA WebRTC - Call handling v0.2\nCall origination cuse case"
+autonumber "<font color=blue><b>[0]"
+
+<style>
+.audioStyle {
+  arrow {
+    LineColor red
+    LineThickness 5
+  }
+}
+.wsStyle { 
+  arrow { 
+    LineColor blue 
+    LineThickness 5 
+  } 
+} 
+</style>
+
+box DEVICE
+participant DA as "Device\nApplication"
+participant NC as "Notification\nClient"
+end box
+
+' participant AGG as "Aggregator\nNetwork"
+participant API as "API exposure\nfunction"
+participant NS as "Notification\nService"
+participant NET as "Telco\nNetwork"
+
+box DEVICE
+participant "Remote\nendpoint" as RE
+end box
+
+' --- webrtc-events-subscription --- 
+
+NC <-> NS : webrtc-events-susbcription
+activate NC #LightSteelBlue
+activate NS #LightSteelBlue
+
+note across
+  To have full media session control, it is a precondition to have:
+  - a valid **session** to register the device on the network and enbale its subscriber number.
+  - a valid **subscription**, using the ""webrtc-events-subscription"" API to receive updates about the ""mediaSession"" life cycle.  
+end note
+
+' ---------------------------------------------------------
+' CALL ORIGINATION - WebRTC device initiaties voice session
+' ---------------------------------------------------------
+
+== CALL ORIGINATION (creating NET calls) ==
+
+[-> DA ++ : User creates a call
+
+DA -> API ++ : **POST /webrtc-call-handling/{apiVersion}/sessions** \n\
+  Headers:\n\
+  - registrationId*\n\
+  Body:\n\
+  - originatorAddress* \n\
+  - receiverAddress* \n\
+  - clientCorrelator \n\
+  - offer: sdp: SDP_OFFER_RFC4566
+
+note right of DA
+Local or no media provided as initial request
+end note
+
+API -> NS ++ : stores session
+return
+
+API -> NET ++: **SIP INVITE** \n\
+  From: originatorAddress \n\
+  To: receiverAddress \n\
+  SDP_OFFER_RFC4566
+
+note over NET
+Call starts
+end note
+
+NET -> RE ++ : **SIP INVITE** \n\
+  From: originatorAddress \n\
+  To: receiverAddress \n\
+  SDP_OFFER_RFC4566
+
+RE -> NET: 100 Trying
+NET -> API: 100 Trying 
+API -> DA -- : **201 Created session** \n\
+  - originatorAddress \n\
+  - receiverAddress \n\
+  - status : "Initial" \n\
+  - mediaSessionId
+
+RE -> NET: **183 Session progress** \n\
+  SDP_ANSWER_RFC4566
+NET -> API ++ : **183 Session progress** \n\
+  SDP_ANSWER_RFC4566
+
+API --> NS --++ : SESSION_UPDATE
+NC <- NS: **POST /callback_url/** \n\
+  - type: "org.camaraproject.webrtc-events.v0.session-status" \n\
+  - data.status: InProgress \n\
+  - data.answer: SDP_ANSWER_RFC4566 \n\
+  - data.mediaSessionId
+NC --> NS: **204** Sucessful
+deactivate NS
+
+
+note right of NET
+Network should asume ACKs and
+not exposed signaling
+end note
+NET -> RE: **PRACK** \n selectedCodec \n localQoS
+RE -> NET: 200 OK
+
+note across 
+  There are two main signaling mechanisms:
+   - **Device** needs to update the media session (REST API methods)
+   - **Network** needs to update the media session (Callback mechanism)
+
+  Late media re-negotiation (WebRTC ICE) and SIP signaling updates (BYE, CANCEL) can be achievedwith these two main mechanisms.
+
+  The rest of the diagram intends to explain in detail how the call progress throught their main stages
+end note
+
+== Late media ICE discovery ==
+
+DA <[#purple]-> API: DTLS Handshake
+DA <[#purple]-> API: ICE Connectivity Check
+DA -> API ++ : **PUT /vvoip/{apiVersion}/sessions/{mediaSessionId}/status**\n\
+  Headers:\n\
+  - authorization*\n\
+  Body: \n\
+  - status: **In Progress** \n\
+  - offer: SDP_LATE_OFFER_RFC4566 \n\
+  - answer: SDP_ANSWER_RFC4566
+
+API ->NET: **SIP UPDATE** \n SDP_LATE_OFFER_RFC4566
+DA <- API --: **204** Sucessful
+
+NET -> RE: **SIP UPDATE** \n\
+  SDP_LATE_OFFER_RFC4566
+RE -> NET: **200 OK** \n\
+  SDP_LATE_ANSWER_RFC4566
+NET -> API ++: **200 OK** \n\
+  SDP_LATE_ANSWER_RFC4566
+
+API --> NS --++ : SESSION_UPDATE
+NC <- NS: **POST /callback_url/** \n\
+  - type: "org.camaraproject.webrtc-events.v0.session-status" \n\
+  - data.status: InProgress \n\
+  - data.answer: SDP_LATE_ANSWER_RFC4566 \n\
+  - data.mediaSessionId
+NC --> NS: **204** Sucessful
+deactivate NS
+
+== Ringing stage ==
+
+RE ->NET: **SIP 180 Ringing**
+NET -> API ++: **SIP 180 Ringing**
+
+API --> NS --++ : SESSION_UPDATE
+NC <- NS: **POST /callback_url/** \n\
+  - type: "org.camaraproject.webrtc-events.v0.session-status" \n\
+  - data.status: Ringing \n\
+  - data.mediaSessionId
+NC --> NS: **204** Sucessful
+deactivate NS
+
+== Answering stage ==
+
+RE -> NET : **SIP 200 OK**
+NET -> API ++: **SIP 200 OK**
+
+API --> NS --++ : SESSION_UPDATE
+NC <- NS: **POST /callback_url/** \n\
+  - type: "org.camaraproject.webrtc-events.v0.session-status" \n\
+  - data.status: Connected \n\
+  - data.mediaSessionId
+NC --> NS: **204** Sucessful
+deactivate NS
+
+
+DA <--> API <<audioStyle>>: DTLS-SRTP
+API <--> RE <<audioStyle>>: RTP/SRTP
+
+== Hangup stage ==
+
+[-> DA: Hangup
+DA -> API ++ : **DELETE /vvoip/{apiVersion}/sessions/{mediaSessionId}**
+API -> NET: **SIP BYE**
+DA <- API -- : **204** Sucessful
+deactivate DA
+
+NET -> RE: **SIP BYE**
+RE -> NET --: **SIP 200 OK**
+NET -> API --: **SIP 200 OK**
+
+API --> NS --++ : SESSION_UPDATE
+NC <- NS: **POST /callback_url/** \n\
+  - type: "org.camaraproject.webrtc-events.v0.session-status" \n\
+  - data.status: Terminated \n\
+  - data.mediaSessionId
+NC --> NS: **204** Sucessful
+deactivate NS
+
+|||
