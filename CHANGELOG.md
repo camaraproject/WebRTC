@@ -3,6 +3,7 @@
 
 ## Table of contents
 
+- **[r1.3](#r13)**
 - **[r1.2](#r12)**
 - **[r1.1](#r11)**
 - **[v0.1.1](#v011)**
@@ -16,6 +17,66 @@ The below sections record the changes for each API version in each release as fo
 * for the first release-candidate, all changes since the last public release
 * for subsequent release-candidate(s), only the delta to the previous release-candidate
 * for a public release, the consolidated changes since the previous public release
+
+# r1.3
+
+## Release Notes
+
+This public release contains the definition and documentation of
+
+* webrtc-registration v0.2.0
+* webrtc-call-handling v0.2.0
+* webrtc-events v0.1.0
+
+The API definition(s) are based on
+
+* Commonalities r3.2
+* Identity and Consent Management r3.2
+
+Changelog since latest public r1.2
+
+* Full Changelog with the list of PRs and contributors: https://github.com/camaraproject/WebRTC/compare/r1.2...r1.3
+
+## WebRTC Registration v0.3.0
+
+- API definition **with inline documentation**:
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.3/code/API_definitions/webrtc-registration.yaml&nocors)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.3/code/API_definitions/webrtc-registration.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r1.3/code/API_definitions/webrtc-registration.yaml)
+
+### Added
+* Support registration expiry updates and termination event notifications at PR #83
+* Introduced `regSessionUpdate` schema with optional `registrationExpireTime` field to allow clients to request a new expiry time.
+* Added 200 OK response definition for `PUT /sessions/{registrationId}` to acknowledge successful updates.
+
+### Changed
+* Commonalities aligment 0.6 at PR #XX
+* Extended `regSessionResponse` schema to include `expiresAt`, indicating the assigned expiry time of the registration session.
+
+## webrtc-call-handling v0.2.0
+
+- API definition **with inline documentation**:
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.3/code/API_definitions/webrtc-call-handling.yaml&nocors)
+  - [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.3/code/API_definitions/webrtc-call-handling.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r1.3/code/API_definitions/webrtc-call-handling.yaml)
+
+### Changes
+* Commonalities aligment 0.6 at PR #XX
+
+## WebRTC Events v0.1.0
+
+- API definition **with inline documentation**:
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-events.yaml&nocors)
+  - [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-events.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r1.2/code/API_definitions/webrtc-events.yaml)
+
+### Added
+* Added new event type `webrtc-events:org.camaraproject.webrtc-events.v0.registration-ends` to notify subscribers when a registration ends.
+* Provided a concrete example for the `registration-ends` event subscription.
+
+### Changes
+* Commonalities aligment 0.6 at PR #XX
+* Extended `TerminationReason` enumeration to include `REGISTRATION_EXPIRED`, allowing precise classification of expiry-based terminations.
 
 # r1.2
 
