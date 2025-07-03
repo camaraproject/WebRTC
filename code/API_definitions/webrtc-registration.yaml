@@ -98,7 +98,7 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 0.2.0
+  version: vwip
   x-camara-commonalities: 0.5
 
 externalDocs:
@@ -157,11 +157,26 @@ paths:
       tags:
         - Registration
       summary: Refresh network registration.
-      description: |
-        API Endpoint used to renew or refresh the registration on the network.
-        It is possible to renew the registration before it expires. This API
-        endpoint will trigger a network registration refresh based on a
-        pre-existing registration.
+      description: |-
+        API endpoint used to **refresh** an existing registration *before* it
+        expires.
+
+        **Server behaviour on refresh**
+
+        1. Let `t_req` be the server-side receipt time of the request and
+           `t_prev` the previously stored `registrationExpireTime`.
+        2. Compute the remaining lifetime
+              remaining = t_prev - t_req
+           (values ≤ 0 indicate the client is late; operators MAY reject or
+           treat it as a new registration).
+        3. Apply the operator's configured TTL (`TTL_cfg`, e.g. 3600 s) **from
+           `t_req`, not from `t_prev`**:
+              newExpire = t_req + TTL_cfg
+        4. Persist `newExpire` and return it in `expiresAt` inside the
+           response body.
+
+        Clients SHOULD plan to refresh well **before** `newExpire` to avoid
+        race conditions.
       operationId: updateRegistrationById
       parameters:
         - $ref: '#/components/parameters/x-correlator'
@@ -169,7 +184,21 @@ paths:
       security:
         - openId:
             - webrtc-registration:sessions:write
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/regSessionUpdate'
       responses:
+        '200':
+          description: Ok
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/regSessionResponse'
         '204':
           description: Updated the registration status (no content)
           headers:
@@ -252,9 +281,28 @@ components:
         deviceId:
           type: string
           description: |-
-            The device-id of the client in UUID format. A unique identifier for
+            The deviceId of the client in UUID format. A unique identifier for
             the physical device where a registration is initiated. Generated
             by the WebRTC application, and consistent within the same device.
+        registrationExpireTime:
+          type: string
+          format: date-time
+          description: |-
+            Optional **absolute** expiry moment for this registration,
+            expressed as an RFC 3339/UTC timestamp.
+
+            ▸ **Devices without a trustworthy clock** (e.g. Wi-Fi-only tablets
+              or other non-SIM hardware) SHOULD treat the value as an
+              **upper bound**.  Such devices MAY derive a local time-to-live:
+
+                  ttl = registrationExpireTime - now()
+
+              and initiate a refresh *before* `ttl` elapses (a safety margin
+              of ~120 s is recommended).
+
+            ▸ If the client omits this field, the server will set the expiry
+              according to its own TTL policy and return the resulting
+              `registrationExpireTime` in the response.
     regSessionResponse:
       type: object
       properties:
@@ -263,6 +311,31 @@ components:
         registrationId:
           type: string
           description: The registration session ID is returned when registering a device with the network . Clients must utilize this ID to as a parameter in the call-handling and subscription APIs.
+        expiresAt:
+          type: string
+          format: date-time
+          description: |-
+            Authoritative expiry timestamp calculated **after** applying the
+            refresh logic. Clients MUST treat this value as the new upper-bound
+            and schedule their next refresh accordingly.
+
+            Client applications should compute the remaining time before expiry (expiresAt - currentTime)
+            and plan to refresh well in advance to avoid race conditions. A suggested margin is 120 seconds before expiry.
+    regSessionUpdate:
+      type: object
+      properties:
+        registrationExpireTime:
+          type: string
+          format: date-time
+          description: |-
+            Optional **absolute** UTC timestamp that *requests* a new expiry.
+            The server will honour the value only if it is **later than the
+            operator's minimum TTL** and **earlier than operator maximum TTL**;
+            otherwise it falls back to its own policy (see refresh algorithm
+            above).
+
+            If omitted, the server always extends the expiry by its configured
+            TTL, measured from the moment the refresh is received.
     RegistrationStatus:
       type: string
       enum:
