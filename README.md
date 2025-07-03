@@ -59,7 +59,7 @@ Sandbox API Repository to describe, develop, document, and test the WebRTC Servi
 
 ## Meetings
 * Meetings are held virtually
-  * Find meeting notes at https://wiki.camaraproject.org/display/CAM/WebRTC+Meeting+Minutes
+  * Find meeting notes at https://lf-camaraproject.atlassian.net/wiki/spaces/CAM/pages/14564608/Minutes+-+WebRTC
 * Schedule:
   * Tuesdays 4pm CEST (Madrid, Paris, Berlin, Rome), each 15 days
   
