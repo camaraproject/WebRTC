@@ -126,9 +126,9 @@ Initial version covering the following functionality and related endpoints:
 * API to subscribe to call events. Bringing server-side updates about a voice video session in progress or during negotiation.
 
 - API definition **with inline documentation**:
-  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-events.yaml&nocors)
-  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-events.yaml)
-  - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r1.2/code/API_definitions/webrtc-events.yaml)
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-events-subscription.yaml&nocors)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-events-subscription.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r1.2/code/API_definitions/webrtc-events-subscription.yaml)
 
 ### Added
 * YAML inline documentation at PR #53

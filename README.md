@@ -42,9 +42,9 @@ Sandbox API Repository to describe, develop, document, and test the WebRTC Servi
   [[View it on Swagger Editor]](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-call-handling.yaml)
 
   * **webrtc-events v0.1.0**
-  [[YAML]](https://github.com/camaraproject/WebRTC/blob/r1.2/code/API_definitions/webrtc-events.yaml)
-  [[View it on ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-events.yaml&nocors)
-  [[View it on Swagger Editor]](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-events.yaml)
+  [[YAML]](https://github.com/camaraproject/WebRTC/blob/r1.2/code/API_definitions/webrtc-events-subscription.yaml)
+  [[View it on ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-events-subscription.yaml&nocors)
+  [[View it on Swagger Editor]](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-events-subscription.yaml)
 
 * Previous releases and pre-releases are available here: https://github.com/camaraproject/WebRTC/releases
 * For changes see [CHANGELOG.md](https://github.com/camaraproject/WebRTC/blob/main/CHANGELOG.md)
@@ -59,7 +59,7 @@ Sandbox API Repository to describe, develop, document, and test the WebRTC Servi
 
 ## Meetings
 * Meetings are held virtually
-  * Find meeting notes at https://wiki.camaraproject.org/display/CAM/WebRTC+Meeting+Minutes
+  * Find meeting notes at https://lf-camaraproject.atlassian.net/wiki/spaces/CAM/pages/14564608/Minutes+-+WebRTC
 * Schedule:
   * Tuesdays 4pm CEST (Madrid, Paris, Berlin, Rome), each 15 days
   
