@@ -33,6 +33,7 @@ Use the previous links to check the DEV main version of the API. Copy & paste an
 
 * ReDoc: https://redocly.github.io/redoc/
 * Swagger: https://editor.swagger.io/
+* CAMARA dedicated swagger instance: https://camaraproject.github.io/swagger-ui/
 
 
 ## Build HTML from sources

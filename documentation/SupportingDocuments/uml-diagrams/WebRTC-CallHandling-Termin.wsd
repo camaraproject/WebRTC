@@ -1,6 +1,6 @@
-@startuml WebRTC-CallHandling-TERM-0.2
+@startuml WebRTC-CallHandling-TERM-0.3
 
-title "CAMARA WebRTC - Call handling v0.2\nCall termination use case"
+title "CAMARA WebRTC - Call handling v0.3\nCall termination use case"
 autonumber "<font color=blue><b>[0]"
 
 <style>
