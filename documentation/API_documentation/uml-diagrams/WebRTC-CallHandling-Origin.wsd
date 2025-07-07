@@ -1,6 +1,6 @@
 @startuml WebRTC-CallHandling-ORIG-0.2
 
-title "CAMARA WebRTC - Call handling v0.2\nCall origination cuse case"
+title "CAMARA WebRTC - Call handling v0.2\nCall origination use case"
 autonumber "<font color=blue><b>[0]"
 
 <style>
