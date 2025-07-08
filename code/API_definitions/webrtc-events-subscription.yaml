@@ -76,7 +76,7 @@ info:
 
       - Events triggered when a webrtc registration is terminated (e.g. webrtc registration expired)
 
-    Note: Additionally to these list, ``org.camaraproject.webrtc-events.v0.subscription-ends``
+    Note: Additionally to these list, ``org.camaraproject.webrtc-events.v0.subscription-ended``
     notification `type` is sent when the subscription ends.
     This notification does not require dedicated subscription.
 
@@ -136,11 +136,11 @@ info:
     a unique SessionId, to create a dedicated subscription and receive events
     about the session itself and its status progressing inside the network.
 
-    ### 3.3. Subscription ends (subscription-ends)
+    ### 3.3. Subscription ends (subscription-ended)
 
-    A `org.camaraproject.webrtc-events.v0.subscription-ends` event indicates that
+    A `org.camaraproject.webrtc-events.v0.subscription-ended` event indicates that
     the endpoint will no longer be notified when a new event occurs. From
-    the developer's point of view, receiving the subscription-ends event should
+    the developer's point of view, receiving the subscription-ended event should
     signal the need to check the event subscription status and attempt to refresh
     it in order to continue receiving new event notifications.
 
@@ -271,8 +271,8 @@ paths:
                         $ref: "#/components/examples/SESSION_UPDATE"
                       REGISTRATION_EXPIRED (registration-ends):
                         $ref: "#/components/examples/REGISTRATION_ENDS"
-                      SUBSCRIPTION_REVOKED (subscription-ends):
-                        $ref: "#/components/examples/SUBSCRIPTION_REVOKED"
+                      SUBSCRIPTION_ENDED (subscription-ended):
+                        $ref: "#/components/examples/SUBSCRIPTION_ENDED"
               responses:
                 "204":
                   description: Successful notification
@@ -491,6 +491,7 @@ components:
         sink:
           type: string
           format: uri
+          pattern: ^https:\/\/.+$
           description: The address to which events shall be delivered using the selected protocol.
           example: "https://endpoint.example.com/sink"
         sinkCredential:
@@ -642,7 +643,7 @@ components:
         - `org.camaraproject.webrtc-events.v0.registration-ends`
           - Events triggered for registration termination (e.g. incoming session)
 
-        `subscription-ends` is not supported for subscription. Sent by default
+        `subscription-ended` is not supported for subscription. It is sent by default
       enum:
         - org.camaraproject.webrtc-events.v0.session-status
         - org.camaraproject.webrtc-events.v0.session-invitation
@@ -663,6 +664,7 @@ components:
         sink:
           type: string
           format: uri
+          pattern: ^https:\/\/.+$
           description: The address to which events shall be delivered using the selected protocol.
           example: "https://endpoint.example.com/sink"
         types:
@@ -762,7 +764,7 @@ components:
         data:
           type: object
           description: |-
-            Event details payload. Depending of the event type, it will will include one of the data structures defined on this specification. Along with the subscription-ends, that is an authomatic event.
+            Event details payload. Depending of the event type, it will will include one of the data structures defined on this specification. Along with the subscription-ended, that is an authomatic event.
 
             Check the introduction documentation and the other CAMARA WebRTC APIs for extra info about data structures included on the events.
         time:
@@ -772,7 +774,7 @@ components:
         mapping:
           org.camaraproject.webrtc-events.v0.session-invitation: "#/components/schemas/EventSessionInvitation"
           org.camaraproject.webrtc-events.v0.session-status: "#/components/schemas/EventSessionStatus"
-          org.camaraproject.webrtc-events.v0.subscription-ends: "#/components/schemas/EventSubscriptionEnds"
+          org.camaraproject.webrtc-events.v0.subscription-ended: "#/components/schemas/EventSubscriptionEnded"
           org.camaraproject.webrtc-events.v0.registration-ends: "#/components/schemas/EventRegistrationEnds"
 
     Source:
@@ -929,20 +931,20 @@ components:
             An inlined session description in SDP format [RFC4566].If XML syntax is used, the content of this element SHALL be embedded in a CDATA section
 
     # CloudEvent and CAMARA standard
-    EventSubscriptionEnds:
+    EventSubscriptionEnded:
       description: event structure for event subscription ends
       allOf:
         - $ref: "#/components/schemas/CloudEvent"
         - type: object
           properties:
             data:
-              $ref: "#/components/schemas/SubscriptionEnds"
+              $ref: "#/components/schemas/SubscriptionEnded"
             type:
               enum:
-                - org.camaraproject.webrtc-events.v0.subscription-ends
+                - org.camaraproject.webrtc-events.v0.subscription-ended
 
-    SubscriptionEnds:
-      description: Event detail structure for SUBSCRIPTION_ENDS event
+    SubscriptionEnded:
+      description: Event detail structure for SUBSCRIPTION_ENDED event
       type: object
       required:
         - subscriptionId
@@ -1062,6 +1064,7 @@ components:
                       - INVALID_PROTOCOL
                       - INVALID_CREDENTIAL
                       - INVALID_TOKEN
+                      - INVALID_SINK
           examples:
             GENERIC_400_INVALID_ARGUMENT:
               description: Invalid Argument. Generic Syntax Exception
@@ -1093,6 +1096,12 @@ components:
                 status: 400
                 code: INVALID_TOKEN
                 message: Only bearer token is supported
+            GENERIC_400_INVALID_SINK:
+              description: Invalid sink value
+              value:
+                status: 400
+                code: INVALID_SINK
+                message: sink not valid for the specified protocol
     Generic400:
       description: Problem with the client request
       headers:
@@ -1217,7 +1226,6 @@ components:
                   code:
                     enum:
                       - PERMISSION_DENIED
-                      - INVALID_TOKEN_CONTEXT
                       - SUBSCRIPTION_MISMATCH
           examples:
             GENERIC_403_PERMISSION_DENIED:
@@ -1226,12 +1234,6 @@ components:
                 status: 403
                 code: PERMISSION_DENIED
                 message: Client does not have sufficient permissions to perform this action.
-            GENERIC_403_INVALID_TOKEN_CONTEXT:
-              description: Reflect some inconsistency between information in some field of the API and the related OAuth2 Token
-              value:
-                status: 403
-                code: INVALID_TOKEN_CONTEXT
-                message: "config.subscriptionDetail is not consistent with access token."
             GENERIC_403_SUBSCRIPTION_MISMATCH:
               description: Inconsistent access token for requested subscription
               value:
@@ -1439,7 +1441,7 @@ components:
         `+1234567890` at `acme.opentelco.com`.
 
         This will be used to receive incoming sessions (incoming
-        calls). The implicit subscription to `subscription-ends` will make
+        calls). The implicit subscription to `subscription-ended` will make
         the client aware of registration status updates from the server.
         (i.e. when a REGISTRATION expires).
 
@@ -1578,13 +1580,13 @@ components:
           mediaSessionId: "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
           reason: "Answer SDP update"
           sequenceNumber: 3
-    SUBSCRIPTION_REVOKED:
+    SUBSCRIPTION_ENDED:
       description: |-
-        Example of `subscription-ends` events.
+        Example of `subscription-ended` events.
 
-        When a re-registration is requested from server, maybe due
+        Triggered when an event subscription is not valid anymore. Maybe due
         administrative token revocation or due any other technical reason. It
-        is expected from the endpoint to re-register. No new sessions will be
+        is expected from the endpoint to subscribe again. No new events will be
         delivered to the user endpoint, as the subscription is not valid
         anymore.
 
@@ -1594,11 +1596,11 @@ components:
       value:
         id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
         source: https://notificationServer.opentelco.com
-        type: org.camaraproject.webrtc-events.v0.subscription-ends
+        type: org.camaraproject.webrtc-events.v0.subscription-ended
         specversion: "1.0"
         datacontenttype: application/json
         time: 2024-11-05T05:40:23.682Z
         data:
           subscriptionId: qs15-h556-rt89-1298
-          terminationReason: NETWORK_TERMINATED
-          terminationDescription: "SIP re-registration required"
+          terminationReason: SUBSCRIPTION_EXPIRED
+          terminationDescription: "Subscription expired"
