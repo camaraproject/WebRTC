@@ -265,17 +265,14 @@ components:
     x-correlator:
       description: Correlation id for the different services
       schema:
-        type: string
-        pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+        $ref: "#/components/schemas/XCorrelator"
   parameters:
     x-correlator:
       name: x-correlator
       in: header
       description: Correlation id for the different services
       schema:
-        type: string
-        pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
-        example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
+        $ref: "#/components/schemas/XCorrelator"
     pathParamRegistrationId:
       name: registrationId
       in: path
@@ -286,6 +283,10 @@ components:
       schema:
         type: string
   schemas:
+    XCorrelator:
+      type: string
+      pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+      example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
     regSessionRequest:
       type: object
       required:
