@@ -22,7 +22,7 @@ The below sections record the changes for each API version in each release as fo
 
 ## Release Notes
 
-This public release contains the definition and documentation of
+This pre-release contains the definition and documentation of
 
 * webrtc-registration v0.3.0-rc.1
 * webrtc-call-handling v0.3.0-rc.1
