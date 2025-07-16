@@ -1,0 +1,136 @@
+@startuml WebRTC-CallHandling-TERM-0.3
+
+title "CAMARA WebRTC - Call handling v0.3\nCall termination use case"
+autonumber "<font color=blue><b>[0]"
+
+<style>
+.audioStyle {
+  arrow {
+    LineColor red
+    LineThickness 5
+  }
+}
+.wsStyle { 
+  arrow { 
+    LineColor blue 
+    LineThickness 5 
+  } 
+} 
+</style>
+
+box DEVICE
+participant DA as "Device\nApplication"
+participant NC as "Notification\nClient"
+end box
+
+' participant AGG as "Aggregator\nNetwork"
+participant API as "API exposure\nfunction"
+participant NS as "Notification\nService"
+participant NET as "Telco\nNetwork"
+
+box DEVICE
+participant "Remote\nendpoint" as RE
+end box
+
+' -------------------------------------------------------
+' CALL TERMINATION - WebRTC device receives voice session
+' -------------------------------------------------------
+
+' --- webrtc-events-subscription --- 
+
+note across
+  To have full media session control, it is a precondition to have:
+  - a valid **session** to register the device on the network and enbale its subscriber number.
+  - a valid **subscription**, using the ""webrtc-events-subscription"" API to receive updates about the ""mediaSession"" life cycle.  
+end note
+
+NC <-> NS : webrtc-events-susbcription
+activate NC #LightSteelBlue
+activate NS #LightSteelBlue
+
+== CALL TERMINATION (receiving NET calls) ==
+
+...
+
+RE <- ++ : User creates a call
+
+RE -> NET ++ : **SIP INVITE** \n\
+    From: originatorAddress \n\
+    To: receiverAddress \n\
+    SDP_OFFER_RFC4566
+
+NET -> RE: **SIP 100 Trying**
+
+NET -> API ++ : **SIP INVITE** \n\
+    From: originatorAddress \n\
+    To: receiverAddress \n\
+    SDP_OFFER_RFC4566
+
+API -> NET: 100 Trying
+
+API --> NS --++ : NEW_SESSION_INCOMING
+NC <- NS: **POST /callback_url/** \n\
+  - type: "org.camaraproject.webrtc-events.v0.session-invitation" \n\
+  - data: mediaSessionId
+NC --> NS: **204 Sucessful**
+deactivate NS
+
+NC -> DA ++ : **Launch app**\n\
+  session-invitation\n\
+  mediaSessionId
+
+note over DA
+  Now call starts to be
+  processed on the user
+  device.
+end note
+
+' Retrieve call information
+DA -> API ++ : **GET /webrtc-call-handling/{apiVersion}/sessions/{mediaSessionId}**
+
+DA <- API --: **200 OK** \n\
+  Body: \n\
+  - originatorAddress \n\
+  - receiverAddress \n\
+  - status: Initial \n\
+  - offer: SDP_OFFER_RFC4566
+
+note over DA
+  Event notification only wakes
+  the device. All session info
+  is gathered from the server.
+end note
+
+<- DA: Ringing to user
+' Initial DA setup
+DA -> API ++ : **PUT /webrtc-call-handling/{apiVersion}/sessions/{mediaSessionId}/status**\n\
+  Body: \n\
+  - status: **Ringing** \n\
+  - offer: SDP_ANSWER_RFC4566
+
+note right of DA
+Local or no media provided as initial answer
+end note
+
+API -> NET: **183 SessionInProgress** \n\
+  SDP_ANSWER_RFC4566
+
+API -> DA: 200 Updated
+NET -> RE: **183 SessionInProgress** \n\
+  SDP_ANSWER_RFC4566
+
+RE -> NET: SIP PRACK
+NET -> RE: 200 OK
+
+note across
+  The rest of the process is as explained at activity UML for CallHandling origination use case.
+  
+  There are two main mechanisms:
+   - **Device** needs to update the media session (REST API methods)
+   - **Network** needs to update the media session (Callback mechanism)
+
+  Late media re-negotiation (WebRTC ICE) and SIP signaling updates (BYE, CANCEL) can be achieved
+  with these two main mechanisms.
+end note
+
+@enduml
