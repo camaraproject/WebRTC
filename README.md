@@ -34,7 +34,7 @@ Sandbox API Repository to describe, develop, document, and test the WebRTC Servi
     [[View it on ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.1/code/API_definitions/webrtc-registration.yaml&nocors)
     [[View it on Swagger Editor]](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.1/code/API_definitions/webrtc-registration.yaml)
 
-    * **webrtc-call-handling v0.2.0-rc.1**
+    * **webrtc-call-handling v0.3.0-rc.1**
     [[YAML]](https://github.com/camaraproject/WebRTC/blob/r2.1/code/API_definitions/webrtc-call-handling.yaml)
     [[View it on ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.1/code/API_definitions/webrtc-call-handling.yaml&nocors)
     [[View it on Swagger Editor]](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.1/code/API_definitions/webrtc-call-handling.yaml)
