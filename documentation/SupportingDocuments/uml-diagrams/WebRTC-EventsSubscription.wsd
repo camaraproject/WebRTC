@@ -1,0 +1,105 @@
+@startuml WebRTC-EventsSusbcription-0.2
+
+title "CAMARA WebRTC - Events subscription v0.2"
+autonumber "<font color=blue><b>[0]"
+
+<style>
+.audioStyle {
+  arrow {
+    LineColor red
+    LineThickness 5
+  }
+}
+.wsStyle { 
+  arrow { 
+    LineColor blue 
+    LineThickness 5 
+  } 
+} 
+</style>
+
+box DEVICE
+participant DA as "Device\nApplication"
+participant NC as "Notification\nClient"
+end box
+
+' participant AGG as "Aggregator\nNetwork"
+participant API as "API exposure\nfunction"
+participant NS as "Notification\nService"
+participant NET as "Telco\nNetwork"
+
+box DEVICE
+participant "Remote\nendpoint" as RE
+end box
+
+note across
+  An event will be triggered when...
+    * A call is receive for the susbcriber
+    * Each time that the remote end required to change something on the call status
+    * The device regsiter won't be valid anymore
+    * The susbcription itself won't be valid anymore (implicit)
+
+  So, three explicit susbcriptions are needed for the three types of events.
+end note
+
+-> DA++: Launch app
+
+DA --> NC: Start & Get sink URL
+activate NC #LightSteelBlue
+DA <-- NC: SINK_URL
+
+== Incoming call susbcription ==
+
+DA -> API++: **POST /webrtc-events-suscription/{apiVersion}/subscriptions** \n\
+  "sink": "https://notificationServer.opentelco.com",\n\
+  "types": [ "org.camaraproject.webrtc-events.v0.session-invitation" ]\n\
+  "config": { ... }
+
+API -> NS
+activate NS #LightSteelBlue
+API <-- NS
+DA <-- API--: 201 Created
+
+API <-o NET++: Incoming call
+API -> NS --++
+NC <- NS --: **POST SINK_URL** \n\
+  "type": "org.camaraproject.webrtc-events.v0.session-invitation",\n\
+  "data": sessionId
+
+== Active session susbcription ==
+
+DA -> API++: **POST /webrtc-events-suscription/{apiVersion}/subscriptions** \n\
+  "sink": "https://notificationServer.opentelco.com",\n\
+  "types": [ "org.camaraproject.webrtc-events.v0.session-status" ]\n\
+  "config": { ... }
+
+API -> NS
+activate NS #LightSteelBlue
+API <-- NS
+DA <-- API--: 201 Created
+
+API <-o NET++: Call media or status update
+API -> NS --++
+NC <- NS --: **POST SINK_URL** \n\
+  "type": "org.camaraproject.webrtc-events.v0.session-status",\n\
+  "data": sessionId
+
+== Device network registration expiration ==
+
+DA -> API++: **POST /webrtc-events-suscription/{apiVersion}/subscriptions** \n\
+  "sink": "https://notificationServer.opentelco.com",\n\
+  "types": [ "org.camaraproject.webrtc-events.v0.registration-ends" ]\n\
+  "config": { ... }
+
+API -> NS
+activate NS #LightSteelBlue
+API <-- NS
+DA <-- API--: 201 Created
+
+API <-o NET++: Subcriptor REGISTER expiration
+API -> NS --++
+NC <- NS --: **POST SINK_URL** \n\
+  "type": "org.camaraproject.webrtc-events.v0.registration-ends",\n\
+  "data": sessionId
+
+@enduml

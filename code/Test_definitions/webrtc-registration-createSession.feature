@@ -5,7 +5,7 @@ Feature: CAMARA WebRTC Registration, v0.2.0 - Operation createSession
     And the resource "/webrtc-registration/v0.2/sessions"                                                              |
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
-    And the header "x-correlator" is set to a UUID value
+    And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
     And the request body is set by default to a request body compliant with the schema at "/components/schemas/regSessionRequest"
     # Properties not explicitly overwritten in the Scenarios can take any values compliant with the schema
  

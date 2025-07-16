@@ -1,0 +1,123 @@
+@startuml WebRTC-Registration-0.3
+
+title "CAMARA WebRTC - Registration v0.3"
+autonumber "<font color=blue><b>[0]"
+
+<style>
+.audioStyle {
+  arrow {
+    LineColor red
+    LineThickness 5
+  }
+}
+.wsStyle { 
+  arrow { 
+    LineColor blue 
+    LineThickness 5 
+  } 
+} 
+</style>
+
+box DEVICE
+participant DA as "Device\nApplication"
+participant NC as "Notification\nClient"
+end box
+
+' participant AGG as "Aggregator\nNetwork"
+participant API as "API exposure\nfunction"
+participant NS as "Notification\nService"
+participant NET as "Telco\nNetwork"
+
+box DEVICE
+participant "Remote\nendpoint" as RE
+end box
+
+' --- UE REGISTRATION
+group DEVICE REGISTRATION
+
+[-> DA ++: Launch app
+
+DA -> API ++: **POST /webrtc-registration/v0.2/sessions**\n\
+  Headers: \n\
+  - authorization \n\
+  - x-correlator \n\
+  Body: \n\
+  - deviceId
+
+note over API,NET
+  phoneNumber (MSISDN) is retrieved
+  based on the deviceId, part of the
+  proivision and linked to a subscriber
+  ex.: IAM, IMS network or GW
+end note
+
+API -> NET: **SIP REGISTER**\nFrom: phoneNumber\nTo:phoneNumber\nContact: CAMARA_GW
+activate NET #LightSteelBlue
+API <- NET: 100 Trying
+API <- NET: 200 OK
+DA <-- API--: **200 OK**\n\
+  Headers: \n\
+  - x-correlator \n\
+  Body:\n\
+  - regInfo/phoneNumber\n\
+  - regInfo/regStatus\n\
+  - registrationId \n\
+  - expiresAt
+note over DA, NC
+  Registrations will be valid while auth-token is still valid, or due
+  network request to refresh. This event will be notitified via the
+  webrtc-events API
+end note
+end
+
+' --- Refreshing of registration
+group REGISTRATION REFRESH
+
+note over DA,NC
+  When auth-token is about to expire, it is needed to refresh
+  and update the WebRTC registration. Use **registrationId** to
+  specify the registration to refresh
+end note
+
+DA -> API++: **PUT /webrtc-registration/v0.2/sessions/{registrationId}** \n\
+ Headers: \n\
+ - authorization \n\
+ - x-correlator
+
+API -> NET++: SIP RE-REGISTER
+API <- NET--: 200 OK
+DA <-- API--: **200 OK**\n\
+ Headers: \n\
+ - x-correlator \n\
+ Body: \n\
+ - registrationExpireTime
+end
+
+' --- DE-REGISTRATION
+group DE-REGISTRATION
+
+[-> DA: Closes session
+
+note over DA, NC: Graceful logout
+
+DA -> API++: **DELETE /webrtc-registration/v0.2/sessions/{registrationId}** \n\
+ Headers: \n\
+ - authorization \n\
+ - x-correlator
+API -> NET++: SIP DE-REGISTER
+API <- NET--: 200 OK
+deactivate NET
+
+DA <-- API--: **204 No content**\n\
+ Headers: \n\
+ - x-correlator
+
+deactivate DA      
+
+note over DA, NC
+  Non-graceful logout will let the SIP REGISTRATION to expire,
+  due registration timeout on the network side
+end note
+end 
+
+@enduml
