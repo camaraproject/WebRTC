@@ -5,7 +5,7 @@ Feature: CAMARA WebRTC Call Handling, v0.2.0 - Operation createSession
     And the resource "/webrtc-call-handling/v0.2/sessions"                                                              |
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
-    And the header "x-correlator" is set to a UUID value
+    And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
     And the header "registrationId" is set to a UUID value
 
   @webrtc_call_handling_createSession_01_generic_success_scenario

@@ -58,10 +58,7 @@ info:
 
     This API allows to create an explicit notification channel for two types of
     events. It is mandatory in the subscription to provide the event type for
-    which the client would like to subscribe. Per CAMARA Commonalities,
-    **each subscription only can be dedicated to a single event type**. You
-    usually will need one per endpoint registration and one per session in
-    progress.
+    which the client would like to subscribe.
 
     Following event types are managed for this API:
 
@@ -79,7 +76,7 @@ info:
 
       - Events triggered when a webrtc registration is terminated (e.g. webrtc registration expired)
 
-    Note: Additionally to these list, ``org.camaraproject.webrtc-events.v0.subscription-ends``
+    Note: Additionally to these list, ``org.camaraproject.webrtc-events.v0.subscription-ended``
     notification `type` is sent when the subscription ends.
     This notification does not require dedicated subscription.
 
@@ -139,11 +136,11 @@ info:
     a unique SessionId, to create a dedicated subscription and receive events
     about the session itself and its status progressing inside the network.
 
-    ### 3.3. Subscription ends (subscription-ends)
+    ### 3.3. Subscription ends (subscription-ended)
 
-    A `org.camaraproject.webrtc-events.v0.subscription-ends` event indicates that
+    A `org.camaraproject.webrtc-events.v0.subscription-ended` event indicates that
     the endpoint will no longer be notified when a new event occurs. From
-    the developer's point of view, receiving the subscription-ends event should
+    the developer's point of view, receiving the subscription-ended event should
     signal the need to check the event subscription status and attempt to refresh
     it in order to continue receiving new event notifications.
 
@@ -173,8 +170,18 @@ info:
     compliance with user privacy preferences and regulatory obligations,
     upholding the principles of transparency and user-centric data control.
 
-    ## 5. Further info and support
-    (Will be added in a later version of the documentation)
+    ## 5. Additional CAMARA error responses
+    The list of error codes in this API specification is not exhaustive.
+    Therefore the API specification may not document some non-mandatory error
+    statuses as indicated in `CAMARA API Design Guide`.
+
+    Please refer to the `CAMARA_common.yaml` of the Commonalities Release
+    associated to this API version for a complete list of error responses. The
+    applicable Commonalities Release can be identified in the `API Readiness
+    Checklist` document associated to this API version.
+
+    As a specific rule, error `501 - NOT_IMPLEMENTED` can be only a possible
+    error response if it is explicitly documented in the API.
 
   license:
     name: Apache 2.0
@@ -264,8 +271,8 @@ paths:
                         $ref: "#/components/examples/SESSION_UPDATE"
                       REGISTRATION_EXPIRED (registration-ends):
                         $ref: "#/components/examples/REGISTRATION_ENDS"
-                      SUBSCRIPTION_REVOKED (subscription-ends):
-                        $ref: "#/components/examples/SUBSCRIPTION_REVOKED"
+                      SUBSCRIPTION_ENDED (subscription-ended):
+                        $ref: "#/components/examples/SUBSCRIPTION_ENDED"
               responses:
                 "204":
                   description: Successful notification
@@ -441,16 +448,18 @@ components:
       in: header
       description: Correlation id for the different services
       schema:
-        type: string
-        pattern: ^[a-zA-Z0-9-]{0,55}$
-        example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
+        $ref: "#/components/schemas/XCorrelator"
   headers:
     x-correlator:
       description: Correlation id for the different services
       schema:
-        type: string
-        pattern: ^[a-zA-Z0-9-]{0,55}$
+        $ref: "#/components/schemas/XCorrelator"
   schemas:
+    XCorrelator:
+      type: string
+      pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+      example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
+
     ErrorInfo:
       type: object
       required:
@@ -482,6 +491,7 @@ components:
         sink:
           type: string
           format: uri
+          pattern: ^https:\/\/.+$
           description: The address to which events shall be delivered using the selected protocol.
           example: "https://endpoint.example.com/sink"
         sinkCredential:
@@ -489,8 +499,7 @@ components:
         types:
           description: |-
             Camara Event types eligible to be delivered by this subscription.
-            Note: for the Commonalities meta-release v0.4 we enforce to have only event type per subscription
-            then for following meta-release use of array MUST be decided at API project level.
+            Note: the maximum number of event types per subscription will be decided at API project level
           type: array
           minItems: 1
           maxItems: 1
@@ -523,7 +532,10 @@ components:
           type: string
           format: date-time
           example: 2023-01-17T13:18:23.682Z
-          description: The subscription expiration time (in date-time format) requested by the API consumer. Up to API project decision to keep it.
+          description: |-
+            The subscription expiration time (in date-time format) requested by the API consumer. Up to API project decision to keep it.
+            It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
+            Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
         subscriptionMaxEvents:
           type: integer
           description: Identifies the maximum number of event reports to be generated (>=1) requested by the API consumer - Once this number is reached, the subscription ends. Up to API project decision to keep it.
@@ -631,7 +643,7 @@ components:
         - `org.camaraproject.webrtc-events.v0.registration-ends`
           - Events triggered for registration termination (e.g. incoming session)
 
-        `subscription-ends` is not supported for subscription. Sent by default
+        `subscription-ended` is not supported for subscription. It is sent by default
       enum:
         - org.camaraproject.webrtc-events.v0.session-status
         - org.camaraproject.webrtc-events.v0.session-invitation
@@ -652,18 +664,18 @@ components:
         sink:
           type: string
           format: uri
+          pattern: ^https:\/\/.+$
           description: The address to which events shall be delivered using the selected protocol.
           example: "https://endpoint.example.com/sink"
         types:
           description: |-
             Camara Event types eligible to be delivered by this subscription.
-            For Commonalities v0.4 we enforce to use one subscription per event type. In consequence,
-            this field is an array of a single element.
+            Note: the maximum number of event types per subscription will be decided at API project level
           type: array
           minItems: 1
           maxItems: 1
           items:
-            type: string
+            $ref: "#/components/schemas/SubscriptionEventType"
         config:
           $ref: '#/components/schemas/Config'
         id:
@@ -674,7 +686,7 @@ components:
           description: |
             Date when the event subscription will begin/began
             It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-            Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
+            Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
           example: "2023-07-03T12:27:08.312Z"
         expiresAt:
           type: string
@@ -682,7 +694,7 @@ components:
           description: |
             Date when the event subscription will expire. Only provided when `subscriptionExpireTime` is indicated by API client or Telco Operator has specific policy about that.
             It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-            Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
+            Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
           example: "2023-07-03T12:27:08.312Z"
         status:
           type: string
@@ -752,7 +764,7 @@ components:
         data:
           type: object
           description: |-
-            Event details payload. Depending of the event type, it will will include one of the data structures defined on this specification. Along with the subscription-ends, that is an authomatic event.
+            Event details payload. Depending of the event type, it will will include one of the data structures defined on this specification. Along with the subscription-ended, that is an authomatic event.
 
             Check the introduction documentation and the other CAMARA WebRTC APIs for extra info about data structures included on the events.
         time:
@@ -762,7 +774,7 @@ components:
         mapping:
           org.camaraproject.webrtc-events.v0.session-invitation: "#/components/schemas/EventSessionInvitation"
           org.camaraproject.webrtc-events.v0.session-status: "#/components/schemas/EventSessionStatus"
-          org.camaraproject.webrtc-events.v0.subscription-ends: "#/components/schemas/EventSubscriptionEnds"
+          org.camaraproject.webrtc-events.v0.subscription-ended: "#/components/schemas/EventSubscriptionEnded"
           org.camaraproject.webrtc-events.v0.registration-ends: "#/components/schemas/EventRegistrationEnds"
 
     Source:
@@ -784,7 +796,10 @@ components:
     DateTime:
       type: string
       format: date-time
-      description: Timestamp of when the occurrence happened. Must adhere to RFC 3339.
+      description: |-
+        Timestamp of when the occurrence happened. Must adhere to RFC 3339.
+        It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
+        Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
       example: "2018-04-05T17:31:00Z"
 
     ############################################
@@ -916,20 +931,20 @@ components:
             An inlined session description in SDP format [RFC4566].If XML syntax is used, the content of this element SHALL be embedded in a CDATA section
 
     # CloudEvent and CAMARA standard
-    EventSubscriptionEnds:
+    EventSubscriptionEnded:
       description: event structure for event subscription ends
       allOf:
         - $ref: "#/components/schemas/CloudEvent"
         - type: object
           properties:
             data:
-              $ref: "#/components/schemas/SubscriptionEnds"
+              $ref: "#/components/schemas/SubscriptionEnded"
             type:
               enum:
-                - org.camaraproject.webrtc-events.v0.subscription-ends
+                - org.camaraproject.webrtc-events.v0.subscription-ended
 
-    SubscriptionEnds:
-      description: Event detail structure for SUBSCRIPTION_ENDS event
+    SubscriptionEnded:
+      description: Event detail structure for SUBSCRIPTION_ENDED event
       type: object
       required:
         - subscriptionId
@@ -1049,6 +1064,7 @@ components:
                       - INVALID_PROTOCOL
                       - INVALID_CREDENTIAL
                       - INVALID_TOKEN
+                      - INVALID_SINK
           examples:
             GENERIC_400_INVALID_ARGUMENT:
               description: Invalid Argument. Generic Syntax Exception
@@ -1080,6 +1096,12 @@ components:
                 status: 400
                 code: INVALID_TOKEN
                 message: Only bearer token is supported
+            GENERIC_400_INVALID_SINK:
+              description: Invalid sink value
+              value:
+                status: 400
+                code: INVALID_SINK
+                message: sink not valid for the specified protocol
     Generic400:
       description: Problem with the client request
       headers:
@@ -1154,20 +1176,13 @@ components:
                   code:
                     enum:
                       - UNAUTHENTICATED
-                      - AUTHENTICATION_REQUIRED
           examples:
             GENERIC_401_UNAUTHENTICATED:
-              description: Request cannot be authenticated
+              description: Request cannot be authenticated and a new authentication is required
               value:
                 status: 401
                 code: UNAUTHENTICATED
-                message: Request not authenticated due to missing, invalid, or expired credentials.
-            GENERIC_401_AUTHENTICATION_REQUIRED:
-              description: New authentication is needed, authentication is no longer valid
-              value:
-                status: 401
-                code: AUTHENTICATION_REQUIRED
-                message: New authentication is required.
+                message: Request not authenticated due to missing, invalid, or expired credentials. A new authentication is required.
     Generic403:
       description: Client does not have sufficient permission
       headers:
@@ -1211,7 +1226,6 @@ components:
                   code:
                     enum:
                       - PERMISSION_DENIED
-                      - INVALID_TOKEN_CONTEXT
                       - SUBSCRIPTION_MISMATCH
           examples:
             GENERIC_403_PERMISSION_DENIED:
@@ -1220,12 +1234,6 @@ components:
                 status: 403
                 code: PERMISSION_DENIED
                 message: Client does not have sufficient permissions to perform this action.
-            GENERIC_403_INVALID_TOKEN_CONTEXT:
-              description: Reflect some inconsistency between information in some field of the API and the related OAuth2 Token
-              value:
-                status: 403
-                code: INVALID_TOKEN_CONTEXT
-                message: "config.subscriptionDetail is not consistent with access token."
             GENERIC_403_SUBSCRIPTION_MISMATCH:
               description: Inconsistent access token for requested subscription
               value:
@@ -1331,19 +1339,13 @@ components:
                       - 422
                   code:
                     enum:
-                      - IDENTIFIER_MISMATCH
                       - SERVICE_NOT_APPLICABLE
                       - MISSING_IDENTIFIER
                       - UNSUPPORTED_IDENTIFIER
                       - UNNECESSARY_IDENTIFIER
                       - MULTIEVENT_SUBSCRIPTION_NOT_SUPPORTED
+                      - MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED
           examples:
-            GENERIC_422_IDENTIFIER_MISMATCH:
-              description: Inconsistency between identifiers not pointing to the same device
-              value:
-                status: 422
-                code: IDENTIFIER_MISMATCH
-                message: Provided identifiers are not consistent.
             GENERIC_422_SERVICE_NOT_APPLICABLE:
               description: Service not applicable for the provided identifier
               value:
@@ -1374,6 +1376,12 @@ components:
                 status: 422
                 code: MULTIEVENT_SUBSCRIPTION_NOT_SUPPORTED
                 message: Multi event types subscription not managed
+            GENERIC_422_MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED:
+              description: Combination of multiple event types is temporarily not supported
+              value:
+                status: 422
+                code: MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED
+                message: The requested combination of event types is temporarily not supported.
     Generic429:
       description: Too Many Requests
       headers:
@@ -1433,7 +1441,7 @@ components:
         `+1234567890` at `acme.opentelco.com`.
 
         This will be used to receive incoming sessions (incoming
-        calls). The implicit subscription to `subscription-ends` will make
+        calls). The implicit subscription to `subscription-ended` will make
         the client aware of registration status updates from the server.
         (i.e. when a REGISTRATION expires).
 
@@ -1572,13 +1580,13 @@ components:
           mediaSessionId: "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
           reason: "Answer SDP update"
           sequenceNumber: 3
-    SUBSCRIPTION_REVOKED:
+    SUBSCRIPTION_ENDED:
       description: |-
-        Example of `subscription-ends` events.
+        Example of `subscription-ended` events.
 
-        When a re-registration is requested from server, maybe due
+        Triggered when an event subscription is not valid anymore. Maybe due
         administrative token revocation or due any other technical reason. It
-        is expected from the endpoint to re-register. No new sessions will be
+        is expected from the endpoint to subscribe again. No new events will be
         delivered to the user endpoint, as the subscription is not valid
         anymore.
 
@@ -1588,11 +1596,11 @@ components:
       value:
         id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
         source: https://notificationServer.opentelco.com
-        type: org.camaraproject.webrtc-events.v0.subscription-ends
+        type: org.camaraproject.webrtc-events.v0.subscription-ended
         specversion: "1.0"
         datacontenttype: application/json
         time: 2024-11-05T05:40:23.682Z
         data:
           subscriptionId: qs15-h556-rt89-1298
-          terminationReason: NETWORK_TERMINATED
-          terminationDescription: "SIP re-registration required"
+          terminationReason: SUBSCRIPTION_EXPIRED
+          terminationDescription: "Subscription expired"

@@ -5,7 +5,7 @@ Feature: CAMARA WebRTC Registration, v0.2.0 - Operation updateSession
     And the resource "/webrtc-registration/v0.2/sessions/{registrationId}"                                                              |
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
-    And the header "x-correlator" is set to a UUID value
+    And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
     And the path parameter "registrationId" is set by default to a existing register session
  
   @webrtc_registration_updateSession_01_generic_success_scenario
