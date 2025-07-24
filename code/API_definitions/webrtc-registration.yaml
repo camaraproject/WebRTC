@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: WebRTC Registration Service API
+  title: WebRTC Registration Service
   description: |-
     ## 1. Introduction
     This API provides the API consumer with the capabilities to manage
@@ -110,15 +110,15 @@ info:
 
   license:
     name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: 0.3.0-rc.1
-  x-camara-commonalities: 0.5
+  x-camara-commonalities: 0.6
 
 externalDocs:
   description: Product documentation at CAMARA
   url: https://github.com/camaraproject/WebRTC
 servers:
-  - url: '{apiRoot}/webrtc-registration/v0.2'
+  - url: '{apiRoot}/webrtc-registration/v0.3rc1'
     description: APIs to manage device registration and connection
     variables:
       apiRoot:
@@ -294,6 +294,8 @@ components:
       properties:
         deviceId:
           type: string
+          pattern: ^[a-zA-Z0-9-]{0,256}$
+          example: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
           description: |-
             The deviceId of the client in UUID format. A unique identifier for
             the physical device where a registration is initiated. Generated

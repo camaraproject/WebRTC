@@ -1,6 +1,6 @@
 # API WebRTC events
 
-Checklist for webrtc-events v0.2.0 in r2.1
+Checklist for webrtc-events v0.2.0-rc.1 in r2.1
 
 | Nr | API release assets  | alpha | release-candidate |  initial<br>public | stable<br> public | Status | Reference information |
 |----|----------------------------------------------|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
