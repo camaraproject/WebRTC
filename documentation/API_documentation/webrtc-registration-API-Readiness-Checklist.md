@@ -1,6 +1,6 @@
 # API WebRTC Registration
 
-Checklist for webrtc-registration v0.3.0 in r2.1
+Checklist for webrtc-registration v0.3.0-rc.1 in r2.1
 
 | Nr | API release assets  | alpha | release-candidate |  initial<br>public | stable<br> public | Status | Reference information |
 |----|----------------------------------------------|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|

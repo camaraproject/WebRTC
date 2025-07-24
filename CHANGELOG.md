@@ -50,8 +50,13 @@ Changelog since latest public r1.2
 * Added 200 OK response definition for `PUT /sessions/{registrationId}` to acknowledge successful updates.
 
 ### Changed
-* Commonalities aligment 0.6 at PR #XX
-* Extended `regSessionResponse` schema to include `expiresAt`, indicating the assigned expiry time of the registration session.
+* Commonalities aligment 0.6 at PR #88
+  * fix: Remove AUTHENTICATION_REQUIRED error code
+  * doc: Update `types` (multiple) property of `Subscription` schema
+  * feat: Error 422 MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED added
+  * fix: Remove IDENTIFIER_MISMATCH error
+  * fix: x-correlator format update, along test and schema update 
+* Extended `regSessionResponse` schema to include `expiresAt`, indicating the assigned expiry time of the registration session at PR #83
 
 ## webrtc-call-handling v0.3.0-rc.1
 
@@ -61,7 +66,12 @@ Changelog since latest public r1.2
   - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r2.1/code/API_definitions/webrtc-call-handling.yaml)
 
 ### Changes
-* Commonalities aligment 0.6 at PR #XX
+* Commonalities aligment 0.6 at PR #88
+  * fix: Remove AUTHENTICATION_REQUIRED error code
+  * doc: Update `types` (multiple) property of `Subscription` schema
+  * feat: Error 422 MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED added
+  * fix: Remove IDENTIFIER_MISMATCH error
+  * fix: x-correlator format update, along test and schema update
 
 ## WebRTC Events v0.2.0-rc.1
 
@@ -71,12 +81,17 @@ Changelog since latest public r1.2
   - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r1.2/code/API_definitions/webrtc-events.yaml)
 
 ### Added
-* Added new event type `webrtc-events:org.camaraproject.webrtc-events.v0.registration-ends` to notify subscribers when a registration ends.
+* Added new event type `webrtc-events:org.camaraproject.webrtc-events.v0.registration-ends` to notify subscribers when a registration ends at PR #83
 * Provided a concrete example for the `registration-ends` event subscription.
 
 ### Changes
-* Commonalities aligment 0.6 at PR #XX
-* Extended `TerminationReason` enumeration to include `REGISTRATION_EXPIRED`, allowing precise classification of expiry-based terminations.
+* Commonalities aligment 0.6 at PR #88
+  * fix: Remove AUTHENTICATION_REQUIRED error code
+  * doc: Update `types` (multiple) property of `Subscription` schema
+  * feat: Error 422 MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED added
+  * fix: Remove IDENTIFIER_MISMATCH error
+  * fix: x-correlator format update, along test and schema update
+* Extended `TerminationReason` enumeration to include `REGISTRATION_EXPIRED`, allowing precise classification of expiry-based terminations at PR #83
 
 # r1.2
 
