@@ -320,6 +320,8 @@ components:
               `registrationExpireTime` in the response.
     regSessionResponse:
       type: object
+      required:
+        - registrationId
       properties:
         regInfo:
           $ref: '#/components/schemas/RegistrationInformation'
