@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: WebRTC Call Handling API
+  title: WebRTC Call Handling
   description: |-
     ## 1. Introduction
 
@@ -165,7 +165,7 @@ info:
 
     Let's say that we are responding this session `0AEE1B58BAEEDA3EABA42B32EBB3DFE0DEAD`:
     ```
-    PUT /webrtc-call-handling/v0.2/sessions/0AEE1B58BAEEDA3EABA42B32EBB3DFE0DEAD
+    PUT /webrtc-call-handling/v0.2/sessions/0AEE1B58BAEEDA3EABA42B32EBB3DFE0DEAD/status
     {
         "status": "InProgress",
         "answer": {
@@ -207,15 +207,15 @@ info:
 
   license:
     name: Apache 2.0
-    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-  version: 0.2.0
-  x-camara-commonalities: 0.5
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+  version: 0.3.0-rc.1
+  x-camara-commonalities: 0.6
 
 externalDocs:
   description: Product documentation at CAMARA
   url: https://github.com/camaraproject/WebRTC
 servers:
-  - url: '{apiRoot}/webrtc-call-handling/v0.2'
+  - url: '{apiRoot}/webrtc-call-handling/v0.3rc1'
     variables:
       apiRoot:
         description: API root
@@ -293,6 +293,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MediaSessionInformation'
+        '400':
+          $ref: '#/components/responses/Generic400'
         '401':
           $ref: '#/components/responses/Generic401'
         '403':
@@ -324,6 +326,8 @@ paths:
           headers:
             x-correlator:
               $ref: "#/components/headers/x-correlator"
+        '400':
+          $ref: '#/components/responses/Generic400'
         '401':
           $ref: '#/components/responses/Generic401'
         '403':
@@ -384,6 +388,8 @@ paths:
                   $ref: '#/components/examples/exampleSessionStatusResume'
         '204':
           description: Updated the session status (no content)
+        '400':
+          $ref: '#/components/responses/Generic400'
         '401':
           $ref: '#/components/responses/Generic401'
         '403':
@@ -508,12 +514,6 @@ components:
           type: string
           description: |-
             An inlined session description in SDP format [RFC4566].If XML syntax is used, the content of this element SHALL be embedded in a CDATA section
-    SessionNotification:
-      allOf:
-        - $ref: '#/components/schemas/MediaSessionInformation'
-      required:
-        - status
-        - mediaSessionId
     SessionStatus:
       type: string
       description: Provides the status of the media session. During the session creation, this attribute SHALL NOT be included in the request.

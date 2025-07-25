@@ -1,8 +1,8 @@
-Feature: CAMARA WebRTC Events, v0.1.0 - Operation deleteSubscription
+Feature: CAMARA WebRTC Events, v0.2.0-rc.1 - Operation deleteSubscription
 
   Background: Common deleteSubscription setup
     Given an environment at "apiRoot"
-    And the resource "/webrtc-call-handling/v0.1/subscriptions/{subscriptionId}"                                                              |
+    And the resource "/webrtc-call-handling/v0.2rc1/subscriptions/{subscriptionId}"                                                              |
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
