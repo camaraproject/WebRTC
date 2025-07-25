@@ -4,7 +4,7 @@
 <a href="https://github.com/camaraproject/WebRTC/graphs/contributors" title="Contributors"><img src="https://img.shields.io/github/contributors/camaraproject/WebRTC?style=plastic"></a>
 <a href="https://github.com/camaraproject/WebRTC" title="Repo Size"><img src="https://img.shields.io/github/repo-size/camaraproject/WebRTC?style=plastic"></a>
 <a href="https://github.com/camaraproject/WebRTC/blob/main/LICENSE" title="License"><img src="https://img.shields.io/badge/License-Apache%202.0-green.svg?style=plastic"></a>
-<a href="https://github.com/camaraproject/{{repo_name}}/releases/latest" title="Latest Release"><img src="https://img.shields.io/github/release/camaraproject/{{repo_name}}?style=plastic"></a>
+<a href="https://github.com/camaraproject/WebRTC/releases/latest" title="Latest Release"><img src="https://img.shields.io/github/release/camaraproject/WebRTC?style=plastic"></a>
 <a href="https://github.com/camaraproject/Governance/blob/main/ProjectStructureAndRoles.md" title="Sandbox API Repository"><img src="https://img.shields.io/badge/Sandbox%20API%20Repository-yellow?style=plastic"></a>
 
 # WebRTC
