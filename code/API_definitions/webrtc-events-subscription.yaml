@@ -816,10 +816,10 @@ components:
         - $ref: "#/components/schemas/CloudEvent"
         - type: object
           required:
-            - mediaSessionId
+            - data
           properties:
             data:
-              $ref: "#/components/schemas/MediaSessionInformation"
+              $ref: "#/components/schemas/MediaSessionInvite"
             type:
               enum:
                 - org.camaraproject.webrtc-events.v0.session-invitation
@@ -842,16 +842,18 @@ components:
             - status
           properties:
             data:
-              $ref: "#/components/schemas/MediaSessionInformation"
+              $ref: "#/components/schemas/MediaSessionStatusUpdate"
             type:
               enum:
                 - org.camaraproject.webrtc-events.v0.session-status
 
     ############################################
-    MediaSessionInformation:
+    MediaSession:
       description: |-
         A prototype for Webrtc events. Used at `SessionStatusEvent` and `SessionInvitationEvent` schemas
       type: object
+      required:
+        - mediaSessionId
       properties:
         subscriptionId:
           $ref: "#/components/schemas/SubscriptionId"
@@ -922,6 +924,21 @@ components:
           type: integer
           description: The sequence number of the notification sent to client
 
+    MediaSessionStatusUpdate:
+      allOf:
+        - $ref: "#/components/schemas/MediaSession"
+        - type: object
+          required:
+            - status
+
+    MediaSessionInvite:
+      allOf:
+        - $ref: "#/components/schemas/MediaSession"
+        - type: object
+          required:
+            - originatorAddress
+            - receiverAddress
+      
     WrtcSDPDescriptor:
       type: object
       properties:
@@ -978,6 +995,8 @@ components:
       allOf:
         - $ref: "#/components/schemas/CloudEvent"
         - type: object
+          required:
+            - data
           properties:
             data:
               $ref: "#/components/schemas/RegistrationEnds"
