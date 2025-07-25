@@ -850,7 +850,7 @@ components:
     ############################################
     MediaSession:
       description: |-
-        A prototype for Webrtc events. Used at `SessionStatusEvent` and `SessionInvitationEvent` schemas
+        A prototype for media session infomration on Webrtc events. Used as event data schemas for session updates.
       type: object
       required:
         - mediaSessionId
@@ -928,6 +928,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/MediaSession"
         - type: object
+          description: MediaSession information emitted on a EventSessionStatus event
           required:
             - status
 
@@ -935,10 +936,11 @@ components:
       allOf:
         - $ref: "#/components/schemas/MediaSession"
         - type: object
+          description: MediaSession information emitted on a EventSessionInvitation event
           required:
             - originatorAddress
             - receiverAddress
-      
+
     WrtcSDPDescriptor:
       type: object
       properties:
