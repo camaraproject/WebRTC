@@ -294,8 +294,7 @@ components:
       properties:
         deviceId:
           type: string
-          pattern: ^[a-zA-Z0-9-]{0,256}$
-          example: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
+          pattern: uuid
           description: |-
             The deviceId of the client in UUID format. A unique identifier for
             the physical device where a registration is initiated. Generated

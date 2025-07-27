@@ -1,6 +1,6 @@
 # WebRTC APIs definitions
 
-This folder contain the OpenAPI v3 definition of the WebRTC subgroup
+This folder contain the OpenAPI definitions of the WebRTC subgroup
 
 ## APIs included
 
@@ -18,12 +18,6 @@ This folder contain the OpenAPI v3 definition of the WebRTC subgroup
   * This API definition provides functionality for REST clients, browser or native application, to track session events. This will allow the client to receive server side updates about new incoming calls and other needed updates regarding the media negotiation and session progress (ringing, hangup, etc).
     * [View main on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/main/code/API_definitions/webrtc-events.yaml&nocors)
     * [View main on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/main/code/API_definitions/webrtc-events.yaml)
-
-* `webrtc-notification-channel` [Notification Channel management](webrtc-notification-channel.yaml)
-  * **API not included on meta-release**
-  * This API definition provides functionality for a REST client, browser or native application, to establish notification channel to receive asynchronous notifications from MNO's IMS Network.
-    * [View main on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/main/code/API_definitions/webrtc-notification-channel.yaml&nocors)
-    * [View main on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/main/code/API_definitions/webrtc-notification-channel.yaml)
 
 Detailed descriptions, diagrams and more information could be found at [API documentation](../../documentation/API_documentation/) section
 
