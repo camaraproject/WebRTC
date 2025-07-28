@@ -8,7 +8,7 @@ Feature: CAMARA WebRTC Registration, v0.2.0 - Operation createSession
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
     And the request body is set by default to a request body compliant with the schema at "/components/schemas/regSessionRequest"
     # Properties not explicitly overwritten in the Scenarios can take any values compliant with the schema
- 
+
   @webrtc_registration_createSession_01_generic_success_scenario
   Scenario: Create a new registration session
     When the client sends a POST request to "/sessions" with the following payload:
@@ -19,7 +19,7 @@ Feature: CAMARA WebRTC Registration, v0.2.0 - Operation createSession
       """
     Then the response status code should be 200
     And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response body should contain a "registrationId"
+    And the response body must contain a "registrationId"
 
   # Error scenarios
 
