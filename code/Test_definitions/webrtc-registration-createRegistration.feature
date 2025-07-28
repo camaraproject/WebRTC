@@ -14,7 +14,7 @@ Feature: CAMARA WebRTC Registration, v0.3.0-rc.1 - Operation createRegistration
     When the client sends a POST request to "/sessions" with the following payload:
       """
       {
-        "deviceId": "1qazxsw23edc"
+        "deviceId": "7d444840-9dc0-11d1-b245-5ffdce74fad2"
       }
       """
     Then the response status code should be 200

@@ -22,7 +22,7 @@ Feature: CAMARA WebRTC Events, v0.2.0-rc.1 - Operation createSubscription
         ],
         "config": {
           "subscriptionDetail": {
-            "deviceId": "1qazxsw23edc",
+            "deviceId": "7d444840-9dc0-11d1-b245-5ffdce74fad2",
             "registrationId": "xsmcaum3z4zw4l0cu4w115m0"
           },
           "initialEvent": true,

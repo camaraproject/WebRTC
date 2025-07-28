@@ -616,7 +616,7 @@ components:
       properties:
         deviceId:
           type: string
-          example: 1qazxsw23edc
+          format: uuid
           description: |-
             The device-id of the client in UUID format. A unique identifier for
             the physical device where a registration is initiated. Generated
@@ -1479,7 +1479,7 @@ components:
           - org.camaraproject.webrtc-events.v0.session-invitation
         config:
           subscriptionDetail:
-            deviceId: "1qazxsw23edc"
+            deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
             registrationId: "xsmcaum3z4zw4l0cu4w115m0"
           initialEvent: true
           subscriptionMaxEvents: 50
@@ -1501,7 +1501,7 @@ components:
           - org.camaraproject.webrtc-events.v0.session-status
         config:
           subscriptionDetail:
-            deviceId: "1qazxsw23edc"
+            deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
             registrationId: "xsmcaum3z4zw4l0cu4w115m0"
             mediaSessionId: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
           initialEvent: true
