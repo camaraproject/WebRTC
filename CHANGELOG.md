@@ -50,6 +50,8 @@ Changelog since latest public r1.2
 * Added 200 OK response definition for `PUT /sessions/{registrationId}` to acknowledge successful updates.
 
 ### Changed
+* fix: Updated deviceId format, examples and tests at #91
+* fix: registrationId became mandatory on registration response at #93
 * Commonalities aligment 0.6 at PR #88
   * fix: Remove AUTHENTICATION_REQUIRED error code
   * doc: Update `types` (multiple) property of `Subscription` schema
@@ -66,6 +68,7 @@ Changelog since latest public r1.2
   - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r2.1/code/API_definitions/webrtc-call-handling.yaml)
 
 ### Changes
+* fix: Added 400 error response at #91
 * Commonalities aligment 0.6 at PR #88
   * fix: Remove AUTHENTICATION_REQUIRED error code
   * doc: Update `types` (multiple) property of `Subscription` schema
@@ -85,6 +88,8 @@ Changelog since latest public r1.2
 * Provided a concrete example for the `registration-ends` event subscription.
 
 ### Changes
+* fix: Updated deviceId format, examples and tests at #91
+* fix: Updated mandatory fields per specific event data callback at #94
 * Commonalities aligment 0.6 at PR #88
   * fix: Remove AUTHENTICATION_REQUIRED error code
   * doc: Update `types` (multiple) property of `Subscription` schema
