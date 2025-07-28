@@ -38,10 +38,10 @@ Feature: CAMARA WebRTC Registration, v0.3.0-rc.1 - Operation deleteRegistrationB
     And the response property "$.code" is "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
 
-  @webrtc_registration_getSession_400.2_empty_request
+  @webrtc_registration_deleteRegistration_400.2_empty_request
   Scenario: Empty object as request path
     Given the path parameter "registrationId" is set to ""
-    When the HTTP "GET" request is sent
+    When the HTTP "DELETE" request is sent
     Then the response status code is 400
     And the response property "$.status" is 400
     And the response property "$.code" is "INVALID_ARGUMENT"
