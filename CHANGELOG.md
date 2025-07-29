@@ -45,20 +45,20 @@ Changelog since latest public r1.2
   - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r2.1/code/API_definitions/webrtc-registration.yaml)
 
 ### Added
-* Support registration expiry updates and termination event notifications at PR #83
+* Support registration expiry updates and termination event notifications at PR [#83](https://github.com/camaraproject/WebRTC/pull/83)
 * Introduced `regSessionUpdate` schema with optional `registrationExpireTime` field to allow clients to request a new expiry time.
 * Added 200 OK response definition for `PUT /sessions/{registrationId}` to acknowledge successful updates.
 
 ### Changed
-* fix: Updated deviceId format, examples and tests at #91
-* fix: registrationId became mandatory on registration response at #93
-* Commonalities aligment 0.6 at PR #88
+* fix: Updated deviceId format, examples and tests at [#91](https://github.com/camaraproject/WebRTC/pull/91)
+* fix: registrationId became mandatory on registration response at [#93](https://github.com/camaraproject/WebRTC/pull/93)
+* Commonalities aligment 0.6 at PR [#88](https://github.com/camaraproject/WebRTC/pull/88)
   * fix: Remove AUTHENTICATION_REQUIRED error code
   * doc: Update `types` (multiple) property of `Subscription` schema
   * feat: Error 422 MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED added
   * fix: Remove IDENTIFIER_MISMATCH error
   * fix: x-correlator format update, along test and schema update 
-* Extended `regSessionResponse` schema to include `expiresAt`, indicating the assigned expiry time of the registration session at PR #83
+* Extended `regSessionResponse` schema to include `expiresAt`, indicating the assigned expiry time of the registration session at PR [#83](https://github.com/camaraproject/WebRTC/pull/83)
 
 ## webrtc-call-handling v0.3.0-rc.1
 
@@ -68,8 +68,8 @@ Changelog since latest public r1.2
   - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r2.1/code/API_definitions/webrtc-call-handling.yaml)
 
 ### Changes
-* fix: Added 400 error response at #91
-* Commonalities aligment 0.6 at PR #88
+* fix: Added 400 error response at [#91](https://github.com/camaraproject/WebRTC/pull/91)
+* Commonalities aligment 0.6 at PR [#88](https://github.com/camaraproject/WebRTC/pull/88)
   * fix: Remove AUTHENTICATION_REQUIRED error code
   * doc: Update `types` (multiple) property of `Subscription` schema
   * feat: Error 422 MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED added
@@ -84,19 +84,19 @@ Changelog since latest public r1.2
   - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r1.2/code/API_definitions/webrtc-events.yaml)
 
 ### Added
-* Added new event type `webrtc-events:org.camaraproject.webrtc-events.v0.registration-ends` to notify subscribers when a registration ends at PR #83
+* Added new event type `webrtc-events:org.camaraproject.webrtc-events.v0.registration-ends` to notify subscribers when a registration ends at PR [#83](https://github.com/camaraproject/WebRTC/pull/83)
 * Provided a concrete example for the `registration-ends` event subscription.
 
 ### Changes
-* fix: Updated deviceId format, examples and tests at #91
-* fix: Updated mandatory fields per specific event data callback at #94
-* Commonalities aligment 0.6 at PR #88
+* fix: Updated deviceId format, examples and tests at [#91](https://github.com/camaraproject/WebRTC/pull/91)
+* fix: Updated mandatory fields per specific event data callback at [#94](https://github.com/camaraproject/WebRTC/pull/94)
+* Commonalities aligment 0.6 at PR [#88](https://github.com/camaraproject/WebRTC/pull/88)
   * fix: Remove AUTHENTICATION_REQUIRED error code
   * doc: Update `types` (multiple) property of `Subscription` schema
   * feat: Error 422 MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED added
   * fix: Remove IDENTIFIER_MISMATCH error
   * fix: x-correlator format update, along test and schema update
-* Extended `TerminationReason` enumeration to include `REGISTRATION_EXPIRED`, allowing precise classification of expiry-based terminations at PR #83
+* Extended `TerminationReason` enumeration to include `REGISTRATION_EXPIRED`, allowing precise classification of expiry-based terminations at PR [#83](https://github.com/camaraproject/WebRTC/pull/83)
 
 # r1.2
 
@@ -127,16 +127,16 @@ Changelog since latest public v0.1.1
   - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r1.2/code/API_definitions/webrtc-registration.yaml)
 
 ### Added
-* YAML inline documentation at PR #67
-* Commonalites aligment 0.5 at PR #65
-* Included base testing scenarios at PR #69
-* Included basic error testing at PR #71
+* YAML inline documentation at PR [#67](https://github.com/camaraproject/WebRTC/pull/67)
+* Commonalites aligment 0.5 at PR [#65](https://github.com/camaraproject/WebRTC/pull/65)
+* Included base testing scenarios at PR [#69](https://github.com/camaraproject/WebRTC/pull/69)
+* Included basic error testing at PR [#71](https://github.com/camaraproject/WebRTC/pull/71)
 
 ### Changed
-* API naming to WebRTC Registarion and filename `webrtc-registration.yaml` PR #59
-* Server `url` based on Commonalities 0.5 at PR #59
-* Security schema `openId` based on Commonalities 0.5 at PR #65
-* Response code based on Commonalities 0.5 at PR #65
+* API naming to WebRTC Registarion and filename `webrtc-registration.yaml` PR [#59](https://github.com/camaraproject/WebRTC/pull/59)
+* Server `url` based on Commonalities 0.5 at PR [#59](https://github.com/camaraproject/WebRTC/pull/59)
+* Security schema `openId` based on Commonalities 0.5 at PR [#65](https://github.com/camaraproject/WebRTC/pull/65)
+* Response code based on Commonalities 0.5 at PR [#65](https://github.com/camaraproject/WebRTC/pull/65)
 * Term `RACM` is replaced by `Registration` or `reg` suffix
 * TransactionId header (required) was replaced by x-correlator header (optional)
 * `msisdn` response is now `phoneNumber`
@@ -151,8 +151,8 @@ Changelog since latest public v0.1.1
 
 ### Removed
 * `BYON` terminology and API naming
-* `notificationChannel` API related parameter `channelId` at PR #67
-* `BearerAuth` in favor of `openId` as security schema at PR #65
+* `notificationChannel` API related parameter `channelId` at PR [#67](https://github.com/camaraproject/WebRTC/pull/67)
+* `BearerAuth` in favor of `openId` as security schema at PR [#65](https://github.com/camaraproject/WebRTC/pull/65)
 * Removed generic 5xx reponses
 * `clientId` header is removed
 
@@ -166,18 +166,18 @@ Changelog since latest public v0.1.1
   - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r1.2/code/API_definitions/webrtc-call-handling.yaml)
 
 ### Added
-* YAML inline documentation at PR #68
-* Commonalites aligment 0.5 at PR #65
-* Included base testing scenarios at PR #69
+* YAML inline documentation at PR [#68](https://github.com/camaraproject/WebRTC/pull/68)
+* Commonalites aligment 0.5 at PR [#65](https://github.com/camaraproject/WebRTC/pull/65)
+* Included base testing scenarios at PR [#69](https://github.com/camaraproject/WebRTC/pull/69)
 * Included basic error testing
 
 ### Changed
-* API naming to WebRTC Call Handling and filename `webrtc-call-handling.yaml` PR #59
-* Server `url` based on Commonalities 0.5 at PR #59
-* Security schema `openId` based on Commonalities 0.5 at PR #65
-* Response code based on Commonalities 0.5 at PR #65
-* `MediaSessionInformation` schema expanded, to include all fields used related to a single voice-video session at PR #56
-* `SessionNotification` schema updated at PR #56
+* API naming to WebRTC Call Handling and filename `webrtc-call-handling.yaml` PR [#59](https://github.com/camaraproject/WebRTC/pull/59)
+* Server `url` based on Commonalities 0.5 at PR [#59](https://github.com/camaraproject/WebRTC/pull/59)
+* Security schema `openId` based on Commonalities 0.5 at PR [#65](https://github.com/camaraproject/WebRTC/pull/65)
+* Response code based on Commonalities 0.5 at PR [#65](https://github.com/camaraproject/WebRTC/pull/65)
+* `MediaSessionInformation` schema expanded, to include all fields used related to a single voice-video session at PR [#56](https://github.com/camaraproject/WebRTC/pull/56)
+* `SessionNotification` schema updated at PR [#56](https://github.com/camaraproject/WebRTC/pull/56)
   * It aligns this API with the WebRTC Event notification service. So `SessionNotification` schema, now, its just a wrapper for `MediaSessionInformation` schema. This way, the developer only need to use one object for notification and voice-video session updates (POST / PUT operations).
 * Term `RACM` is replaced by `Registration` or `reg` suffix
 * Suffix `vvoip` is replaced by `media` to identify media sessions, like calls, video-calls or any media session
@@ -191,8 +191,8 @@ Changelog since latest public v0.1.1
 
 ### Removed
 * `BYON` terminology and API naming
-* `BearerAuth` in favor of `openId` as security schema at PR #65
-* `SessionNotification` schema updated at PR #56
+* `BearerAuth` in favor of `openId` as security schema at PR [#65](https://github.com/camaraproject/WebRTC/pull/65)
+* `SessionNotification` schema updated at PR [#56](https://github.com/camaraproject/WebRTC/pull/56)
   * `SessionInvitationNotification` - Became part of `SessionNotification`
   * `SessionStatusNotification` - Became part of `SessionNotification`
 * Removed generic 5xx reponses
@@ -212,13 +212,13 @@ Initial version covering the following functionality and related endpoints:
   - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r1.2/code/API_definitions/webrtc-events-subscription.yaml)
 
 ### Added
-* YAML inline documentation at PR #53
-* Commonalites aligment 0.5 at PR #66
-* Included `subscriptions` endpoint to create CloudEvents subscrition at PR #53
+* YAML inline documentation at PR [#53](https://github.com/camaraproject/WebRTC/pull/53)
+* Commonalites aligment 0.5 at PR [#66](https://github.com/camaraproject/WebRTC/pull/66)
+* Included `subscriptions` endpoint to create CloudEvents subscrition at PR [#53](https://github.com/camaraproject/WebRTC/pull/53)
   * Endpoints can now define a callback and receive server-side events using CloudEvents
   * Endpoints can now receive callback events regarding new available audio-video sessions (call incomming)
   * Endpoints can now receive callback events regarding session establishment updates like network changes and remote session termination (call progress and call hangup)
-* Included base testing scenarios at PR #69
+* Included base testing scenarios at PR [#69](https://github.com/camaraproject/WebRTC/pull/69)
 * Included basic error testing
 
 ### Changed
@@ -255,23 +255,23 @@ webrtc-registration v0.2.0-rc.1 is the release candidate of the version 0.2.0 of
   - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r1.1/code/API_definitions/webrtc-registration.yaml)
 
 ### Added
-* YAML inline documentation at PR #67
-* Commonalites aligment 0.5 at PR #65
-* Included base testing scenarios at PR #69
+* YAML inline documentation at PR [#67](https://github.com/camaraproject/WebRTC/pull/67)
+* Commonalites aligment 0.5 at PR [#65](https://github.com/camaraproject/WebRTC/pull/65)
+* Included base testing scenarios at PR [#69](https://github.com/camaraproject/WebRTC/pull/69)
 
 ### Changed
-* API naming to WebRTC Registarion and filename `webrtc-registration.yaml` PR #59
-* Server `url` based on Commonalities 0.5 at PR #59
-* Security schema `openId` based on Commonalities 0.5 at PR #65
-* Response code based on Commonalities 0.5 at PR #65
+* API naming to WebRTC Registarion and filename `webrtc-registration.yaml` PR [#59](https://github.com/camaraproject/WebRTC/pull/59)
+* Server `url` based on Commonalities 0.5 at PR [#59](https://github.com/camaraproject/WebRTC/pull/59)
+* Security schema `openId` based on Commonalities 0.5 at PR [#65](https://github.com/camaraproject/WebRTC/pull/65)
+* Response code based on Commonalities 0.5 at PR [#65](https://github.com/camaraproject/WebRTC/pull/65)
 
 ### Fixed
 * Descriptions and relevant information for all documentation and schemas
 
 ### Removed
 * `BYON` terminology and API naming
-* `notificationChannel` API related paramter `channelId` at PR #67
-* `BearerAuth` in favor of `openId` as security schema at PR #65
+* `notificationChannel` API related paramter `channelId` at PR [#67](https://github.com/camaraproject/WebRTC/pull/67)
+* `BearerAuth` in favor of `openId` as security schema at PR [#65](https://github.com/camaraproject/WebRTC/pull/65)
 
 ## WebRTC Call Handling v0.2.0-rc.1
 
@@ -285,17 +285,17 @@ webrtc-call-handling v0.2.0-rc.1 is the release candidate of the version 0.2.0 o
   - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r1.1/code/API_definitions/webrtc-call-handling.yaml)
 
 ### Added
-* YAML inline documentation at PR #68
-* Commonalites aligment 0.5 at PR #65
-* Included base testing scenarios at PR #69
+* YAML inline documentation at PR [#68](https://github.com/camaraproject/WebRTC/pull/68)
+* Commonalites aligment 0.5 at PR [#65](https://github.com/camaraproject/WebRTC/pull/65)
+* Included base testing scenarios at PR [#69](https://github.com/camaraproject/WebRTC/pull/69)
 
 ### Changed
-* API naming to WebRTC Call Handling and filename `webrtc-call-handling.yaml` PR #59
-* Server `url` based on Commonalities 0.5 at PR #59
-* Security schema `openId` based on Commonalities 0.5 at PR #65
-* Response code based on Commonalities 0.5 at PR #65
-* `MediaSessionInformation` schema expanded, to include all fields used related to a single voice-video session at PR #56
-* `SessionNotification` schema updated at PR #56
+* API naming to WebRTC Call Handling and filename `webrtc-call-handling.yaml` PR [#59](https://github.com/camaraproject/WebRTC/pull/59)
+* Server `url` based on Commonalities 0.5 at PR [#59](https://github.com/camaraproject/WebRTC/pull/59)
+* Security schema `openId` based on Commonalities 0.5 at PR [#65](https://github.com/camaraproject/WebRTC/pull/65)
+* Response code based on Commonalities 0.5 at PR [#65](https://github.com/camaraproject/WebRTC/pull/65)
+* `MediaSessionInformation` schema expanded, to include all fields used related to a single voice-video session at PR [#56](https://github.com/camaraproject/WebRTC/pull/56)
+* `SessionNotification` schema updated at PR [#56](https://github.com/camaraproject/WebRTC/pull/56)
   * It aligns this API with the WebRTC Event notification service. So `SessionNotification` schema, now, its just a wrapper for `MediaSessionInformation` schema. This way, the developer only need to use one object for notification and voice-video session updates (POST / PUT operations).
 
 ### Fixed
@@ -303,8 +303,8 @@ webrtc-call-handling v0.2.0-rc.1 is the release candidate of the version 0.2.0 o
 
 ### Removed
 * `BYON` terminology and API naming
-* `BearerAuth` in favor of `openId` as security schema at PR #65
-* `SessionNotification` schema updated at PR #56
+* `BearerAuth` in favor of `openId` as security schema at PR [#65](https://github.com/camaraproject/WebRTC/pull/65)
+* `SessionNotification` schema updated at PR [#56](https://github.com/camaraproject/WebRTC/pull/56)
   * `SessionInvitationNotification` - Became part of `SessionNotification`
   * `SessionStatusNotification` - Became part of `SessionNotification`
 
@@ -324,13 +324,13 @@ Initial version covering the following functionality and related endpoints:
   - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r1.1/code/API_definitions/webrtc-events.yaml)
 
 ### Added
-* YAML inline documentation at PR #53
-* Commonalites aligment 0.5 at PR #66
-* Included `subscriptions` endpoint to create CloudEvents subscrition at PR #53
+* YAML inline documentation at PR [#53](https://github.com/camaraproject/WebRTC/pull/53)
+* Commonalites aligment 0.5 at PR [#66](https://github.com/camaraproject/WebRTC/pull/66)
+* Included `subscriptions` endpoint to create CloudEvents subscrition at PR [#53](https://github.com/camaraproject/WebRTC/pull/53)
   * Endpoints can now define a callback and receive server-side events using CloudEvents
   * Endpoints can now receive callback events regarding new available audio-video sessions (call incomming)
   * Endpoints can now receive callback events regarding session establishment updates like network changes and remote session termination (call progress and call hangup)
-* Included base testing scenarios at PR #69
+* Included base testing scenarios at PR [#69](https://github.com/camaraproject/WebRTC/pull/69)
 
 ### Changed
 * n/a
