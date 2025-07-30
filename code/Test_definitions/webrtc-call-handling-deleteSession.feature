@@ -1,8 +1,8 @@
-Feature: CAMARA WebRTC Call Handling, v0.2.0 - Operation deleteSession
+Feature: CAMARA WebRTC Call Handling, v0.3.0-rc.1 - Operation deleteSession
 
   Background: Common deleteSession setup
     Given an environment at "apiRoot"
-    And the resource "/webrtc-call-handling/v0.2/sessions/{mediaSessionId}"                                                              |
+    And the resource "/webrtc-call-handling/v0.3rc1/sessions/{mediaSessionId}"                                                              |
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
@@ -38,10 +38,10 @@ Feature: CAMARA WebRTC Call Handling, v0.2.0 - Operation deleteSession
     And the response property "$.code" is "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
 
-  @webrtc_call_handling_getSession_400.2_empty_request
+  @webrtc_call_handling_deleteSession_400.2_empty_request
   Scenario: Empty object as request path
     Given the path parameter "mediaSessionId" is set to ""
-    When the HTTP "GET" request is sent
+    When the HTTP "DELETE" request is sent
     Then the response status code is 400
     And the response property "$.status" is 400
     And the response property "$.code" is "INVALID_ARGUMENT"

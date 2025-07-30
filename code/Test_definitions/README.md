@@ -5,16 +5,16 @@ The test plan has to be enhanced
 
 WebRTC Registration
 
-* webrtc-registration-createSession.feature
-* webrtc-registration-updateSession.feature
-* webrtc-registration-deleteSession.feature
+* webrtc-registration-createRegistration.feature
+* webrtc-registration-updateRegistration.feature
+* webrtc-registration-deleteRegistration.feature
 
 WebRTC Call Handling
 
 * webrtc-call-handling-createSession.feature
 * webrtc-call-handling-getSession.feature
 * webrtc-call-handling-deleteSession.feature
-* webrtc-call-handling-updateSession.feature
+* webrtc-call-handling-updateSessionStatus.feature
 
 WebRTC Events
 
