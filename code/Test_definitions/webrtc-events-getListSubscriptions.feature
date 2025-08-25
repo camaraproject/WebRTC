@@ -15,7 +15,7 @@ Feature: CAMARA WebRTC Events, v0.2.0-rc.1 - Operation getListSubscriptions
     Then the response status code should be 200
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And each item of the the response array, if any, complies with the OAS schema at "/components/schemas/Subscription"
-  
+
   # Error scenarios
 
   # Generic 401 errors

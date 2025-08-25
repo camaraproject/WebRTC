@@ -9,7 +9,6 @@ Feature: CAMARA WebRTC Events, v0.2.0-rc.1 - Operation createSubscription
     And the request body is set by default to a request body compliant with the schema at "/components/schemas/SubscriptionRequest"
     # Properties not explicitly overwritten in the Scenarios can take any values compliant with the schema
 
-
   @webrtc_events_createSubscription_01_generic_success_scenario
   Scenario: Create a webrtc-events event subscription
     When the client sends a POST request to "/sessions" with the following payload:
