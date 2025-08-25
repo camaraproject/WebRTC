@@ -7,7 +7,7 @@ Feature: CAMARA WebRTC Registration, v0.3.0-rc.1 - Operation deleteRegistrationB
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
     And the path parameter "registrationId" is set by default to a existing register session
- 
+
   @webrtc_registration_deleteRegistrationById_01_generic_success_scenario
   Scenario: Delete an existing registration session
     Given an existing registration session with "registrationId" as "existing-session-id"

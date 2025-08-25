@@ -42,7 +42,7 @@ Feature: CAMARA WebRTC Call Handling, v0.3.0-rc.1 - Operation getSession
   @webrtc_call_handling_getSession_400.2_empty_request
   Scenario: Empty object as request path
     Given the request body is set to "{}"
-    Given the path parameter "mediaSessionId" is set to ""
+    And the path parameter "mediaSessionId" is set to ""
     When the HTTP "GET" request is sent
     Then the response status code is 400
     And the response property "$.status" is 400

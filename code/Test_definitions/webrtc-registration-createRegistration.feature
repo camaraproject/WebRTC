@@ -8,7 +8,7 @@ Feature: CAMARA WebRTC Registration, v0.3.0-rc.1 - Operation createRegistration
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
     And the request body is set by default to a request body compliant with the schema at "/components/schemas/regSessionRequest"
     # Properties not explicitly overwritten in the Scenarios can take any values compliant with the schema
- 
+
   @webrtc_registration_createRegistration_01_generic_success_scenario
   Scenario: Create a new registration session
     When the client sends a POST request to "/sessions" with the following payload:
