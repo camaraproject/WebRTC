@@ -305,7 +305,6 @@ components:
           description: |-
             Optional **absolute** expiry moment for this registration.
             It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-            Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
 
             ▸ **Devices without a trustworthy clock** (e.g. Wi-Fi-only tablets
               or other non-SIM hardware) SHOULD treat the value as an
@@ -341,7 +340,6 @@ components:
             and plan to refresh well in advance to avoid race conditions. A suggested margin is 120 seconds before expiry.
 
             It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-            Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
     regSessionUpdate:
       type: object
       properties:
@@ -359,7 +357,6 @@ components:
             TTL, measured from the moment the refresh is received.
 
             It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-            Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
     RegistrationStatus:
       type: string
       enum:
