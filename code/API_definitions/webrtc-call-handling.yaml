@@ -553,7 +553,7 @@ components:
     Address:
       type: string
       description: Subscriber address (Sender or Receiver)
-      pattern: '^(tel:+[0-9]{5,15}|sip:.+@.+)$'
+      pattern: '^(tel:\+[0-9]{5,15}|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})$'
       example: 'tel:+11234567899'
   examples:
     exampleMediaSessionRequest:
