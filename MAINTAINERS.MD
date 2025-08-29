@@ -12,3 +12,4 @@
 | Vodafone | Ratna Ganeshanandan | ratnavf |
 | Orange | Benjamin Busvel | BenjaminBusvel |
 | Orange | Maxime Delon | maximedelon |
+| NTT | Tsuyoshi Takakura | teikuran |
