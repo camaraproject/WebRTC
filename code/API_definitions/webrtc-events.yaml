@@ -940,6 +940,7 @@ components:
           required:
             - originatorAddress
             - receiverAddress
+            - status
 
     WrtcSDPDescriptor:
       type: object
