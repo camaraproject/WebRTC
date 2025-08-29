@@ -1,4 +1,4 @@
-Feature: CAMARA WebRTC Events, v0.2.0-rc.1 - Operation createSubscription
+Feature: CAMARA WebRTC Events, v0.2.0 - Operation createSubscription
 
   Background: Common createSubscription setup
     Given an environment at "apiRoot"

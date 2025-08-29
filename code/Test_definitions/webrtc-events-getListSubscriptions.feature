@@ -1,4 +1,4 @@
-Feature: CAMARA WebRTC Events, v0.2.0-rc.1 - Operation getListSubscriptions
+Feature: CAMARA WebRTC Events, v0.2.0 - Operation getListSubscriptions
 
   Background: Common getListSubscriptions setup
     Given an environment at "apiRoot"

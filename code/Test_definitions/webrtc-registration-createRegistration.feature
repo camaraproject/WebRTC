@@ -1,4 +1,4 @@
-Feature: CAMARA WebRTC Registration, v0.3.0-rc.1 - Operation createRegistration
+Feature: CAMARA WebRTC Registration, v0.3.0 - Operation createRegistration
 
   Background: Common createRegistration setup
     Given an environment at "apiRoot"
