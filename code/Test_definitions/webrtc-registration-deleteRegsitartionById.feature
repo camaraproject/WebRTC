@@ -1,4 +1,4 @@
-Feature: CAMARA WebRTC Registration, v0.3.0-rc.1 - Operation deleteRegistrationById
+Feature: CAMARA WebRTC Registration, v0.3.0 - Operation deleteRegistrationById
 
   Background: Common deleteRegistrationById setup
     Given an environment at "apiRoot"
