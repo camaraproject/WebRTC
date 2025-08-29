@@ -60,11 +60,11 @@ Changelog since latest public r1.2
   * fix: x-correlator format update, along test and schema update 
 * Extended `regSessionResponse` schema to include `expiresAt`, indicating the assigned expiry time of the registration session at PR [#83](https://github.com/camaraproject/WebRTC/pull/83)
 
-## webrtc-call-handling v0.3.0-rc.1
+## Webrtc Call Handling v0.3.0-rc.1
 
 - API definition **with inline documentation**:
   - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.1/code/API_definitions/webrtc-call-handling.yaml&nocors)
-  - [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.1/code/API_definitions/webrtc-call-handling.yaml)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.1/code/API_definitions/webrtc-call-handling.yaml)
   - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r2.1/code/API_definitions/webrtc-call-handling.yaml)
 
 ### Changes
@@ -79,9 +79,9 @@ Changelog since latest public r1.2
 ## WebRTC Events v0.2.0-rc.1
 
 - API definition **with inline documentation**:
-  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-events.yaml&nocors)
-  - [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r1.2/code/API_definitions/webrtc-events.yaml)
-  - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r1.2/code/API_definitions/webrtc-events.yaml)
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.1/code/API_definitions/webrtc-events.yaml&nocors)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.1/code/API_definitions/webrtc-events.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r2.1/code/API_definitions/webrtc-events.yaml)
 
 ### Added
 * Added new event type `webrtc-events:org.camaraproject.webrtc-events.v0.registration-ends` to notify subscribers when a registration ends at PR [#83](https://github.com/camaraproject/WebRTC/pull/83)
