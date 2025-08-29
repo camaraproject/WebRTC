@@ -3,6 +3,7 @@
 
 ## Table of contents
 
+- **[r2.2](#r22)**
 - **[r2.1](#r21)**
 - **[r1.2](#r12)**
 - **[r1.1](#r11)**
@@ -17,6 +18,92 @@ The below sections record the changes for each API version in each release as fo
 * for the first release-candidate, all changes since the last public release
 * for subsequent release-candidate(s), only the delta to the previous release-candidate
 * for a public release, the consolidated changes since the previous public release
+
+# r2.2
+
+## Release Notes
+
+This **public release** contains the definition and documentation of
+
+* webrtc-registration v0.3.0
+* webrtc-call-handling v0.3.0
+* webrtc-events v0.2.0
+
+The API definition(s) are based on
+
+* Commonalities r3.3
+* Identity and Consent Management r3.3
+
+Changelog since latest public v1.2
+
+* Full Changelog with the list of PRs and contributors: https://github.com/camaraproject/WebRTC/compare/r1.2...r2.2
+
+## WebRTC Registration v0.3.0
+
+- API definition **with inline documentation**:
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.2/code/API_definitions/webrtc-registration.yaml&nocors)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.2/code/API_definitions/webrtc-registration.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r2.2/code/API_definitions/webrtc-registration.yaml)
+
+### Added
+- Support registration expiry updates and termination event notifications at PR [#83](https://github.com/camaraproject/WebRTC/pull/83)
+- Introduced `regSessionUpdate` schema with optional `registrationExpireTime` field to allow clients to request a new expiry time.
+- Added 200 OK response definition for `PUT /sessions/{registrationId}` to acknowledge successful updates.
+
+### Changed
+- fix: Updated deviceId format, examples and tests at [#91](https://github.com/camaraproject/WebRTC/pull/91)
+- fix: registrationId became mandatory on registration response at [#93](https://github.com/camaraproject/WebRTC/pull/93)
+- Commonalities aligment 0.6 at PR [#88](https://github.com/camaraproject/WebRTC/pull/88)
+  - fix: Remove AUTHENTICATION_REQUIRED error code
+  - doc: Update `types` (multiple) property of `Subscription` schema
+  - feat: Error 422 MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED added
+  - fix: Remove IDENTIFIER_MISMATCH error
+  - fix: x-correlator format update, along test and schema update 
+- Extended `regSessionResponse` schema to include `expiresAt`, indicating the assigned expiry time of the registration session at PR [#83](https://github.com/camaraproject/WebRTC/pull/83)
+- fix: Description for date-time review at [#101](https://github.com/camaraproject/WebRTC/pull/101)
+
+## WebRTC Call Handling v0.3.0
+
+- API definition **with inline documentation**:
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.2/code/API_definitions/webrtc-call-handling.yaml&nocors)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.2/code/API_definitions/webrtc-call-handling.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r2.2/code/API_definitions/webrtc-call-handling.yaml)
+
+### Changes
+- fix: Added 400 error response at [#91](https://github.com/camaraproject/WebRTC/pull/91)
+- Commonalities aligment 0.6 at PR [#88](https://github.com/camaraproject/WebRTC/pull/88)
+  - fix: Remove AUTHENTICATION_REQUIRED error code
+  - doc: Update `types` (multiple) property of `Subscription` schema
+  - feat: Error 422 MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED added
+  - fix: Remove IDENTIFIER_MISMATCH error
+  - fix: x-correlator format update, along test and schema update
+- fix: Removed too wide insecure pattern .+ from address fields at [#103](https://github.com/camaraproject/WebRTC/pull/103)
+
+## WebRTC Events v0.2.0
+
+- API definition **with inline documentation**:
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.2/code/API_definitions/webrtc-events.yaml&nocors)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.2/code/API_definitions/webrtc-events.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r2.2/code/API_definitions/webrtc-events.yaml)
+
+### Added
+- Added new event type `webrtc-events:org.camaraproject.webrtc-events.v0.registration-ends` to notify subscribers when a registration ends at PR [#83](https://github.com/camaraproject/WebRTC/pull/83)
+- Provided a concrete example for the `registration-ends` event subscription.
+
+### Changes
+- fix: Updated deviceId format, examples and tests at [#91](https://github.com/camaraproject/WebRTC/pull/91)
+- fix: Updated mandatory fields per specific event data callback at [#94](https://github.com/camaraproject/WebRTC/pull/94)
+- Commonalities aligment 0.6 at PR [#88](https://github.com/camaraproject/WebRTC/pull/88)
+  - fix: Remove AUTHENTICATION_REQUIRED error code
+  - doc: Update `types` (multiple) property of `Subscription` schema
+  - feat: Error 422 MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED added
+  - fix: Remove IDENTIFIER_MISMATCH error
+  - fix: x-correlator format update, along test and schema update
+- Extended `TerminationReason` enumeration to include `REGISTRATION_EXPIRED`, allowing precise classification of expiry-based terminations at PR [#83](https://github.com/camaraproject/WebRTC/pull/83)
+- fix: Description for date-time review at [#101](https://github.com/camaraproject/WebRTC/pull/101)
+- fix: Updated mandatory fields for EventSessionInvitation at [#102](https://github.com/camaraproject/WebRTC/pull/102)
+- fix: Removed too wide insecure pattern .+ from address fields [#103](https://github.com/camaraproject/WebRTC/pull/103)
+
 
 # r2.1
 
