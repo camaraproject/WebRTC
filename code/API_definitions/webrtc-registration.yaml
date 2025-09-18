@@ -383,7 +383,7 @@ components:
           description: A human-readable code to describe the error
         message:
           type: string
-          description: A human-readable description of what the event represents 
+          description: A human-readable description of what the event represents
     PhoneNumber:
       description: A public identifier addressing a telephone subscription. In mobile networks it corresponds to the MSISDN (Mobile Station International Subscriber Directory Number). In order to be globally unique it has to be formatted in international format, according to E.164 standard, prefixed with '+'.
       type: string

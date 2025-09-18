@@ -475,7 +475,7 @@ components:
           description: A human-readable code to describe the error
         message:
           type: string
-          description: A human-readable description of what the event represents 
+          description: A human-readable description of what the event represents
 
     SubscriptionRequest:
       description: The request for creating a event-type event subscription
