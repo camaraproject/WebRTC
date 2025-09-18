@@ -1,4 +1,4 @@
-Feature: CAMARA WebRTC Registration, v0.3.0-rc.1 - Operation updateRegistrationById
+Feature: CAMARA WebRTC Registration, v0.3.0 - Operation updateRegistrationById
 
   Background: Common updateRegistrationById setup
     Given an environment at "apiRoot"
