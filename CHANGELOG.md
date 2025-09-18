@@ -38,7 +38,7 @@ Changelog since latest public v1.2
 
 * Full Changelog with the list of PRs and contributors: https://github.com/camaraproject/WebRTC/compare/r1.2...r2.2
 
-## WebRTC Registration v0.3.0
+## webrtc-registration v0.3.0
 
 - API definition **with inline documentation**:
   - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.2/code/API_definitions/webrtc-registration.yaml&nocors)
@@ -62,7 +62,7 @@ Changelog since latest public v1.2
 - Extended `regSessionResponse` schema to include `expiresAt`, indicating the assigned expiry time of the registration session at PR [#83](https://github.com/camaraproject/WebRTC/pull/83)
 - fix: Description for date-time review at [#101](https://github.com/camaraproject/WebRTC/pull/101)
 
-## WebRTC Call Handling v0.3.0
+## webrtc-call-handling v0.3.0
 
 - API definition **with inline documentation**:
   - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.2/code/API_definitions/webrtc-call-handling.yaml&nocors)
@@ -79,7 +79,7 @@ Changelog since latest public v1.2
   - fix: x-correlator format update, along test and schema update
 - fix: Removed too wide insecure pattern .+ from address fields at [#103](https://github.com/camaraproject/WebRTC/pull/103)
 
-## WebRTC Events v0.2.0
+## webrtc-events v0.2.0
 
 - API definition **with inline documentation**:
   - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.2/code/API_definitions/webrtc-events.yaml&nocors)
@@ -124,7 +124,7 @@ Changelog since latest public r1.2
 
 * Full Changelog with the list of PRs and contributors: https://github.com/camaraproject/WebRTC/compare/r1.2...r2.1
 
-## WebRTC Registration v0.3.0-rc.1
+## webrtc-registration v0.3.0-rc.1
 
 - API definition **with inline documentation**:
   - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.1/code/API_definitions/webrtc-registration.yaml&nocors)
@@ -147,7 +147,7 @@ Changelog since latest public r1.2
   * fix: x-correlator format update, along test and schema update 
 * Extended `regSessionResponse` schema to include `expiresAt`, indicating the assigned expiry time of the registration session at PR [#83](https://github.com/camaraproject/WebRTC/pull/83)
 
-## Webrtc Call Handling v0.3.0-rc.1
+## webrt-call-handling v0.3.0-rc.1
 
 - API definition **with inline documentation**:
   - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.1/code/API_definitions/webrtc-call-handling.yaml&nocors)
@@ -163,7 +163,7 @@ Changelog since latest public r1.2
   * fix: Remove IDENTIFIER_MISMATCH error
   * fix: x-correlator format update, along test and schema update
 
-## WebRTC Events v0.2.0-rc.1
+## webrtc-events v0.2.0-rc.1
 
 - API definition **with inline documentation**:
   - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r2.1/code/API_definitions/webrtc-events.yaml&nocors)
