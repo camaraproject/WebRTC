@@ -58,9 +58,10 @@ Changelog since latest public v1.2
   - doc: Update `types` (multiple) property of `Subscription` schema
   - feat: Error 422 MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED added
   - fix: Remove IDENTIFIER_MISMATCH error
-  - fix: x-correlator format update, along test and schema update 
+  - fix: x-correlator format update, along test and schema update
 - Extended `regSessionResponse` schema to include `expiresAt`, indicating the assigned expiry time of the registration session at PR [#83](https://github.com/camaraproject/WebRTC/pull/83)
 - fix: Description for date-time review at [#101](https://github.com/camaraproject/WebRTC/pull/101)
+- fix: ErrorInfo updated descriptions at [#113](https://github.com/camaraproject/WebRTC/pull/113)
 
 ## webrtc-call-handling v0.3.0
 
@@ -78,6 +79,7 @@ Changelog since latest public v1.2
   - fix: Remove IDENTIFIER_MISMATCH error
   - fix: x-correlator format update, along test and schema update
 - fix: Removed too wide insecure pattern .+ from address fields at [#103](https://github.com/camaraproject/WebRTC/pull/103)
+- fix: ErrorInfo updated descriptions at [#113](https://github.com/camaraproject/WebRTC/pull/113)
 
 ## webrtc-events v0.2.0
 
@@ -103,6 +105,7 @@ Changelog since latest public v1.2
 - fix: Description for date-time review at [#101](https://github.com/camaraproject/WebRTC/pull/101)
 - fix: Updated mandatory fields for EventSessionInvitation at [#102](https://github.com/camaraproject/WebRTC/pull/102)
 - fix: Removed too wide insecure pattern .+ from address fields [#103](https://github.com/camaraproject/WebRTC/pull/103)
+- fix: ErrorInfo updated descriptions at [#113](https://github.com/camaraproject/WebRTC/pull/113)
 
 
 # r2.1
@@ -144,7 +147,7 @@ Changelog since latest public r1.2
   * doc: Update `types` (multiple) property of `Subscription` schema
   * feat: Error 422 MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED added
   * fix: Remove IDENTIFIER_MISMATCH error
-  * fix: x-correlator format update, along test and schema update 
+  * fix: x-correlator format update, along test and schema update
 * Extended `regSessionResponse` schema to include `expiresAt`, indicating the assigned expiry time of the registration session at PR [#83](https://github.com/camaraproject/WebRTC/pull/83)
 
 ## webrt-call-handling v0.3.0-rc.1
