@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: WebRTC Registration Service
   description: |-
-    ## 1. Introduction
+    # Introduction
     This API provides the API consumer with the capabilities to manage
     registration and connectivity towards the network.
 
@@ -28,7 +28,7 @@ info:
       - An additional subscription to webrtc-events API is required to receive
         incoming calls.
 
-    ## 2. Relevant terms and definitions
+    # Relevant terms and definitions
 
     - **registration** A media device session. A valid client running on a valid
       device, with permission to use the network capabilities to create and receive
@@ -55,7 +55,7 @@ info:
       describing multimedia communication sessions for the purposes of announcement
       and invitation.
 
-    ## 3. API functionality
+    # API functionality
 
     This API allows to create device registrations. These, identified by a unique
     `registrationId` can be updated and terminated via this API and its methods.
@@ -77,7 +77,7 @@ info:
     Check for extra details on each of these APIs already present on the WebRTC
     repository.
 
-    ## 4. Authorization and authentication
+    # Authorization and authentication
 
     The "Camara Security and Interoperability Profile" provides details of how an
     API consumer requests an access token. Please refer to Identity and Consent
@@ -95,7 +95,8 @@ info:
     in compliance with privacy regulations, upholding the principles of
     transparency and user-centric privacy-by-design.
 
-    ## 5. Additional CAMARA error responses
+    # Additional CAMARA error responses
+
     The list of error codes in this API specification is not exhaustive.
     Therefore the API specification may not document some non-mandatory error
     statuses as indicated in `CAMARA API Design Guide`.
