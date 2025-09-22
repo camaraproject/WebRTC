@@ -2,7 +2,7 @@ Feature: CAMARA WebRTC Call Handling, v0.3.0 - Operation updateSessionStatus
 
   Background: Common updateSessionStatus setup
     Given an environment at "apiRoot"
-    And the resource "/webrtc-call-handling/v0.3rc1/sessions/{mediaSessionId}/status"                                                              |
+    And the resource "/webrtc-call-handling/v0.3/sessions/{mediaSessionId}/status"                                                              |
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"

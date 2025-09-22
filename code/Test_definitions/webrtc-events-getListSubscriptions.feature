@@ -2,7 +2,7 @@ Feature: CAMARA WebRTC Events, v0.2.0 - Operation getListSubscriptions
 
   Background: Common getListSubscriptions setup
     Given an environment at "apiRoot"
-    And the resource "/webrtc-events/v0.2rc1/subscriptions"                                                              |
+    And the resource "/webrtc-events/v0.2/subscriptions"                                                              |
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"

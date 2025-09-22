@@ -119,7 +119,7 @@ externalDocs:
   description: Product documentation at CAMARA
   url: https://github.com/camaraproject/WebRTC
 servers:
-  - url: '{apiRoot}/webrtc-registration/v0.3rc1'
+  - url: '{apiRoot}/webrtc-registration/v0.3'
     description: APIs to manage device registration and connection
     variables:
       apiRoot:

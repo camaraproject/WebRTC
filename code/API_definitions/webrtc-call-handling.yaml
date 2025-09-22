@@ -215,7 +215,7 @@ externalDocs:
   description: Product documentation at CAMARA
   url: https://github.com/camaraproject/WebRTC
 servers:
-  - url: '{apiRoot}/webrtc-call-handling/v0.3rc1'
+  - url: '{apiRoot}/webrtc-call-handling/v0.3'
     variables:
       apiRoot:
         description: API root
