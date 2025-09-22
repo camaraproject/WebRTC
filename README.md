@@ -26,7 +26,7 @@ Sandbox API Repository to describe, develop, document, and test the WebRTC Servi
 ## Release Information
 
 * The latest public release is available here: https://github.com/camaraproject/WebRTC/releases/latest
-  * The latest **public** release is **[r2.2](https://github.com/camaraproject/WebRTC/tree/r2.2) (Fall25 meta-release)**
+  * The latest **public** release is **[r2.2](https://github.com/camaraproject/WebRTC/releases/tag/r2.2)**
     
     * **webrtc-registration v0.3.0**
     [[YAML]](https://github.com/camaraproject/WebRTC/blob/r2.2/code/API_definitions/webrtc-registration.yaml)
