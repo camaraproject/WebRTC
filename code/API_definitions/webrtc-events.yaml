@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: WebRTC Events
   description: |-
-    ## 1. Introduction
+    # Introduction
 
     This API provide REST API for a client, browser or native application, to
     receive events about updates of an active session or new sessions requests
@@ -37,7 +37,7 @@ info:
           devices
         - A call audit application that requires to remotely monitor call status
 
-    ## 2. Relevant terms and definitions
+    # Relevant terms and definitions
 
     - **BYON**: Bring Your Own Number. A commercial name for the functionality
       to use your network credentials and phone number identity to non-SIM
@@ -51,7 +51,7 @@ info:
     - **registrationId**: Unique identifier of an device **registration**.
       Retrieved using the `webrtc-registration` API
 
-    ## 3. API functionality
+    # API functionality
 
     The CAMARA subscription model is detailed in the CAMARA API design guideline
     document and follows CloudEvents specification.
@@ -90,7 +90,7 @@ info:
       (optionally set by the requester)
     - the API server has to stop sending notification prematurely
 
-    ### 3.1. Session events (session-status)
+    ## 1. Session events (session-status)
 
     Find more information at the Schema description.
 
@@ -116,7 +116,7 @@ info:
       MUST NOT be present in a request from the application to the server to
       create a session.
 
-    ### 3.2. New session request (session-invitation)
+    ## 2. New session request (session-invitation)
 
     Find more information at the Schema description.
 
@@ -136,7 +136,7 @@ info:
     a unique SessionId, to create a dedicated subscription and receive events
     about the session itself and its status progressing inside the network.
 
-    ### 3.3. Subscription ends (subscription-ended)
+    ## 3. Subscription ends (subscription-ended)
 
     A `org.camaraproject.webrtc-events.v0.subscription-ended` event indicates that
     the endpoint will no longer be notified when a new event occurs. From
@@ -144,33 +144,30 @@ info:
     signal the need to check the event subscription status and attempt to refresh
     it in order to continue receiving new event notifications.
 
-    ### 3.4. Registration ends (`registration-ends`)
+    ## 4. Registration ends (`registration-ends`)
 
     A `org.camaraproject.webrtc-events.v0.registration-ends` event indicates that a previously active registration has ended and is no longer valid.
     From a developer's point of view, reception of the `registration-ends` event should be treated as a signal to renew the WebRTC registration in order to continue receiving or initiating calls for the registered phone number.
 
-    ## 4. Authorization and authentication
+    # Authorization and authentication
 
-    The "Camara Security and Interoperability Profile" provides details on how
-    a client requests an access token. Please refer to [Identify and Consent
-    Management](https://github.com/camaraproject/IdentityAndConsentManagement/)
-    for the released version of
-    the Profile.
+    The "Camara Security and Interoperability Profile" provides details of how an
+    API consumer requests an access token. Please refer to Identity and Consent
+    Management (https://github.com/camaraproject/IdentityAndConsentManagement/)
+    for the released version of the profile.
 
-    Which specific authorization flows are to be used will be determined during
-    onboarding process, happening between the API Client and the API Provider,
-    taking into account the declared purpose for accessing the API, while also
-    being subject to the prevailing legal framework dictated by local
-    legislation.
+    The specific authorization flows to be used will be agreed upon during the
+    onboarding process, happening between the API consumer and the API provider,
+    taking into account the declared purpose for accessing the API, whilst also
+    being subject to the prevailing legal framework dictated by local legislation.
 
-    It is important to remark that in cases where personal user data is
-    processed by the API, and users can exercise their rights through
-    mechanisms such as opt-in and/or opt-out, the use of 3-legged access tokens
-    becomes mandatory. This measure ensures that the API remains in strict
-    compliance with user privacy preferences and regulatory obligations,
-    upholding the principles of transparency and user-centric data control.
+    In cases where personal data is processed by the API and users can exercise
+    their rights through mechanisms such as opt-in and/or opt-out, the use of
+    three-legged access tokens is mandatory. This ensures that the API remains
+    in compliance with privacy regulations, upholding the principles of
+    transparency and user-centric privacy-by-design.
 
-    ## 5. Additional CAMARA error responses
+    # Additional CAMARA error responses
     The list of error codes in this API specification is not exhaustive.
     Therefore the API specification may not document some non-mandatory error
     statuses as indicated in `CAMARA API Design Guide`.
@@ -186,14 +183,14 @@ info:
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: 0.2.0-rc.1
+  version: 0.2.0
   x-camara-commonalities: 0.6
 
 externalDocs:
   description: Product documentation at CAMARA
   url: https://github.com/camaraproject/WebRTC
 servers:
-  - url: "{apiRoot}/webrtc-events/v0.2rc1"
+  - url: "{apiRoot}/webrtc-events/v0.2"
     variables:
       apiRoot:
         default: http://localhost:9091

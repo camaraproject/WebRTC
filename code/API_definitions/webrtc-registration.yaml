@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: WebRTC Registration Service
   description: |-
-    ## 1. Introduction
+    # Introduction
     This API provides the API consumer with the capabilities to manage
     registration and connectivity towards the network.
 
@@ -28,7 +28,7 @@ info:
       - An additional subscription to webrtc-events API is required to receive
         incoming calls.
 
-    ## 2. Relevant terms and definitions
+    # Relevant terms and definitions
 
     - **registration** A media device session. A valid client running on a valid
       device, with permission to use the network capabilities to create and receive
@@ -55,7 +55,7 @@ info:
       describing multimedia communication sessions for the purposes of announcement
       and invitation.
 
-    ## 3. API functionality
+    # API functionality
 
     This API allows to create device registrations. These, identified by a unique
     `registrationId` can be updated and terminated via this API and its methods.
@@ -77,7 +77,7 @@ info:
     Check for extra details on each of these APIs already present on the WebRTC
     repository.
 
-    ## 4. Authorization and authentication
+    # Authorization and authentication
 
     The "Camara Security and Interoperability Profile" provides details of how an
     API consumer requests an access token. Please refer to Identity and Consent
@@ -95,7 +95,8 @@ info:
     in compliance with privacy regulations, upholding the principles of
     transparency and user-centric privacy-by-design.
 
-    ## 5. Additional CAMARA error responses
+    # Additional CAMARA error responses
+
     The list of error codes in this API specification is not exhaustive.
     Therefore the API specification may not document some non-mandatory error
     statuses as indicated in `CAMARA API Design Guide`.
@@ -111,14 +112,14 @@ info:
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: 0.3.0-rc.1
+  version: 0.3.0
   x-camara-commonalities: 0.6
 
 externalDocs:
   description: Product documentation at CAMARA
   url: https://github.com/camaraproject/WebRTC
 servers:
-  - url: '{apiRoot}/webrtc-registration/v0.3rc1'
+  - url: '{apiRoot}/webrtc-registration/v0.3'
     description: APIs to manage device registration and connection
     variables:
       apiRoot:
@@ -380,10 +381,10 @@ components:
           description: HTTP response status code
         code:
           type: string
-          description: A human-readable code to describe the error
+          description: Friendly Code to describe the error
         message:
           type: string
-          description: A human-readable description of what the event represents
+          description: A human readable description of what the event represent
     PhoneNumber:
       description: A public identifier addressing a telephone subscription. In mobile networks it corresponds to the MSISDN (Mobile Station International Subscriber Directory Number). In order to be globally unique it has to be formatted in international format, according to E.164 standard, prefixed with '+'.
       type: string

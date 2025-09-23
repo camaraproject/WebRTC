@@ -1,8 +1,8 @@
-Feature: CAMARA WebRTC Events, v0.2.0-rc.1 - Operation getSubscription
+Feature: CAMARA WebRTC Events, v0.2.0 - Operation getSubscription
 
   Background: Common getSubscription setup
     Given an environment at "apiRoot"
-    And the resource "/webrtc-events/v0.2rc1/subscriptions/{subscriptionId}"                                                              |
+    And the resource "/webrtc-events/v0.2/subscriptions/{subscriptionId}"                                                              |
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"

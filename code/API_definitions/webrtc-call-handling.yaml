@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: WebRTC Call Handling
   description: |-
-    ## 1. Introduction
+    # Introduction
 
     This API provides REST API for clients to manage live audio and video sessions
     towards the operator's network (IMS network).
@@ -36,7 +36,7 @@ info:
       - An additional subscription to webrtc-events API is required to receive
         incoming events from network side (ex. remote hangup event).
 
-    ## 2. Relevant terms and definitions
+    # Relevant terms and definitions
 
     - **media session**: An exchange of media between devices.
       Typical example of session is a "single one-to-one call".
@@ -70,7 +70,7 @@ info:
       obtain an SDP for WebRTC calling using the WebRTC API provided by the browser
       or any other media library.
 
-    ## 3. API functionality
+    # API functionality
 
     This API allows to create 1-1 voice and video sessions. These, identified by a
     unique `mediaSessionId` can be recovered, updated and terminated via this API
@@ -83,7 +83,7 @@ info:
     To receive updates from the network about the session establishment process, you
     must use `webrtc-events` API.
 
-    ### 3.1. Creating a call
+    ## 1. Creating a call
 
     To call someone, you need, previously a valid registration on the network.
     You must check the webrtc-registration API to retrieve a valid registration
@@ -140,7 +140,7 @@ info:
     Check webrtc-events API inline documentation and supporting documents
     for further information.
 
-    ### 3.2. Hanging up a call
+    ## 2. Hanging up a call
 
     When you have a voice/video session in progress, you can decide to finish the
     call, to do so, simply execute a DELETE request of the session using the
@@ -149,7 +149,7 @@ info:
     This action will trigger all necessary action on the network side to properly
     hangup and drop the call.
 
-    ### 3.3. Picking up a call
+    ## 3. Picking up a call
 
     Using the `webrtc-events` API, you can receive events from the network, these
     events could include the `session-invitation` event. This means that someone
@@ -174,7 +174,7 @@ info:
     }
     ```
 
-    ## 4. Authorization and authentication
+    # Authorization and authentication
 
     The "Camara Security and Interoperability Profile" provides details of how an
     API consumer requests an access token. Please refer to Identity and Consent
@@ -192,7 +192,7 @@ info:
     in compliance with privacy regulations, upholding the principles of
     transparency and user-centric privacy-by-design.
 
-    ## 5. Additional CAMARA error responses
+    # Additional CAMARA error responses
     The list of error codes in this API specification is not exhaustive.
     Therefore the API specification may not document some non-mandatory error
     statuses as indicated in `CAMARA API Design Guide`.
@@ -208,14 +208,14 @@ info:
   license:
     name: Apache 2.0
     url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
-  version: 0.3.0-rc.1
+  version: 0.3.0
   x-camara-commonalities: 0.6
 
 externalDocs:
   description: Product documentation at CAMARA
   url: https://github.com/camaraproject/WebRTC
 servers:
-  - url: '{apiRoot}/webrtc-call-handling/v0.3rc1'
+  - url: '{apiRoot}/webrtc-call-handling/v0.3'
     variables:
       apiRoot:
         description: API root
@@ -546,10 +546,10 @@ components:
           description: HTTP response status code
         code:
           type: string
-          description: A human-readable code to describe the error
+          description: Friendly Code to describe the error
         message:
           type: string
-          description: A human-readable description of what the event represents
+          description: A human readable description of what the event represent
     Address:
       type: string
       description: Subscriber address (Sender or Receiver)

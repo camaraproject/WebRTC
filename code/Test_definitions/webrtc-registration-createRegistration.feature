@@ -1,8 +1,8 @@
-Feature: CAMARA WebRTC Registration, v0.3.0-rc.1 - Operation createRegistration
+Feature: CAMARA WebRTC Registration, v0.3.0 - Operation createRegistration
 
   Background: Common createRegistration setup
     Given an environment at "apiRoot"
-    And the resource "/webrtc-registration/v0.3rc1/sessions"                                                              |
+    And the resource "/webrtc-registration/v0.3/sessions"                                                              |
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
