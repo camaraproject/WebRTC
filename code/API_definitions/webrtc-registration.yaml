@@ -372,19 +372,19 @@ components:
     ErrorInfo:
       type: object
       required:
-        - message
         - status
         - code
+        - message
       properties:
-        message:
-          type: string
-          description: A human readable description of what the event represent
         status:
           type: integer
           description: HTTP response status code
         code:
           type: string
           description: Friendly Code to describe the error
+        message:
+          type: string
+          description: A human readable description of what the event represent
     PhoneNumber:
       description: A public identifier addressing a telephone subscription. In mobile networks it corresponds to the MSISDN (Mobile Station International Subscriber Directory Number). In order to be globally unique it has to be formatted in international format, according to E.164 standard, prefixed with '+'.
       type: string
