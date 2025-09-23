@@ -53,7 +53,7 @@ Changelog since latest public v1.2
 ### Changed
 - fix: Updated deviceId format, examples and tests at [#91](https://github.com/camaraproject/WebRTC/pull/91)
 - fix: registrationId became mandatory on registration response at [#93](https://github.com/camaraproject/WebRTC/pull/93)
-- Commonalities aligment 0.6 at PR [#88](https://github.com/camaraproject/WebRTC/pull/88)
+- Commonalities aligment 0.6 at PR [#90](https://github.com/camaraproject/WebRTC/pull/90)
   - fix: Remove AUTHENTICATION_REQUIRED error code
   - doc: Update `types` (multiple) property of `Subscription` schema
   - feat: Error 422 MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED added
@@ -72,7 +72,7 @@ Changelog since latest public v1.2
 
 ### Changes
 - fix: Added 400 error response at [#91](https://github.com/camaraproject/WebRTC/pull/91)
-- Commonalities aligment 0.6 at PR [#88](https://github.com/camaraproject/WebRTC/pull/88)
+- Commonalities aligment 0.6 at PR [#90](https://github.com/camaraproject/WebRTC/pull/90)
   - fix: Remove AUTHENTICATION_REQUIRED error code
   - doc: Update `types` (multiple) property of `Subscription` schema
   - feat: Error 422 MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED added
@@ -95,7 +95,7 @@ Changelog since latest public v1.2
 ### Changes
 - fix: Updated deviceId format, examples and tests at [#91](https://github.com/camaraproject/WebRTC/pull/91)
 - fix: Updated mandatory fields per specific event data callback at [#94](https://github.com/camaraproject/WebRTC/pull/94)
-- Commonalities aligment 0.6 at PR [#88](https://github.com/camaraproject/WebRTC/pull/88)
+- Commonalities aligment 0.6 at PR [#90](https://github.com/camaraproject/WebRTC/pull/90)
   - fix: Remove AUTHENTICATION_REQUIRED error code
   - doc: Update `types` (multiple) property of `Subscription` schema
   - feat: Error 422 MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED added
@@ -142,7 +142,7 @@ Changelog since latest public r1.2
 ### Changed
 * fix: Updated deviceId format, examples and tests at [#91](https://github.com/camaraproject/WebRTC/pull/91)
 * fix: registrationId became mandatory on registration response at [#93](https://github.com/camaraproject/WebRTC/pull/93)
-* Commonalities aligment 0.6 at PR [#88](https://github.com/camaraproject/WebRTC/pull/88)
+* Commonalities aligment 0.6 at PR [#90](https://github.com/camaraproject/WebRTC/pull/90)
   * fix: Remove AUTHENTICATION_REQUIRED error code
   * doc: Update `types` (multiple) property of `Subscription` schema
   * feat: Error 422 MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED added
@@ -159,7 +159,7 @@ Changelog since latest public r1.2
 
 ### Changes
 * fix: Added 400 error response at [#91](https://github.com/camaraproject/WebRTC/pull/91)
-* Commonalities aligment 0.6 at PR [#88](https://github.com/camaraproject/WebRTC/pull/88)
+* Commonalities aligment 0.6 at PR [#90](https://github.com/camaraproject/WebRTC/pull/90)
   * fix: Remove AUTHENTICATION_REQUIRED error code
   * doc: Update `types` (multiple) property of `Subscription` schema
   * feat: Error 422 MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED added
@@ -180,7 +180,7 @@ Changelog since latest public r1.2
 ### Changes
 * fix: Updated deviceId format, examples and tests at [#91](https://github.com/camaraproject/WebRTC/pull/91)
 * fix: Updated mandatory fields per specific event data callback at [#94](https://github.com/camaraproject/WebRTC/pull/94)
-* Commonalities aligment 0.6 at PR [#88](https://github.com/camaraproject/WebRTC/pull/88)
+* Commonalities aligment 0.6 at PR [#90](https://github.com/camaraproject/WebRTC/pull/90)
   * fix: Remove AUTHENTICATION_REQUIRED error code
   * doc: Update `types` (multiple) property of `Subscription` schema
   * feat: Error 422 MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED added
