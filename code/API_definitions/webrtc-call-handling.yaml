@@ -489,14 +489,6 @@ components:
             This element shall be included and set to true, if the session updates are received
             without SDP offer. This element indicates clients to send the offer.
           example: false
-        reason:
-          type: string
-          description: The description of the event that has happened within the session
-          example: 183 Progress
-        sequenceNumber:
-          type: integer
-          description: The sequence number of the notification sent to client
-          example: 345
     WrtcSDPDescriptor:
       type: object
       description: |-
