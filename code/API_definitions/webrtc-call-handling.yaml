@@ -583,22 +583,22 @@ components:
         shape:
           type: string
           enum:
-          - Circle
-          - Ellipsoid
+            - Circle
+            - Ellipsoid
           description: The shape representing the caller's location (Circle or Ellipsoid).
         coordinates:
           oneOf:
-          - $ref: '#/components/schemas/CircleCoordinates'
-          - $ref: '#/components/schemas/EllipsoidCoordinates'
+            - $ref: '#/components/schemas/CircleCoordinates'
+            - $ref: '#/components/schemas/EllipsoidCoordinates'
           description: The coordinates of the caller's location, specific to the chosen
             shape.
         method:
           type: string
           enum:
-          - GPS
-          - DBH
-          - DBH_HELO
-          - Other
+            - GPS
+            - DBH
+            - DBH_HELO
+            - Other
           description: 'The method used to obtain the location information.
 
             * **GPS:** Global Positioning System (highly accurate)
@@ -617,8 +617,8 @@ components:
             pdf:
               type: string
               enum:
-              - normal
-              - uniform
+                - normal
+                - uniform
               description: The probability density function (PDF) associated with the
                 confidence value.
             value:
@@ -636,9 +636,9 @@ components:
     CircleCoordinates:
       type: object
       required:
-      - latitude
-      - longitude
-      - radius
+        - latitude
+        - longitude
+        - radius
       properties:
         latitude:
           type: number
@@ -655,13 +655,13 @@ components:
     EllipsoidCoordinates:
       type: object
       required:
-      - latitude
-      - longitude
-      - zAxis
-      - semiMajorAxis
-      - semiMinorAxis
-      - verticalAxis
-      - orientation
+        - latitude
+        - longitude
+        - zAxis
+        - semiMajorAxis
+        - semiMinorAxis
+        - verticalAxis
+        - orientation
       properties:
         latitude:
           type: number
