@@ -515,7 +515,6 @@ components:
             - EMERGENCY
         locationDetails:
           $ref: '#/components/schemas/LocationDetails'
-          description: Caller location information; MUST be provided when callType is EMERGENCY.
     WrtcSDPDescriptor:
       type: object
       description: |-
@@ -793,11 +792,9 @@ components:
     exampleEmergencyMediaSessionRequest:
       summary: Emergency call initiation with location details
       value:
-        originatorAddress:
-          tel: '+17085852753'
+        originatorAddress: 'tel:+17085852753'
         originatorName: Alice
-        receiverAddress:
-          tel: urn:service:sos
+        receiverAddress: 'urn:service:sos'
         receiverName: PSAP
         offer:
           type: offer
