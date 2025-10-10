@@ -1,0 +1,245 @@
+@startuml
+
+
+
+!pragma teoz true
+autonumber 36 "<font color=blue><b>[0]"
+
+<style>
+.box {
+  Margin 40
+}
+.audio{
+  arrow {
+    LineColor red
+    LineThickness 5
+  }
+}
+</style>
+
+box Device 
+  participant "Device\nApplication" as DA
+end box
+
+participant "Notification\nRelay" as NR
+
+box "Operator Network" #EEEEEE
+  participant "OAuth\nServer" as AS
+  box "WebRTC Gateway"
+    participant "API Exposure\nFunction" as API
+    participant "Notification\nService" as NS
+  end box
+  participant "Telco\nNetwork" as SS
+end box
+
+box Device
+  participant "Remote\nendpoint" as RE
+end box
+
+
+activate DA
+activate NR #LightSteelBlue
+activate NS #LightSteelBlue
+activate NS #LightSteelBlue
+activate NS #LightSteelBlue
+activate SS #LightSteelBlue
+
+
+== Call origination (WebRTC call handling + WebRTC events) ==
+
+[-> DA ++: User creates a call
+
+DA -> AS: GET /token
+DA <-- AS: 200 OK
+
+DA -[#red]> API : **POST /webrtc-call-handling/{apiVersion}/sessions**
+
+AS <- API: POST /token/introspection
+AS --> API ++: 200 OK
+
+API -> NS++: stores session
+return
+
+
+
+API -> SS ++: **SIP INVITE**
+
+SS -> RE ++: SIP INVITE
+SS <- RE: 100 Trying
+
+API <- SS: 100 Trying
+DA <[#red]-- API--: **201 Created**
+
+
+
+SS <- RE: 183 Session progress
+
+API <- SS ++: **183 Session progress**
+
+API -> NS ++: SESSION_UPDATE
+
+NR <[#red]- NS: **POST SINK_URL**
+DA <- NR
+NR --[#red]> NS: **204 No content**
+
+API <-- NS --
+
+API -> SS: SIP PRACK
+
+SS -> RE: SIP PRACK
+SS <- RE: 200 OK (PRA)
+
+API <- SS: 200 OK (PRA)
+deactivate API
+
+
+
+DA <[#purple]-> API: ICE Connectivity Check
+DA <[#purple]-> API: DTLS Handshake
+
+rnote over DA 
+Transport
+established
+endnote
+
+
+DA -> AS: GET /token
+DA <-- AS: 200 OK
+
+DA -[#red]> API: **PUT /webrtc-call-handling/{apiVersion}/sessions/{mediaSessionId}/status**
+
+AS <- API: POST /token/introspection
+AS --> API ++: 200 OK
+
+API -> SS: **SIP UPDATE**
+DA <[#red]-- API --: **204 No content**
+
+SS -> RE: SIP UPDATE
+
+rnote over RE
+Resource
+reserved
+endnote
+
+SS <- RE: 200 OK (UPD)
+
+API <- SS ++: **200 OK (UPD)**
+
+API -> NS ++--: SESSION_UPDATE
+
+NR <[#red]- NS: **POST SINK_URL**
+DA <- NR
+NR --[#red]> NS: **204 No content**
+deactivate NS
+
+
+
+SS <- RE: 180 Ringing
+
+API <- SS ++: **180 Ringing**
+
+API -> NS ++: SESSION_UPDATE
+
+NR <[#red]- NS: **POST SINK_URL**
+DA <- NR
+NR --[#red]> NS: **204 No content**
+
+API <-- NS --
+
+API -> SS: SIP PRACK
+
+SS -> RE: SIP PRACK
+SS <- RE: 200 OK (PRA)
+
+API <- SS: 200 OK (PRA)
+deactivate API
+
+
+
+SS <- RE: 200 OK (INV)
+
+API <- SS ++: **200 OK (INV)**
+
+API -> NS ++: SESSION_UPDATE
+
+NR <[#red]- NS: **POST SINK_URL**
+DA <- NR
+NR --[#red]> NS: **204 No content**
+
+API <-- NS --
+
+API -> SS --: SIP ACK
+SS -> RE: SIP ACK
+
+
+
+DA <--> API <<audio>>: DTLS-SRTP
+API <--> RE <<audio>>: RTP
+
+
+
+alt Call termination by call originator
+
+
+
+[-> DA: Hangup
+
+DA -> AS: GET /token
+DA <-- AS: 200 OK
+
+DA -[#red]> API: **DELETE /webrtc-call-handling/{apiVersion}/sessions/{mediaSessionId}**
+
+AS <- API: POST /token/introspection
+AS --> API ++: 200 OK
+
+API -> SS: **SIP BYE**
+DA <[#red]-- API -- : **204 No content**
+deactivate DA
+
+SS -> RE: SIP BYE
+
+SS <- RE --: 200 OK (BYE)
+
+API <- SS ++--: **200 OK (BYE)**
+
+API -> NS ++--: SESSION_UPDATE
+
+NR <[#red]- NS: **POST SINK_URL**
+DA <- NR
+NR --[#red]> NS: **204 No content**
+deactivate NS
+
+
+
+else Call termination by call receiver
+
+
+
+activate DA
+activate SS
+activate RE
+
+RE <-]: angup
+
+SS <- RE --: SIP BYE
+SS -> RE : 200 OK (BYE)
+
+API <- SS ++: **SIP BYE**
+API -> SS: **200 OK (BYE)**
+deactivate SS
+
+API -> NS ++--: SESSION_UPDATE
+
+NR <[#red]- NS: **POST SINK_URL**
+DA <- NR
+deactivate DA
+NR --[#red]> NS: **204 No content**
+deactivate NS
+
+
+
+end
+
+
+
+@enduml
