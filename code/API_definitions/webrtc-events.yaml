@@ -8,9 +8,15 @@ info:
     receive events about updates of an active session or new sessions requests
     (incoming calls) or registration termination.
 
-    Any device can subscribe to media session events for accessible active media sessions using the
-    `sessionId` to identify the media session to track. Using a valid
-    `registrationId` it can subscribe to new media sessions events (new calls).
+    This API allows a WebRTC client to subscribe to events associated with a specific device,
+    identified by its `deviceId`. The deviceId uniquely represents a physical device on which
+    registrations and sessions may occur.
+
+    Instead of requiring separate subscriptions per registration (`registrationId`) or per session
+    (`sessionId`), event delivery is consolidated under the deviceId. This enables the client to
+    receive all relevant notifications — such as new call invitations or session status updates —
+    for any registration or session belonging to the same device.
+
     This allows the device applications to update the UI while media sessions
     are progressing and also, allows the device to receive new session request,
     generating incoming call scenarios for non-SIM devices.
@@ -214,13 +220,8 @@ paths:
         - `org.camaraproject.webrtc-events.v0.registration-ends`: registration termination event
 
         To subscribe and receive notifications about new calls, a
-        `session-invitation` subscription is required using the `registrationId`
-        obtained from webrtc-registration API.
+        `session-invitation` subscription is required using the `deviceId` related to a valid registration.
 
-        Once you create a new media session or receive an
-        new call event, you can subscribe to `session-status` to receive
-        updates about the media session in progress using the
-        `mediaSessionId` unique identifier.
       operationId: createNotificationChannelSubscription
       parameters:
         - $ref: "#/components/parameters/x-correlator"
@@ -600,14 +601,11 @@ components:
       description: |-
         The detail of the requested event subscription.
         - org.camaraproject.webrtc-events.v0.session-invitation requires a
-          valid `registrationId` obtained via registration endpoint.
-        - org.camaraproject.webrtc-events.v0.session-status requires both, a
-          valid `registrationId` obtained via registration endpoint and a valid
-          `sessionId` obtained via session-invitation event or via CallHandling
-          API
-      type: object
+          `deviceId` related to a valid registration.
+        - org.camaraproject.webrtc-events.v0.session-status requires a
+          `deviceId` related to a valid registration.
       required:
-        - registrationId
+        - deviceId
       properties:
         deviceId:
           type: string
@@ -616,16 +614,6 @@ components:
             The device-id of the client in UUID format. A unique identifier for
             the physical device where a registration is initiated. Generated
             by the WebRTC application, and consistent within the same device.
-        sessionId:
-          type: string
-          example: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EFAAF209EE52FD0BECC5B7CDE645F50DE7D
-          description: |-
-            The media session ID created by the network.
-            The sessionID will identify a unique session between the network and the device client.
-            It will be included on the events generated.
-        registrationId:
-          $ref: "#/components/schemas/RegistrationId"
-
 
     SubscriptionEventType:
       type: string
@@ -1448,7 +1436,7 @@ components:
           - org.camaraproject.webrtc-events.v0.registration-ends
         config:
           subscriptionDetail:
-            registrationId: "xsmcaum3z4zw4l0cu4w115m0"
+            deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
     INVITE_SUBSCRIPTION:
       description: |-
         A sample of media `session-invitation` subscription for phone number
@@ -1473,7 +1461,6 @@ components:
         config:
           subscriptionDetail:
             deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
-            registrationId: "xsmcaum3z4zw4l0cu4w115m0"
           initialEvent: true
           subscriptionMaxEvents: 50
           subscriptionExpireTime: "2024-11-17T13:18:23.682Z"
@@ -1495,8 +1482,6 @@ components:
         config:
           subscriptionDetail:
             deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
-            registrationId: "xsmcaum3z4zw4l0cu4w115m0"
-            mediaSessionId: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
           initialEvent: true
           subscriptionMaxEvents: 50
           subscriptionExpireTime: "2024-11-17T13:18:23.682Z"
