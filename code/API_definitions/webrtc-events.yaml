@@ -13,7 +13,7 @@ info:
     registrations and sessions may occur.
 
     Instead of requiring separate subscriptions per registration (`registrationId`) or per session
-    (`sessionId`), event delivery is consolidated under the deviceId. This enables the client to
+    (`mediaSessionId`), event delivery is consolidated under the deviceId. This enables the client to
     receive all relevant notifications — such as new call invitations or session status updates —
     for any registration or session belonging to the same device.
 
