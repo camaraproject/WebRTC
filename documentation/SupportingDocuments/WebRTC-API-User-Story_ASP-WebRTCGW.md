@@ -1,4 +1,4 @@
-# WebRTC API User Story (Scenario 2: Application Server Invokes)
+# WebRTC API User Story (Inbound-Outbound calling: ASP-WebRTC Gateway scenario)
 
 | **Item** | **Details** |
 | --- | --- |
