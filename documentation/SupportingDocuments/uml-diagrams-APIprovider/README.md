@@ -1,59 +1,34 @@
-# WebRTC API Call Flow
+# WebRTC API call flows
 
-## 1. Purpose
+## 1. General
 
-This document provides example call flows for implementers of a WebRTC gateway that exposes WebRTC APIs and interworks with the telco network.
+This document provides example call flows and messages based on WebRTC API user story for implementers of a WebRTC Gateway that exposes WebRTC APIs and interworks with telco network.
 
-## 2. Assumptions
+## 2. Actors
 
-There are two cases for a WebRTC API Invoker:
+The involved actors in the call flows are as follows:
 
-- The API Invoker is an application on the end-user device
+- **Device Application**：A native application or web application running on the user’s device.
 
-- The API Invoker is a server of a third-party application service provider
+- **Application Server**: Acts as a WebRTC API Invoker.
 
-Depending on the above cases, the entities involved in the call flow, the deployment of endpoints receiving event notifications, and the sequence of the call flow will differ.  
+- **Auth Server**: Performs auth for API usage in accordance with the CAMARA ICM specification.
 
-This call flow illustrates the former case.
+- **WebRTC Gateway**: Acts as a WebRTC API provider, and also interworks with telco network.
 
-## 3. Entities
+- **Telco Network**： Acts as signalling (SIP) & media servers.
 
-The main entities involved in the call flow are as follows:
-
-- **Device Application**：Acts as the WebRTC API Invoker. When the API Invoker is the end user, this is a native application or web application running on the user’s device.
-
-- **API Exposure Function**：Acts as the WebRTC API Provider, and also performs SIP message interworking with the telco network. 
-
-- **Notification Service**：Works with the API Exposure Function to deliver event notifications to the Device Application. 
-
-- **Telco Network**：SIP Proxy/Registrar belonging to the operator's telco network.
-
-- **Remote Endpoint**：The peer in the call using the WebRTC API, which is a SIP application running on a remote device.
-
-The **WebRTC Gateway** consists of the API Exposure Function and the Notification Service.
-
-Since the API Invoker is an end user and the Device Application is not itself an HTTP endpoint for receiving event notifications directly, the following entity is included:
-
-- **Notification Relay**：Receives event notifications from the Notification Service and relays them to the Device Application. In its WebRTC event subscription, the Device Application configures this entity’s HTTP endpoint as the sink. To do so, the Device Application first obtains information about this entity and establishes a connection to receive the relayed notifications. The Notification Relay is considered to be associated with the Device Application, and may be provided either by the Telco Operator or by a third-party application provider. In this flow, the example is given in a way that does not depend on either case.
-
-This call flow also illustrates the authorization procedure involved in using the WebRTC API. Therefore, the following entity is included:
-
-- **OAuth Server**：Performs authentication and authorization of API usage in accordance with the CAMARA ICM specification. Since authorization in the WebRTC API is based on subscriber information, the OAuth Server is assumed to be deployed in the Telco network.
+- **Remote Endpoint**：The peer in the call using the WebRTC API.
 
 
-## 4. Call flow diagrams and message examples
+## 3. List of call flow examples
 
-The following links show the call flow and major message examples. Message exchanges defined by the WebRTC API are indicated with red arrows. The call flow also explicitly illustrates the sequence for obtaining access tokens associated with WebRTC API requests and for validating those tokens.
+The following links provide call flow diagrams and message examples.
 
-- [4.1. Subscription for call-related events](./subscription_for_call-related_events.md)
+- 3.1. [Subscription for WebRTC events](./subscription_for_webrtc_events.md)
+- 3.2. WebRTC registration
+- 3.3. Call orignation and disconnection (TBD)
+- 3.4. Call termination and disconnection (TBD)
 
-- [4.2. Registration and expiration subscription](./registration_and_expiration_subscription.md)
-
-- 4.3. Call orignation and disconnection (TBD)
-
-- 4.4. Call termination and disconnection (TBD)
-
-- 4.5. Registration refresh (TBD)
-
-- 4.6. De-registration and unsubscribe notifications (TBD)
-
+The message examples illustrate the fields necessary for implementing a WebRTC Gateway, including all defined optional fields where applicable.  
+Although the API specification defines fields for [API-design-guidline](https://github.com/camaraproject/Commonalities/blob/main/documentation/API-design-guidelines.md) consistency, those not applicable in the WebRTC API are excluded from the message examples.

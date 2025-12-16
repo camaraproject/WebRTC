@@ -1,0 +1,66 @@
+@startuml
+
+
+!pragma teoz true
+autonumber 23 "<font color=blue><b>[0]"
+
+<style>
+.box {
+  Margin 40
+}
+.audio{
+  arrow {
+    LineColor red
+    LineThickness 5
+  }
+}
+</style>
+
+box Device 
+  participant "Device\nApplication" as DA
+end box
+
+box Application Service Provider
+  participant "Application\nServer" as AS
+end box
+
+box "Operator Network" #EEEEEE
+  participant "Auth\nServer" as AUTH
+  participant "WebRTC\nGateway" as WG
+  participant "Telco\nNetwork" as TN
+end box
+
+box Device
+  participant "Remote\nendpoint" as RE
+end box
+
+
+activate DA
+activate WG #LightSteelBlue
+
+== Unsubscribe from events ==
+
+DA -> AS: Event subscription delete request
+
+AS -> AUTH: GET /authorize
+AS <-- AUTH: 302 Found\n(redirecting user agent)
+DA <[#gray]-> AUTH: End user consent (e.g., ICM Auth Code Flow)
+AS -> AUTH: POST /token
+AS <-- AUTH: 200 OK
+
+AS -[#red]> WG: **DELETE /webrtc-events-suscription/{apiVersion}/subscriptions/{subscriptionId}**
+
+AUTH <- WG: POST /token/introspection
+AUTH --> WG: 200 OK
+
+AS <[#red]-- WG: **202 Accepted**
+
+AS <[#red]- WG: **POST SINK_URL**
+deactivate WG
+
+DA <-- AS: Event subscription delete result
+
+AS --[#red]> WG: **204 No Content**
+
+
+@enduml
