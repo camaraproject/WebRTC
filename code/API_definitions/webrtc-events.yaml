@@ -8,9 +8,15 @@ info:
     receive events about updates of an active session or new sessions requests
     (incoming calls) or registration termination.
 
-    Any device can subscribe to media session events for accessible active media sessions using the
-    `sessionId` to identify the media session to track. Using a valid
-    `registrationId` it can subscribe to new media sessions events (new calls).
+    This API allows a WebRTC client to subscribe to events associated with a specific device,
+    identified by its `deviceId`. The deviceId uniquely represents a physical device on which
+    registrations and sessions may occur.
+
+    Instead of requiring separate subscriptions per registration (`registrationId`) or per session
+    (`mediaSessionId`), event delivery is consolidated under the deviceId. This enables the client to
+    receive all relevant notifications — such as new call invitations or session status updates —
+    for any registration or session belonging to the same device.
+
     This allows the device applications to update the UI while media sessions
     are progressing and also, allows the device to receive new session request,
     generating incoming call scenarios for non-SIM devices.
@@ -214,13 +220,8 @@ paths:
         - `org.camaraproject.webrtc-events.v0.registration-ends`: registration termination event
 
         To subscribe and receive notifications about new calls, a
-        `session-invitation` subscription is required using the `registrationId`
-        obtained from webrtc-registration API.
+        `session-invitation` subscription is required using the `deviceId` related to a valid registration.
 
-        Once you create a new media session or receive an
-        new call event, you can subscribe to `session-status` to receive
-        updates about the media session in progress using the
-        `mediaSessionId` unique identifier.
       operationId: createNotificationChannelSubscription
       parameters:
         - $ref: "#/components/parameters/x-correlator"
@@ -600,14 +601,11 @@ components:
       description: |-
         The detail of the requested event subscription.
         - org.camaraproject.webrtc-events.v0.session-invitation requires a
-          valid `registrationId` obtained via registration endpoint.
-        - org.camaraproject.webrtc-events.v0.session-status requires both, a
-          valid `registrationId` obtained via registration endpoint and a valid
-          `sessionId` obtained via session-invitation event or via CallHandling
-          API
-      type: object
+          `deviceId` related to a valid registration.
+        - org.camaraproject.webrtc-events.v0.session-status requires a
+          `deviceId` related to a valid registration.
       required:
-        - registrationId
+        - deviceId
       properties:
         deviceId:
           type: string
@@ -616,16 +614,6 @@ components:
             The device-id of the client in UUID format. A unique identifier for
             the physical device where a registration is initiated. Generated
             by the WebRTC application, and consistent within the same device.
-        sessionId:
-          type: string
-          example: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EFAAF209EE52FD0BECC5B7CDE645F50DE7D
-          description: |-
-            The media session ID created by the network.
-            The sessionID will identify a unique session between the network and the device client.
-            It will be included on the events generated.
-        registrationId:
-          $ref: "#/components/schemas/RegistrationId"
-
 
     SubscriptionEventType:
       type: string
@@ -893,22 +881,10 @@ components:
           $ref: '#/components/schemas/WrtcSDPDescriptor'
         answer:
           $ref: '#/components/schemas/WrtcSDPDescriptor'
-        clientCorrelator:
-          type: string
-          description: A correlator that the client can use to tag this particular resource representation during a request to create a resource on the server. Note - This allows the client to recover from communication failures during resource creation and therefore avoids re-sending the message in such situations. In case the element is present, the WebRTC GW shall not alter its value, and shall provide it as part of the representation of this resource.
         mediaSessionId:
           type: string
           description: The media session ID created by the network. The mediaSessionId shall not be included in POST requests by the client, but must be included in the notifications from the network to client.
           example: '0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF'
-        callObjectRef:
-          type: string
-          description: The reference to the call object
-        serverCorrelator:
-          type: string
-          description: A correlator that the server instructs the client to use for end to end correlation.
-        offerRequired:
-          type: boolean
-          description: This element shall be included and set to true, if the session updates are received without SDP offer. This element indicates clients to send the offer.
         reason:
           type: string
           description: The description of the event that has happened within the session
@@ -1448,7 +1424,7 @@ components:
           - org.camaraproject.webrtc-events.v0.registration-ends
         config:
           subscriptionDetail:
-            registrationId: "xsmcaum3z4zw4l0cu4w115m0"
+            deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
     INVITE_SUBSCRIPTION:
       description: |-
         A sample of media `session-invitation` subscription for phone number
@@ -1473,7 +1449,6 @@ components:
         config:
           subscriptionDetail:
             deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
-            registrationId: "xsmcaum3z4zw4l0cu4w115m0"
           initialEvent: true
           subscriptionMaxEvents: 50
           subscriptionExpireTime: "2024-11-17T13:18:23.682Z"
@@ -1495,8 +1470,6 @@ components:
         config:
           subscriptionDetail:
             deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
-            registrationId: "xsmcaum3z4zw4l0cu4w115m0"
-            mediaSessionId: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
           initialEvent: true
           subscriptionMaxEvents: 50
           subscriptionExpireTime: "2024-11-17T13:18:23.682Z"
@@ -1529,7 +1502,6 @@ components:
           status: "Initial"
           offer:
             sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0"
-          clientCorrelator: "79520148-0e79-4bd8-adbf-d04c463de6ba"
           mediaSessionId: "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
           reason: "New subscriber incoming call"
           sequenceNumber: 1
@@ -1590,7 +1562,6 @@ components:
             sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\na=extmap:2 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=sendrecv\r\na=rtcp-mux\r\na=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ruAnBNYnTJqDVZAIJV59VpQ5DxGI6tMX9h9kkHSz\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
           answer:
             sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\na=extmap:2 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=sendrecv\r\na=rtcp-mux\r\na=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ruAnBNYnTJqDVZAIJV59VpQ5DxGI6tMX9h9kkHSz\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
-          clientCorrelator: "79520148-0e79-4bd8-adbf-d04c463de6ba"
           mediaSessionId: "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
           reason: "Answer SDP update"
           sequenceNumber: 3
