@@ -500,7 +500,6 @@ components:
             - EMERGENCY
         locationDetails:
           $ref: '#/components/schemas/LocationDetails'
-          description: Optional location information that the client may provide (e.g., for emergency calling use cases).
     WrtcSDPDescriptor:
       type: object
       description: |-
