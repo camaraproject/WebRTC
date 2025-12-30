@@ -494,7 +494,7 @@ components:
           example: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
         callType:
           type: string
-          description: Type of call. When set to EMERGENCY, the client MUST provide locationDetails. If omitted, treated as REGULAR.
+          description: Type of call. When set to EMERGENCY, the client MAY provide locationDetails. If omitted, treated as REGULAR.
           enum:
             - REGULAR
             - EMERGENCY
