@@ -198,6 +198,14 @@ info:
     As a specific rule, error `501 - NOT_IMPLEMENTED` can be only a possible
     error response if it is explicitly documented in the API.
 
+    # Emergency Calling
+    - Introduces a new `callType` attribute with values `REGULAR` or `EMERGENCY`.
+    - When `callType` is `EMERGENCY`, the client **MAY** include `locationDetails`
+    describing the caller's location.
+    - `locationDetails` follows PIDF-LO concepts (3GPP TS 24.229, RFC 4119, RFC 5139,
+    RFC 5491) with either a circle or ellipsoid shape.
+    - If `callType` is omitted, it defaults to `REGULAR`.
+
   license:
     name: Apache 2.0
     url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
@@ -239,6 +247,8 @@ paths:
             examples:
               Media session request:
                 $ref: '#/components/examples/exampleMediaSessionRequest'
+              EmergencyMediaSessionRequest:
+                $ref: '#/components/examples/exampleEmergencyMediaSessionRequest'
       responses:
         '201':
           description: Created
@@ -258,6 +268,31 @@ paths:
           $ref: "#/components/responses/Generic401"
         '403':
           $ref: '#/components/responses/Generic403'
+        '501':
+          description: Not Implemented
+          headers:
+            x-correlator:
+              $ref: '#/components/headers/x-correlator'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ErrorInfo'
+                  - type: object
+                    properties:
+                      status:
+                        enum:
+                          - 501
+                      code:
+                        enum:
+                          - CALLTYPE_EMERGENCY_NOT_SUPPORTED
+              examples:
+                501_CALLTYPE_EMERGENCY_NOT_SUPPORTED:
+                  description: The implementation of API provider does not support the `callType` of `EMERGENCY`.
+                  value:
+                    status: 501
+                    code: CALLTYPE_EMERGENCY_NOT_SUPPORTED
+                    message: Server does not support call type EMERGENCY.
   /sessions/{mediaSessionId}:
     get:
       tags:
@@ -457,6 +492,14 @@ components:
             included in POST requests by the client, but must be included in the notifications
             from the network to the client device.
           example: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
+        callType:
+          type: string
+          description: Type of call. When set to EMERGENCY, the client MAY provide locationDetails. If omitted, treated as REGULAR.
+          enum:
+            - REGULAR
+            - EMERGENCY
+        locationDetails:
+          $ref: '#/components/schemas/LocationDetails'
     WrtcSDPDescriptor:
       type: object
       description: |-
@@ -513,8 +556,121 @@ components:
     Address:
       type: string
       description: Subscriber address (Sender or Receiver)
-      pattern: '^(tel:\+[0-9]{5,15}|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})$'
+      pattern: '^(tel:\+[0-9]{5,15}|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|urn:service:sos(?:\.[a-z0-9](?:[a-z0-9\-]{0,30}[a-z0-9])?)*)$'
       example: 'tel:+11234567899'
+    LocationDetails:
+      type: object
+      description: Details about the caller's location and related information. This
+        object adheres to 3GPP TS 24.229, RFC 4119, RFC 5139, and RFC 5491 for PIDF-LO
+        compatibility.
+      properties:
+        shape:
+          type: string
+          enum:
+            - Circle
+            - Ellipsoid
+          description: The shape representing the caller's location (Circle or Ellipsoid).
+        coordinates:
+          oneOf:
+            - $ref: '#/components/schemas/CircleCoordinates'
+            - $ref: '#/components/schemas/EllipsoidCoordinates'
+          description: The coordinates of the caller's location, specific to the chosen
+            shape.
+        method:
+          type: string
+          enum:
+            - GPS
+            - DBH
+            - DBH_HELO
+            - Other
+          description: 'The method used to obtain the location information.
+
+            * **GPS:** Global Positioning System (highly accurate)
+
+            * **DBH:** Device-Based Hybrid
+
+            * **DBH_HELO:** Device-Based Hybrid using Apple Hybridized Emergency Location
+
+            * **Other:** Other methods (e.g., landmarks, IP Based etc.)
+
+            '
+        confidence:
+          type: object
+          description: The confidence level of the location information.
+          properties:
+            pdf:
+              type: string
+              enum:
+                - normal
+                - uniform
+              description: The probability density function (PDF) associated with the
+                confidence value.
+            value:
+              type: number
+              minimum: 0
+              maximum: 100
+              description: The confidence value (percentage).
+        timestamp:
+          type: string
+          format: date-time
+          description: The timestamp (in ISO 8601 format) indicating when the location
+            information was Calculated. \nThis is crucial for emergency services to
+            assess the timeliness of the data. if not provided current timestamp will
+            be used by default"
+    CircleCoordinates:
+      type: object
+      required:
+        - latitude
+        - longitude
+        - radius
+      properties:
+        latitude:
+          type: number
+          format: float
+          description: Latitude of the center point in decimal degrees (WGS84).
+        longitude:
+          type: number
+          format: float
+          description: Longitude of the center point in decimal degrees (WGS84).
+        radius:
+          type: number
+          format: float
+          description: Radius of the circle in meters, indicating the uncertainty.
+    EllipsoidCoordinates:
+      type: object
+      required:
+        - latitude
+        - longitude
+        - zAxis
+        - semiMajorAxis
+        - semiMinorAxis
+        - verticalAxis
+        - orientation
+      properties:
+        latitude:
+          type: number
+          format: float
+          description: Latitude in the WGS 84 geocentric coordinate system.
+        longitude:
+          type: number
+          format: float
+          description: Longitude in the WGS 84 geocentric coordinate system.
+        zAxis:
+          type: number
+          format: float
+          description: Altitude (optional) in the WGS 84 geocentric coordinate system.
+        semiMajorAxis:
+          type: number
+          description: Length of the semi-major axis of the ellipsoid in meters.
+        semiMinorAxis:
+          type: number
+          description: Length of the semi-minor axis of the ellipsoid in meters.
+        verticalAxis:
+          type: number
+          description: Length of the vertical axis of the ellipsoid in meters.
+        orientation:
+          type: number
+          description: Orientation of the ellipsoid in degrees.
   examples:
     exampleMediaSessionRequest:
       value:
@@ -616,6 +772,28 @@ components:
           status: Resume
           answer:
             sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\na=extmap:2 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=sendrecv\r\na=rtcp-mux\r\na=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ruAnBNYnTJqDVZAIJV59VpQ5DxGI6tMX9h9kkHSz\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
+    exampleEmergencyMediaSessionRequest:
+      summary: Emergency call initiation with location details
+      value:
+        originatorAddress: 'tel:+17085852753'
+        originatorName: Alice
+        receiverAddress: 'urn:service:sos'
+        receiverName: PSAP
+        offer:
+          type: offer
+          sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\na=extmap:2 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=sendrecv\r\na=rtcp-mux\r\na=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ruAnBNYnTJqDVZAIJV59VpQ5DxGI6tMX9h9kkHSz\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
+        callType: EMERGENCY
+        locationDetails:
+          shape: Circle
+          coordinates:
+            latitude: 47.6062
+            longitude: -122.3321
+            radius: 35
+          method: GPS
+          confidence:
+            pdf: normal
+            value: 92
+          timestamp: '2025-10-06T19:31:25Z'
   responses:
     Generic400:
       description: Bad Request
