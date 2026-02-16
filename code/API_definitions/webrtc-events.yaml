@@ -142,6 +142,21 @@ info:
     a unique SessionId, to create a dedicated subscription and receive events
     about the session itself and its status progressing inside the network.
 
+    **Located calls**
+
+    The CAMARA WebRTC API provides an standardization way to locate caller
+    origin. If provided by the network, it helps to contextualize the calls
+    in aim of enhanced security, routing or any other use case. The located
+    calls include a `originatorLocationDetails` object on the `session-invitation`
+    event that could be parsed and used by the API consumer.
+
+    As each party can share its own location, there are two separated objects
+    `originatorLocationDetails` and `receiverLocationDetails`, both serving
+    the same purpose and implementing the `locationDetails` schema.
+
+    The `locationDetails` schema follows PIDF-LO concepts (3GPP TS 24.229,
+    RFC 4119, RFC 5139, RFC 5491) with either a circle or ellipsoid shape.
+
     ## 3. Subscription ends (subscription-ended)
 
     A `org.camaraproject.webrtc-events.v0.subscription-ended` event indicates that
@@ -265,6 +280,8 @@ paths:
                     examples:
                       NEW_SESSION_INCOMING (session-invitation):
                         $ref: "#/components/examples/NEW_SESSION_INCOMING"
+                      NEW_LOCATED_SESSION_INCOMING (session-invitation):
+                        $ref: "#/components/examples/NEW_LOCATED_SESSION_INCOMING"
                       SESSION_UPDATE (session-status):
                         $ref: "#/components/examples/SESSION_UPDATE"
                       REGISTRATION_EXPIRED (registration-ends):
@@ -891,6 +908,10 @@ components:
         sequenceNumber:
           type: integer
           description: The sequence number of the notification sent to client
+        originatorLocationDetails:
+          $ref: '#/components/schemas/LocationDetails
+        receiverLocationDetails:
+          $ref: '#/components/schemas/LocationDetails
 
     MediaSessionStatusUpdate:
       allOf:
@@ -1030,6 +1051,116 @@ components:
           description: The HTTP method to use for sending the message.
           enum:
             - POST
+    LocationDetails:
+      type: object
+      description: Details about the caller's location and related information. This
+        object adheres to 3GPP TS 24.229, RFC 4119, RFC 5139, and RFC 5491 for PIDF-LO
+        compatibility.
+      properties:
+        shape:
+          type: string
+          enum:
+            - Circle
+            - Ellipsoid
+          description: The shape representing the caller's location (Circle or Ellipsoid).
+        coordinates:
+          oneOf:
+            - $ref: '#/components/schemas/CircleCoordinates'
+            - $ref: '#/components/schemas/EllipsoidCoordinates'
+          description: The coordinates of the caller's location, specific to the chosen
+            shape.
+        method:
+          type: string
+          enum:
+            - GPS
+            - DBH
+            - DBH_HELO
+            - Other
+          description: 'The method used to obtain the location information.
+
+            * **GPS:** Global Positioning System (highly accurate)
+            * **DBH:** Device-Based Hybrid
+            * **DBH_HELO:** Device-Based Hybrid using Apple Hybridized Emergency Location
+            * **Other:** Other methods (e.g., landmarks, IP Based etc.)
+
+            '
+        confidence:
+          type: object
+          description: The confidence level of the location information.
+          properties:
+            pdf:
+              type: string
+              enum:
+                - normal
+                - uniform
+              description: The probability density function (PDF) associated with the
+                confidence value.
+            value:
+              type: number
+              minimum: 0
+              maximum: 100
+              description: The confidence value (percentage).
+        timestamp:
+          type: string
+          format: date-time
+          description: The timestamp (in ISO 8601 format) indicating when the location
+            information was Calculated. \nThis is crucial for emergency services to
+            assess the timeliness of the data. if not provided current timestamp will
+            be used by default"
+    CircleCoordinates:
+      type: object
+      required:
+        - latitude
+        - longitude
+        - radius
+      properties:
+        latitude:
+          type: number
+          format: float
+          description: Latitude of the center point in decimal degrees (WGS84).
+        longitude:
+          type: number
+          format: float
+          description: Longitude of the center point in decimal degrees (WGS84).
+        radius:
+          type: number
+          format: float
+          description: Radius of the circle in meters, indicating the uncertainty.
+    EllipsoidCoordinates:
+      type: object
+      required:
+        - latitude
+        - longitude
+        - zAxis
+        - semiMajorAxis
+        - semiMinorAxis
+        - verticalAxis
+        - orientation
+      properties:
+        latitude:
+          type: number
+          format: float
+          description: Latitude in the WGS 84 geocentric coordinate system.
+        longitude:
+          type: number
+          format: float
+          description: Longitude in the WGS 84 geocentric coordinate system.
+        zAxis:
+          type: number
+          format: float
+          description: Altitude (optional) in the WGS 84 geocentric coordinate system.
+        semiMajorAxis:
+          type: number
+          description: Length of the semi-major axis of the ellipsoid in meters.
+        semiMinorAxis:
+          type: number
+          description: Length of the semi-minor axis of the ellipsoid in meters.
+        verticalAxis:
+          type: number
+          description: Length of the vertical axis of the ellipsoid in meters.
+        orientation:
+          type: number
+          description: Orientation of the ellipsoid in degrees.
 
   responses:
     CreateSubscriptionBadRequest400:
@@ -1505,6 +1636,42 @@ components:
           mediaSessionId: "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
           reason: "New subscriber incoming call"
           sequenceNumber: 1
+    NEW_LOCATED_SESSION_INCOMING:
+      description: |-
+        Example of located `session-invitation` event.
+
+        An extended example of `session-invitation` that includes location
+        details within the `LocationDetails` object
+      value:
+        id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
+        source: https://notificationServer.opentelco.com
+        type: org.camaraproject.webrtc-events.v0.session-invitation
+        specversion: "1.0"
+        datacontenttype: application/json
+        time: 2024-11-05T05:40:23.682Z
+        data:
+          subscriptionId: "qs15-h556-rt89-1298"
+          originatorAddress: "tel:+11234567899"
+          originatorName: "Alice"
+          receiverAddress: "tel:+11234998765"
+          receiverName: "Bob"
+          status: "Initial"
+          offer:
+            sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0"
+          mediaSessionId: "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
+          reason: "New subscriber incoming call"
+          sequenceNumber: 1
+          locationDetails:
+            shape: Circle
+            coordinates:
+              latitude: 47.6062
+              longitude: -122.3321
+              radius: 35
+            method: GPS
+            confidence:
+              pdf: normal
+              value: 92
+            timestamp: '2024-11-05T05:35:12.254Z'
     REGISTRATION_ENDS:
       description: |-
         Example of `registration-ends` events.
