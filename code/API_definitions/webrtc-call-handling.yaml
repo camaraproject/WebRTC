@@ -185,6 +185,15 @@ info:
     in compliance with privacy regulations, upholding the principles of
     transparency and user-centric privacy-by-design.
 
+    # Emergency Calling
+
+    - Introduces a new `callType` attribute with values `REGULAR` or `EMERGENCY`.
+    - When `callType` is `EMERGENCY`, the client **MAY** include `locationDetails`
+    describing the caller's location.
+    - `locationDetails` follows PIDF-LO concepts (3GPP TS 24.229, RFC 4119, RFC 5139,
+    RFC 5491) with either a circle or ellipsoid shape.
+    - If `callType` is omitted, it defaults to `REGULAR`.
+
     # Additional CAMARA error responses
     The list of error codes in this API specification is not exhaustive.
     Therefore the API specification may not document some non-mandatory error
@@ -197,14 +206,6 @@ info:
 
     As a specific rule, error `501 - NOT_IMPLEMENTED` can be only a possible
     error response if it is explicitly documented in the API.
-
-    # Emergency Calling
-    - Introduces a new `callType` attribute with values `REGULAR` or `EMERGENCY`.
-    - When `callType` is `EMERGENCY`, the client **MAY** include `locationDetails`
-    describing the caller's location.
-    - `locationDetails` follows PIDF-LO concepts (3GPP TS 24.229, RFC 4119, RFC 5139,
-    RFC 5491) with either a circle or ellipsoid shape.
-    - If `callType` is omitted, it defaults to `REGULAR`.
 
   license:
     name: Apache 2.0
