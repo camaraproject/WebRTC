@@ -1,0 +1,61 @@
+@startuml
+
+!pragma teoz true
+autonumber 47 "<font color=blue><b>[0]"
+
+<style>
+.box {
+  Margin 40
+}
+.audio{
+  arrow {
+    LineColor red
+    LineThickness 5
+  }
+}
+</style>
+
+box Device 
+  participant "Device\nApplication" as DA
+end box
+
+box Application Service Provider
+  participant "Application\nServer" as AS
+end box
+
+box "Operator Network" #EEEEEE
+  participant "Auth\nServer" as AUTH
+  participant "WebRTC\nGateway" as WG
+  participant "Telco\nNetwork" as TN
+end box
+
+box Device
+  participant "Remote\nendpoint" as RE
+end box
+
+activate WG #LightSteelBlue
+activate WG #LightSteelBlue
+activate WG #LightSteelBlue
+activate TN
+activate RE
+activate DA
+
+== Call termination by call receiver ==
+
+
+TN <- RE: SIP BYE
+WG <- TN: **SIP BYE**
+
+WG -> TN: **SIP 200 OK (BYE)**
+TN -> RE --: SIP 200 OK (BYE)
+deactivate RE
+
+AS <[#red]- WG: **POST SINK_URL**
+deactivate WG
+
+DA <- AS
+deactivate DA
+
+AS --[#red]> WG: **204 No content**
+
+@enduml
