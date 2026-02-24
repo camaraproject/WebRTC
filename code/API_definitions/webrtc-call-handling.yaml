@@ -262,8 +262,8 @@ paths:
             schema:
               $ref: '#/components/schemas/MediaSessionInformation'
             examples:
-              Media session request:
-                $ref: '#/components/examples/exampleMediaSessionRequest'
+              RegularMediaSessionRequest:
+                $ref: '#/components/examples/exampleRegularMediaSessionRequest'
               EmergencyMediaSessionRequest:
                 $ref: '#/components/examples/exampleEmergencyMediaSessionRequest'
               LocatedMediaSessionRequest:
@@ -517,7 +517,7 @@ components:
           enum:
             - REGULAR
             - EMERGENCY
-        locationDetails:
+        originatorLocationDetails:
           $ref: '#/components/schemas/LocationDetails'
     WrtcSDPDescriptor:
       type: object
@@ -688,7 +688,8 @@ components:
           type: number
           description: Orientation of the ellipsoid in degrees.
   examples:
-    exampleMediaSessionRequest:
+    exampleRegularMediaSessionRequest:
+      summary: Regular call initiation with media information
       value:
         originatorAddress: tel:+17085852753
         originatorName: tel:+17085852753
