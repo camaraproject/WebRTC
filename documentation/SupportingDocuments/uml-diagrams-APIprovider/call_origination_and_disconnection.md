@@ -8,7 +8,6 @@ The following call flows are constructed on the assumption that the interface be
 
 ## 3.3.1. Call origination
 ### 3.3.1.1. Call flow
-In this call flow, PCMU is used between Device Application and WebRTC Gateway, whereas opus is used between WebRTC Gateway and Telco Network.
 
 ![fig1](./call_origination_and_disconnection_fig-1.png)
 
@@ -503,6 +502,7 @@ x-correlator: a1b2c3d4-e5f6-7890-abcd-000000000049
 HTTP/1.1 204 No Content
 x-correlator: a1b2c3d4-e5f6-7890-abcd-000000000049
 ```
+
 
 
 
