@@ -909,9 +909,9 @@ components:
           type: integer
           description: The sequence number of the notification sent to client
         originatorLocationDetails:
-          $ref: '#/components/schemas/LocationDetails
+          $ref: '#/components/schemas/LocationDetails'
         receiverLocationDetails:
-          $ref: '#/components/schemas/LocationDetails
+          $ref: '#/components/schemas/LocationDetails'
 
     MediaSessionStatusUpdate:
       allOf:
