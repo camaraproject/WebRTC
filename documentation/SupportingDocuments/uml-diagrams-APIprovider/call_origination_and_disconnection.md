@@ -1,10 +1,8 @@
 # 3.3. Call origination and disconnection
 
-This part of the call flows cover call origination from Application Server as WebRTC API Invoker.  
-In the call flows, the WebRTC Gateway and Telco Network connects by using pure SIP as a control message, and mobile IMS specific capablitiies (e.g, preconditions) are not used.  
+This part of the call flows cover call origination from Application Server as WebRTC API Invoker.
 
-The following call flows are constructed on the assumption that the interface between the WebRTC Gateway and the Telco Network is treated as an inter-operator SIP interconnect. Mobile network-specific options (e.g., resource reservation, precondition) are not applied.
-
+In the call flows, the interface between the WebRTC Gateway and the Telco Network is a SIP-based NNI (Network-to-Network Interface). As such, IMS access-layer procedures (e.g., resource reservation, precondition) are out of scope, while reliable provisional responses (100rel / PRACK) are assumed to be supported on the NNI.
 
 ## 3.3.1. Call origination
 ### 3.3.1.1. Call flow
@@ -57,21 +55,19 @@ Contact: <sip:webrtc-gw.operator.com:5060;transport=tcp>
 Supported: 100rel, timer
 Allow: INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, OPTIONS
 Content-Type: application/sdp
-Content-Length: 387
+Content-Length: 266
 
 v=0
 o=- 8066321617929821805 2 IN IP4 webrtc-gw.operator.com
 s=WebRTC-to-SIP Call
 c=IN IP4 203.0.113.100
 t=0 0
-m=audio 30000 RTP/SAVPF 0 8 101
+m=audio 30000 RTP/AVP 0 8 101
 a=rtpmap:0 PCMU/8000
 a=rtpmap:8 PCMA/8000
 a=rtpmap:101 telephone-event/8000
 a=fmtp:101 0-16
-a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:PS1uQCVeeCFCanVmcjkpPywjNWhcYD0mXXtxaVBR
 a=sendrecv
-a=rtcp-mux
 a=ptime:20
 ```
 
@@ -117,21 +113,18 @@ Contact: <sip:+818000000002@198.51.100.10:5060;transport=tcp>
 Require: 100rel
 RSeq: 1
 Content-Type: application/sdp
-Content-Length: 298
+Content-Length: 223
 
 v=0
 o=- 4576312012535546667 2 IN IP4 198.51.100.10
 s=SIP Call
 c=IN IP4 198.51.100.10
 t=0 0
-m=audio 49170 RTP/SAVPF 0 8 101
+m=audio 49170 RTP/AVP 0 101
 a=rtpmap:0 PCMU/8000
-a=rtpmap:8 PCMA/8000
 a=rtpmap:101 telephone-event/8000
 a=fmtp:101 0-16
-a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:d0RmdmcmVCspeEc3QGZiNWpVLFJhQX1cfHAwJSoj
 a=sendrecv
-a=rtcp-mux
 a=ptime:20
 ```
 
@@ -159,10 +152,10 @@ x-correlator: a1b2c3d4-e5f6-7890-abcd-000000000016
     "receiverName": "Bob",
     "status": "InProgress",
     "offer": {
-      "sdp": "v=0\r\no=- 8066321617929821805 2 IN IP4 0.0.0.0\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=msid-semantic: WMS local-stream\r\nm=audio 42988 UDP/TLS/RTP/SAVPF 111 0 8\r\nc=IN IP4 203.0.113.50\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:1645903805 1 udp 2122262783 203.0.113.50 42988 typ host generation 0\r\na=ice-ufrag:4eKp\r\na=ice-pwd:D4sF5Pv9vx9ggaqxBlHbAFMx\r\na=ice-options:trickle\r\na=fingerprint:sha-256 CF:56:D8:57:9B:68:B2:1C:F6:ED:6C:C0:02:7C:96:C2:88:A3:C2:38:AD:A2:CA:F5:0D:47:BB:81:74:7B:75:17\r\na=setup:actpass\r\na=mid:0\r\na=sendrecv\r\na=rtcp-mux\r\na=rtpmap:111 opus/48000/2\r\na=rtpmap:0 PCMU/8000\r\na=rtpmap:8 PCMA/8000\r\n"
+      "sdp": "v=0\r\no=- 8066321617929821805 2 IN IP4 0.0.0.0\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=msid-semantic: WMS local-stream\r\nm=audio 42988 UDP/TLS/RTP/SAVPF 111 0 8\r\nc=IN IP4 203.0.113.50\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:1645903805 1 udp 2122262783 203.0.113.50 42988 typ host generation 0\r\na=ice-ufrag:4eKp\r\na=ice-pwd:D4sF5Pv9vx9ggaqxBlHbAFMx\r\na=ice-options:trickle\r\na=fingerprint:sha-256 CF:56:D8:57:9B:68:B2:1C:F6:ED:6C:C0:02:7C:96:C2:88:A3:C2:38:AD:A2:CA:F5:0D:47:BB:81:74:7B:75:17\r\na=setup:actpass\r\na=mid:0\r\na=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level\r\na=sendrecv\r\na=rtcp-mux\r\na=rtpmap:111 opus/48000/2\r\na=fmtp:111 minptime=10;useinbandfec=1\r\na=rtpmap:0 PCMU/8000\r\na=rtpmap:8 PCMA/8000\r\n"
     },
     "answer": {
-      "sdp": "v=0\r\no=- 4576312012535546667 2 IN IP4 198.51.100.10\r\ns=-\r\nt=0 0\r\nm=audio 49170 RTP/SAVPF 0 8\r\nc=IN IP4 198.51.100.10\r\na=rtcp:49171 IN IP4 198.51.100.10\r\na=ice-ufrag:B7nX\r\na=ice-pwd:m9sK3jLpQwErT6yHvC2xNfAz\r\na=sendrecv\r\na=rtcp-mux\r\na=rtpmap:0 PCMU/8000\r\na=rtpmap:8 PCMA/8000\r\na=ptime:20\r\n"
+      "sdp": "v=0\r\no=- 7893214567890123456 2 IN IP4 203.0.113.100\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\nm=audio 50000 UDP/TLS/RTP/SAVPF 111\r\nc=IN IP4 203.0.113.100\r\na=candidate:2098703421 1 udp 2122262783 203.0.113.100 50000 typ host generation 0\r\na=ice-ufrag:B7nX\r\na=ice-pwd:m9sK3jLpQwErT6yHvC2xNfAz\r\na=fingerprint:sha-256 A1:B2:C3:D4:E5:F6:07:18:29:3A:4B:5C:6D:7E:8F:90:01:12:23:34:45:56:67:78:89:9A:AB:BC:CD:DE:EF:F0\r\na=setup:active\r\na=mid:0\r\na=sendrecv\r\na=rtcp-mux\r\na=rtpmap:111 opus/48000/2\r\na=fmtp:111 minptime=10;useinbandfec=1\r\n"
     },
     "reason": "183 Session Progress received from remote endpoint",
     "sequenceNumber": 1
@@ -285,18 +278,18 @@ Contact: <sip:+818000000002@198.51.100.10:5060;transport=tcp>
 Allow: INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, OPTIONS
 Supported: 100rel, timer
 Content-Type: application/sdp
-Content-Length: 298
+Content-Length: 223
 
 v=0
 o=- 4576312012535546667 4 IN IP4 198.51.100.10
 s=SIP Call
 c=IN IP4 198.51.100.10
 t=0 0
-m=audio 49170 RTP/SAVPF 0
+m=audio 49170 RTP/AVP 0 101
 a=rtpmap:0 PCMU/8000
-a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:d0RmdmcmVCspeEc3QGZiNWpVLFJhQX1cfHAwJSoj
+a=rtpmap:101 telephone-event/8000
+a=fmtp:101 0-16
 a=sendrecv
-a=rtcp-mux
 a=ptime:20
 ```
 
@@ -324,10 +317,10 @@ x-correlator: a1b2c3d4-e5f6-7890-abcd-000000000035
     "receiverName": "Bob",
     "status": "Connected",
     "offer": {
-      "sdp": "v=0\r\no=- 8066321617929821805 2 IN IP4 0.0.0.0\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\nm=audio 42988 UDP/TLS/RTP/SAVPF 111 0 8\r\nc=IN IP4 203.0.113.50\r\na=ice-ufrag:4eKp\r\na=ice-pwd:D4sF5Pv9vx9ggaqxBlHbAFMx\r\na=fingerprint:sha-256 CF:56:D8:57:9B:68:B2:1C:F6:ED:6C:C0:02:7C:96:C2:88:A3:C2:38:AD:A2:CA:F5:0D:47:BB:81:74:7B:75:17\r\na=setup:actpass\r\na=mid:0\r\na=sendrecv\r\na=rtcp-mux\r\na=rtpmap:111 opus/48000/2\r\na=rtpmap:0 PCMU/8000\r\na=rtpmap:8 PCMA/8000\r\n"
+      "sdp": "v=0\r\no=- 8066321617929821805 2 IN IP4 0.0.0.0\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=msid-semantic: WMS local-stream\r\nm=audio 42988 UDP/TLS/RTP/SAVPF 111 0 8\r\nc=IN IP4 203.0.113.50\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:1645903805 1 udp 2122262783 203.0.113.50 42988 typ host generation 0\r\na=ice-ufrag:4eKp\r\na=ice-pwd:D4sF5Pv9vx9ggaqxBlHbAFMx\r\na=ice-options:trickle\r\na=fingerprint:sha-256 CF:56:D8:57:9B:68:B2:1C:F6:ED:6C:C0:02:7C:96:C2:88:A3:C2:38:AD:A2:CA:F5:0D:47:BB:81:74:7B:75:17\r\na=setup:actpass\r\na=mid:0\r\na=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level\r\na=sendrecv\r\na=rtcp-mux\r\na=rtpmap:111 opus/48000/2\r\na=fmtp:111 minptime=10;useinbandfec=1\r\na=rtpmap:0 PCMU/8000\r\na=rtpmap:8 PCMA/8000\r\n"
     },
     "answer": {
-      "sdp": "v=0\r\no=- 4576312012535546667 4 IN IP4 198.51.100.10\r\ns=-\r\nt=0 0\r\nm=audio 49170 RTP/SAVPF 0\r\nc=IN IP4 198.51.100.10\r\na=rtcp:49170 IN IP4 198.51.100.10\r\na=sendrecv\r\na=rtcp-mux\r\na=rtpmap:0 PCMU/8000\r\na=ptime:20\r\n"
+      "sdp": "v=0\r\no=- 7893214567890123456 4 IN IP4 203.0.113.100\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\nm=audio 50000 UDP/TLS/RTP/SAVPF 111\r\nc=IN IP4 203.0.113.100\r\na=candidate:2098703421 1 udp 2122262783 203.0.113.100 50000 typ host generation 0\r\na=ice-ufrag:B7nX\r\na=ice-pwd:m9sK3jLpQwErT6yHvC2xNfAz\r\na=fingerprint:sha-256 A1:B2:C3:D4:E5:F6:07:18:29:3A:4B:5C:6D:7E:8F:90:01:12:23:34:45:56:67:78:89:9A:AB:BC:CD:DE:EF:F0\r\na=setup:active\r\na=mid:0\r\na=sendrecv\r\na=rtcp-mux\r\na=rtpmap:111 opus/48000/2\r\na=fmtp:111 minptime=10;useinbandfec=1\r\n"
     },
     "reason": "200 OK received - call connected",
     "sequenceNumber": 3
@@ -438,12 +431,12 @@ HTTP/1.1 204 No Content
 x-correlator: a1b2c3d4-e5f6-7890-abcd-000000000059
 ```
 
-## 3.3.2. Call termination by call receiver
-### 3.3.2.1. Sequence
+## 3.3.3. Call termination by call receiver
+### 3.3.3.1. Sequence
 
 ![fig3](./call_origination_and_disconnection_fig-3.png)
 
-### 3.3.2.2. Example messages
+### 3.3.3.2. Example messages
 
 #### [48] SIP BYE
 ```
@@ -502,7 +495,6 @@ x-correlator: a1b2c3d4-e5f6-7890-abcd-000000000049
 HTTP/1.1 204 No Content
 x-correlator: a1b2c3d4-e5f6-7890-abcd-000000000049
 ```
-
 
 
 
