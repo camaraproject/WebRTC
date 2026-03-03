@@ -10,7 +10,7 @@ repository:
   # Options: independent (default) | meta-release
   release_track: meta-release
   # Meta-release participation (update for next cycle when planning)
-  meta_release: Synch26
+  meta_release: Sync26
 
   # Target CAMARA release tag.
   # Initialized to the latest release; update when planning the next release.
