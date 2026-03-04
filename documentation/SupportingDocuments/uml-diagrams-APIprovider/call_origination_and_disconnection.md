@@ -31,7 +31,7 @@ registrationId: reg-550e8400-e29b-41d4-a716-446655440000
 }
 ```
 
-> **ISSUE** (NotAddressed)
+> **ISSUE** (UnderDiscussion)
 > 
 > Related Issue: #147
 >
@@ -495,6 +495,7 @@ x-correlator: a1b2c3d4-e5f6-7890-abcd-000000000049
 HTTP/1.1 204 No Content
 x-correlator: a1b2c3d4-e5f6-7890-abcd-000000000049
 ```
+
 
 
 
