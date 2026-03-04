@@ -1,8 +1,7 @@
 @startuml
 
-
 !pragma teoz true
-autonumber 23 "<font color=blue><b>[0]"
+autonumber 47 "<font color=blue><b>[0]"
 
 <style>
 .box {
@@ -34,13 +33,16 @@ box Device
   participant "Remote\nendpoint" as RE
 end box
 
-
-activate DA
 activate WG #LightSteelBlue
+activate WG #LightSteelBlue
+activate WG #LightSteelBlue
+activate TN
+activate RE
+activate DA
 
-== Unsubscribe from events ==
+== Call termination by call originator ==
 
-DA -> AS: Event subscription delete request
+DA -> AS: Call termination request
 
 AS -> AUTH: GET /authorize
 AS <-- AUTH: 302 Found\n(redirecting user agent)
@@ -48,20 +50,25 @@ DA <[#gray]-> AUTH: End user consent (e.g., ICM Auth Code Flow)
 AS -> AUTH: POST /token
 AS <-- AUTH: 200 OK
 
-AS -[#red]> WG: **DELETE /webrtc-events-suscription/{apiVersion}/subscriptions/{subscriptionId}**
+AS -[#red]> WG: **DELETE /webrtc-call-handling/{apiVersion}/sessions/{mediaSessionId}**
 
 AUTH <- WG: POST /token/introspection
 AUTH --> WG: 200 OK
 
-AS <[#red]-- WG: **202 Accepted**
+AS <[#red]-- WG: **204 No content**
+
+WG -> TN: **SIP BYE**
+TN -> RE: SIP BYE
+
+TN <- RE --: SIP 200 OK (BYE)
+WG <- TN --: **SIP 200 OK (BYE)**
 
 AS <[#red]- WG: **POST SINK_URL**
 deactivate WG
 
-DA <-- AS: Event subscription delete result
+DA <- AS
+deactivate DA
 
-AS --[#red]> WG: **204 No Content**
-
-
+AS --[#red]> WG: **204 No content**
 
 @enduml

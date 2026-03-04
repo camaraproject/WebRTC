@@ -58,4 +58,5 @@ AS <[#red]-- WG: **200 OK**
 DA <-- AS: Event subscription update result
 
 
+
 @enduml
