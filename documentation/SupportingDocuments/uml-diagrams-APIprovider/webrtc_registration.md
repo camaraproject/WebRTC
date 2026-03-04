@@ -78,9 +78,9 @@ x-correlator: b2c3d4e5-f6a7-8901-bcde-f23456789012
 }
 ```
 
-> **ISSUE** (NotAddressed)
+> **ISSUE**
 > 
-> Related Issue: #NN
+> Related Issue: #144
 >
 > Related PR: #NN
 >
@@ -88,9 +88,9 @@ x-correlator: b2c3d4e5-f6a7-8901-bcde-f23456789012
 >
 > Informational descriptions for above need to be revised in webrtc-registration.yaml.
 
-> **ISSUE** (NotAddressed)
+> **ISSUE**
 > 
-> Related Issue: #NN
+> Related Issue: #145
 >
 > Related PR: #NN
 >
@@ -98,9 +98,9 @@ x-correlator: b2c3d4e5-f6a7-8901-bcde-f23456789012
 >
 > Informational descriptions for above need to be added in webrtc-registration.yaml for clarification.
 
-> **ISSUE** (NotAddressed)
+> **ISSUE**
 > 
-> Related Issue: #NN
+> Related Issue: #146
 >
 > Related PR: #NN
 >
@@ -146,3 +146,4 @@ x-correlator: c3d4e5f6-a7b8-9012-cdef-345678901234
 HTTP/1.1 204 No Content
 x-correlator: c3d4e5f6-a7b8-9012-cdef-345678901234
 ```
+
