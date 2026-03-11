@@ -63,12 +63,13 @@ TN -> RE: SIP BYE
 TN <- RE --: SIP 200 OK (BYE)
 WG <- TN --: **SIP 200 OK (BYE)**
 
-AS <[#red]- WG: **POST SINK_URL**
+AS <[#red]- WG: **POST SINK_URL**\nstatus: Terminated
 deactivate WG
 
 DA <- AS
 deactivate DA
 
 AS --[#red]> WG: **204 No content**
+
 
 @enduml
