@@ -67,7 +67,7 @@ TN <- RE: SIP 183 Session progress
 
 WG <- TN: **SIP 183 Session progress**
 
-AS <[#red]- WG: **POST SINK_URL**
+AS <[#red]- WG: **POST SINK_URL**\nstatus: Ringing
 
 DA <- AS
 
@@ -87,7 +87,7 @@ DA <--> WG <<audio>>: DTLS-SRTP (early media/ring back tone)
 TN <- RE: SIP 180 Ringing
 WG <- TN: **SIP 180 Ringing**
 
-AS <[#red]- WG: **POST SINK_URL**
+AS <[#red]- WG: **POST SINK_URL**\nstatus: Ringing
 DA <- AS
 AS --[#red]> WG: **204 No content**
 
@@ -99,7 +99,7 @@ WG <- TN: **SIP 200 OK (PRA)**
 TN <- RE: SIP 200 OK (INV)
 WG <- TN: **SIP 200 OK (INV)**
 
-AS <[#red]- WG: **POST SINK_URL**
+AS <[#red]- WG: **POST SINK_URL**\nstatus: Connected
 DA <- AS
 AS --[#red]> WG: **204 No content**
 
@@ -108,5 +108,6 @@ TN -> RE: SIP ACK
 
 DA <--> WG <<audio>>: DTLS-SRTP (voice media)
 & WG <--> RE <<audio>>: RTP (voice media)
+
 
 @enduml
