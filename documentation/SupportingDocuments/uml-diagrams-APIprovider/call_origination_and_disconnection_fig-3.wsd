@@ -50,12 +50,13 @@ WG -> TN: **SIP 200 OK (BYE)**
 TN -> RE --: SIP 200 OK (BYE)
 deactivate RE
 
-AS <[#red]- WG: **POST SINK_URL**
+AS <[#red]- WG: **POST SINK_URL**\nstatus: Terminated
 deactivate WG
 
 DA <- AS
 deactivate DA
 
 AS --[#red]> WG: **204 No content**
+
 
 @enduml
