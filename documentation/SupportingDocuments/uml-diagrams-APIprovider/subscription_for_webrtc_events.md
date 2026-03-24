@@ -84,9 +84,9 @@ x-correlator: b4333c46-49c0-4f62-80d7-f0ef930f1c46
 }
 ```
 
-> **ISSUE** (NotAddressed)
+> **ISSUE** (UnderDiscussion)
 > 
-> Related Issue: #NN
+> Related Issue: #135
 >
 > Related PR: #NN
 >
@@ -94,9 +94,9 @@ x-correlator: b4333c46-49c0-4f62-80d7-f0ef930f1c46
 >
 > This consolidated subscription pattern should be reflected in the webrtc-events.yaml examples.
 
-> **ISSUE** (NotAddressed)
+> **ISSUE** (UnderDiscussion)
 > 
-> Related Issue: #NN
+> Related Issue: #76
 >
 > Related PR: #NN
 >
@@ -106,9 +106,9 @@ x-correlator: b4333c46-49c0-4f62-80d7-f0ef930f1c46
 >
 > Informational descriptions for above fields need to be added in webrtc-events.yaml.
 
-> **ISSUE** (NotAddressed)
+> **ISSUE** (UnderDiscussion)
 > 
-> Related Issue: #NN
+> Related Issue: #136
 >
 > Related PR: #NN
 >
@@ -176,7 +176,7 @@ x-correlator: f8e7d6c5-b4a3-2190-fedc-ba0987654321
 ```
 > **ISSUE** (NotAddressed)
 > 
-> Related Issue: #NN
+> Related Issue: #78
 >
 > Related PR: #NN
 >
@@ -263,4 +263,5 @@ x-correlator: b2c3d4e5-f6a7-8901-bcde-f23456789012
 ```
 HTTP/1.1 204 No Content
 x-correlator: b2c3d4e5-f6a7-8901-bcde-f23456789012
+
 ```
