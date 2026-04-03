@@ -1,0 +1,117 @@
+@startuml
+
+!pragma teoz true
+autonumber 1 "<font color=blue><b>[0]"
+
+<style>
+.box {
+  Margin 40
+}
+.audio{
+  arrow {
+    LineColor red
+    LineThickness 5
+  }
+}
+</style>
+
+box Device
+  participant "Device\nApplication" as DA
+end box
+
+box Application Service Provider
+  participant "Application\nServer" as AS
+end box
+
+box "Operator Network" #EEEEEE
+  participant "Auth\nServer" as AUTH
+  participant "WebRTC\nGateway" as WG
+  participant "Telco\nNetwork" as TN
+end box
+
+box Device
+  participant "Remote\nendpoint" as RE
+end box
+
+activate WG #LightSteelBlue
+activate WG #LightSteelBlue
+
+== Call Termination ==
+
+RE -> TN ++: SIP INVITE
+TN -> WG: **SIP INVITE**
+activate WG #LightSteelBlue
+
+TN -> RE: SIP 100 Trying
+WG -> TN: **SIP 100 Trying**
+
+AS <[#red]- WG: **POST SINK_URL**\nstatus: Initial
+
+AS --[#red]> WG: **204 No content**
+
+AS -[#red]> WG: **GET /webrtc-call-handling/{apiVersion}/sessions/{mediaSessionId}**
+
+AUTH <- WG: POST /token/introspection
+AUTH --> WG: 200 OK
+
+AS <[#red]-- WG: **200 OK**
+
+DA <- AS: Incoming call notification
+
+DA -> AS: Accept call\n(before user interaction)
+
+AS -[#red]> WG: **PUT /webrtc-call-handling/{apiVersion}/sessions/{mediaSessionId}**\n(status: InProgress, answer SDP)
+
+AUTH <- WG: POST /token/introspection
+AUTH --> WG: 200 OK
+
+AS <[#red]-- WG: **200 OK**
+
+WG -> TN: **SIP 183 Session Progress**
+TN -> RE: SIP 183 Session Progress
+
+TN <- RE: SIP PRACK
+WG <- TN: **SIP PRACK**
+WG -> TN: **SIP 200 OK (PRA)**
+TN -> RE: SIP 200 OK (PRA)
+
+DA <[#purple]-> WG: ICE Connectivity Check
+DA <[#purple]-> WG: DTLS Handshake
+
+DA <--> WG <<audio>>: DTLS-SRTP (early media/ring back tone)
+& WG <--> RE <<audio>>: RTP (early media/ring back tone)
+
+AS -[#red]> WG: **PUT /webrtc-call-handling/{apiVersion}/sessions/{mediaSessionId}**\n(status: Ringing)
+
+AUTH <- WG: POST /token/introspection
+AUTH --> WG: 200 OK
+
+AS <[#red]-- WG: **200 OK**
+
+WG -> TN: **SIP 180 Ringing**
+TN -> RE: SIP 180 Ringing
+
+TN <- RE: SIP PRACK
+WG <- TN: **SIP PRACK**
+WG -> TN: **SIP 200 OK (PRA)**
+TN -> RE: SIP 200 OK (PRA)
+
+DA -> AS: User answers call
+
+AS -[#red]> WG: **PUT /webrtc-call-handling/{apiVersion}/sessions/{mediaSessionId}**\n(status: Connected)
+
+AUTH <- WG: POST /token/introspection
+AUTH --> WG: 200 OK
+
+AS <[#red]-- WG: **200 OK**
+
+WG -> TN: **SIP 200 OK (INV)**
+TN -> RE: SIP 200 OK (INV)
+
+TN <- RE: SIP ACK
+WG <- TN: **SIP ACK**
+
+DA <--> WG <<audio>>: DTLS-SRTP (voice media)
+& WG <--> RE <<audio>>: RTP (voice media)
+
+@enduml

@@ -28,7 +28,7 @@ The following links provide call flow diagrams and message examples.
 - 3.1. [Subscription for WebRTC events](./subscription_for_webrtc_events.md)
 - 3.2. [WebRTC registration](./webrtc_registration.md)
 - 3.3. [Call orignation and disconnection](./call_origination_and_disconnection.md)
-- 3.4. Call termination and disconnection (TBD)
+- 3.4. [Call termination and disconnection](./call_termination_and_disconnection.md)
 
 The message examples illustrate the fields necessary for implementing a WebRTC Gateway, including all defined optional fields where applicable.  
 Although the API specification defines fields for [API-design-guidline](https://github.com/camaraproject/Commonalities/blob/main/documentation/API-design-guidelines.md) consistency, those not applicable in the WebRTC API are excluded from the message examples.
