@@ -26,8 +26,8 @@ The involved actors in the call flows are as follows:
 The following links provide call flow diagrams and message examples.
 
 - 3.1. [Subscription for WebRTC events](./subscription_for_webrtc_events.md)
-- 3.2. WebRTC registration
-- 3.3. Call orignation and disconnection (TBD)
+- 3.2. [WebRTC registration](./webrtc_registration.md)
+- 3.3. [Call orignation and disconnection](./call_origination_and_disconnection.md)
 - 3.4. Call termination and disconnection (TBD)
 
 The message examples illustrate the fields necessary for implementing a WebRTC Gateway, including all defined optional fields where applicable.  
