@@ -183,14 +183,15 @@ info:
     # Located calls
 
     As part of the extended, or contextual information of calls, a location can
-    be provided as part of the call information. A regular call **MAY** provide
-    an `originatorLocationDetails` object in order to help the receiver to
-    locate the geographic position of the device calling. In aim of security,
-    routing or any other use case provided by the network.
+    be provided as part of the call information. Any party **MAY** provide a
+    `locationDetails` object to share the geographic position of their device,
+    in support of security, routing, or any other use case provided by the network.
 
-    As each party can share its own location, there are two separated objects
-    `originatorLocationDetails` and `receiverLocationDetails`, both serving
-    the same purpose and implementing the `locationDetails` schema.
+    The `locationDetails` field in `MediaSessionInformation` always represents the
+    location of the party making the request:
+    - In `POST /sessions`, it is the originator's device location.
+    - In `PUT /sessions/{mediaSessionId}/status`, it is the location of the party
+    making the update (originator or answering party).
 
     The `locationDetails` schema follows PIDF-LO concepts (3GPP TS 24.229,
     RFC 4119, RFC 5139, RFC 5491) with either a circle or ellipsoid shape.
@@ -199,10 +200,9 @@ info:
 
     - Introduces a new `callType` attribute with values `REGULAR` or `EMERGENCY`.
     - When `callType` is `EMERGENCY`, the client **MAY** include
-    `originatorLocationDetails` describing the caller's location.
-    - `originatorLocationDetails` implements the `locationDetails` schema.
-    This schema follows PIDF-LO concepts (3GPP TS 24.229, RFC 4119, RFC 5139,
-    RFC 5491) with either a circle or ellipsoid shape.
+    `locationDetails` describing the caller's device location.
+    - The `locationDetails` schema follows PIDF-LO concepts (3GPP TS 24.229,
+    RFC 4119, RFC 5139, RFC 5491) with either a circle or ellipsoid shape.
     - If `callType` is omitted, it defaults to `REGULAR`.
 
     # Authorization and authentication
@@ -390,6 +390,8 @@ paths:
         Update the status of the media session, this may include updating SDP media
 
         The API consumer shall construct the API path using the `mediaSessionId` supplied in the session creation response (origination) or in the invitation notification (termination).
+
+        The party making the update MAY include `locationDetails` to share their device location. When included in an answer/accept step (e.g., status `Connected` with an answer SDP), `locationDetails` describes the answering party's device location. After call establishment, either party MAY provide or update their location by including `locationDetails`; in that case, the provided location applies to the party making the update.
       operationId: updateSessionStatus
       parameters:
         - $ref: '#/components/parameters/x-correlator'
@@ -413,6 +415,10 @@ paths:
                 $ref: '#/components/examples/exampleSessionStatusHold'
               Update resume (call has been resumed):
                 $ref: '#/components/examples/exampleSessionStatusResume'
+              Answer with location (callee accepts and shares location):
+                $ref: '#/components/examples/exampleSessionStatusConnectedWithLocation'
+              Location update (post-setup location sharing):
+                $ref: '#/components/examples/exampleSessionStatusLocationUpdate'
       responses:
         '200':
           description: |
@@ -433,6 +439,10 @@ paths:
                   $ref: '#/components/examples/exampleSessionStatusHold'
                 Update resume (call has been resumed):
                   $ref: '#/components/examples/exampleSessionStatusResume'
+                Answer with location (callee accepts and shares location):
+                  $ref: '#/components/examples/exampleSessionStatusConnectedWithLocation'
+                Location update (post-setup location sharing):
+                  $ref: '#/components/examples/exampleSessionStatusLocationUpdate'
         '204':
           description: Updated the session status (no content)
         '400':
@@ -517,7 +527,12 @@ components:
           enum:
             - REGULAR
             - EMERGENCY
-        originatorLocationDetails:
+        locationDetails:
+          description: >-
+            Location of the party making this request. When provided in `POST /sessions`, it represents the originator's device location.
+            When provided in `PUT /sessions/{mediaSessionId}/status`, it represents the location of the party making the update
+            (either originator or answering party). Providing this information is specific to certain use cases and does not imply a
+            guarantee of any particular server-side action or behavior.
           $ref: '#/components/schemas/LocationDetails'
     WrtcSDPDescriptor:
       type: object
@@ -579,9 +594,11 @@ components:
       example: 'tel:+11234567899'
     LocationDetails:
       type: object
-      description: Details about the caller's location and related information. This
-        object adheres to 3GPP TS 24.229, RFC 4119, RFC 5139, and RFC 5491 for PIDF-LO
-        compatibility.
+      description: >-
+        Details about a party's location and related information. This object adheres to
+        3GPP TS 24.229, RFC 4119, RFC 5139, and RFC 5491 for PIDF-LO compatibility.
+        Providing this information is specific to certain use cases and does not imply a
+        guarantee of any particular server-side action or behavior.
       properties:
         shape:
           type: string
@@ -789,6 +806,38 @@ components:
           status: Resume
           answer:
             sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\na=extmap:2 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=sendrecv\r\na=rtcp-mux\r\na=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ruAnBNYnTJqDVZAIJV59VpQ5DxGI6tMX9h9kkHSz\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
+    exampleSessionStatusConnectedWithLocation:
+      summary: Answering party accepts the call and shares their device location
+      value:
+        status: Connected
+        answer:
+          sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\na=extmap:2 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=sendrecv\r\na=rtcp-mux\r\na=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ruAnBNYnTJqDVZAIJV59VpQ5DxGI6tMX9h9kkHSz\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
+        locationDetails:
+          shape: Circle
+          coordinates:
+            latitude: 40.7128
+            longitude: -74.0060
+            radius: 50
+          method: GPS
+          confidence:
+            pdf: normal
+            value: 88
+          timestamp: '2025-10-06T19:32:10Z'
+    exampleSessionStatusLocationUpdate:
+      summary: Post-setup location update by either party
+      value:
+        status: Connected
+        locationDetails:
+          shape: Circle
+          coordinates:
+            latitude: 40.7148
+            longitude: -74.0075
+            radius: 30
+          method: GPS
+          confidence:
+            pdf: normal
+            value: 95
+          timestamp: '2025-10-06T19:45:00Z'
     exampleEmergencyMediaSessionRequest:
       summary: Emergency call initiation with location details
       value:
@@ -800,7 +849,7 @@ components:
           type: offer
           sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\na=extmap:2 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=sendrecv\r\na=rtcp-mux\r\na=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ruAnBNYnTJqDVZAIJV59VpQ5DxGI6tMX9h9kkHSz\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
         callType: EMERGENCY
-        originatorLocationDetails:
+        locationDetails:
           shape: Circle
           coordinates:
             latitude: 47.6062
@@ -821,7 +870,7 @@ components:
         offer:
           type: offer
           sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\na=extmap:2 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=sendrecv\r\na=rtcp-mux\r\na=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ruAnBNYnTJqDVZAIJV59VpQ5DxGI6tMX9h9kkHSz\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
-        originatorLocationDetails:
+        locationDetails:
           shape: Circle
           coordinates:
             latitude: 47.5124

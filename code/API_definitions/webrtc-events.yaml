@@ -909,8 +909,10 @@ components:
           type: integer
           description: The sequence number of the notification sent to client
         originatorLocationDetails:
+          description: Location of the call originator's device, as provided by the originating party.
           $ref: '#/components/schemas/LocationDetails'
         receiverLocationDetails:
+          description: Location of the call receiver's device, as provided by the answering party.
           $ref: '#/components/schemas/LocationDetails'
 
     MediaSessionStatusUpdate:
@@ -1053,9 +1055,11 @@ components:
             - POST
     LocationDetails:
       type: object
-      description: Details about the caller's location and related information. This
-        object adheres to 3GPP TS 24.229, RFC 4119, RFC 5139, and RFC 5491 for PIDF-LO
-        compatibility.
+      description: >-
+        Details about a party's location and related information. This object adheres to
+        3GPP TS 24.229, RFC 4119, RFC 5139, and RFC 5491 for PIDF-LO compatibility.
+        Providing this information is specific to certain use cases and does not imply a
+        guarantee of any particular server-side action or behavior.
       properties:
         shape:
           type: string
