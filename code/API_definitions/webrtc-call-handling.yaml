@@ -533,7 +533,8 @@ components:
             When provided in `PUT /sessions/{mediaSessionId}/status`, it represents the location of the party making the update
             (either originator or answering party). Providing this information is specific to certain use cases and does not imply a
             guarantee of any particular server-side action or behavior.
-          $ref: '#/components/schemas/LocationDetails'
+          allOf:
+            - $ref: '#/components/schemas/LocationDetails'
     WrtcSDPDescriptor:
       type: object
       description: |-

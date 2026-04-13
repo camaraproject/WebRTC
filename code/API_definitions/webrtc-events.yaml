@@ -910,10 +910,12 @@ components:
           description: The sequence number of the notification sent to client
         originatorLocationDetails:
           description: Location of the call originator's device, as provided by the originating party.
-          $ref: '#/components/schemas/LocationDetails'
+          allOf:
+            - $ref: '#/components/schemas/LocationDetails'
         receiverLocationDetails:
           description: Location of the call receiver's device, as provided by the answering party.
-          $ref: '#/components/schemas/LocationDetails'
+          allOf:
+            - $ref: '#/components/schemas/LocationDetails'
 
     MediaSessionStatusUpdate:
       allOf:
