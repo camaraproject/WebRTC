@@ -1385,7 +1385,7 @@ components:
         sinkCredential:
           credentialType: "ACCESSTOKEN"
           accessToken: "eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJKV1QiL.."
-          accessTokenExpireUtc: "2024-12-06T14:37:56.147Z"
+          accessTokenExpiresUtc: "2024-12-06T14:37:56.147Z"
           accessTokenType: "bearer"
         types:
           - org.camaraproject.webrtc-events.v0.registration-ends
