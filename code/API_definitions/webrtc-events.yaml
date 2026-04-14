@@ -990,14 +990,6 @@ components:
         - NETWORK_TERMINATED
         - REGISTRATION_EXPIRED
 
-    HTTPSubscriptionRequest:
-      allOf:
-        - $ref: "#/components/schemas/SubscriptionRequest"
-        - type: object
-          properties:
-            protocolSettings:
-              $ref: "#/components/schemas/HTTPSettings"
-
   responses:
     CreateSubscriptionBadRequest400:
       description: Problem with the client request
