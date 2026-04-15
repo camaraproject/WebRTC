@@ -497,7 +497,7 @@ components:
         types:
           description: |-
             Camara Event types eligible to be delivered by this subscription.
-            Note: Multiple event types per subscription MAY be supported. If multi-event subscription isnot supported, a 422 MULTIEVENT_SUBSCRIPTION_NOT_SUPPORTED error will be returned.
+            Note: Multiple event types per subscription MAY be supported. If multi-event subscription is not supported, a 422 MULTIEVENT_SUBSCRIPTION_NOT_SUPPORTED error will be returned.
           type: array
           minItems: 1
           maxItems: 3
@@ -649,7 +649,6 @@ components:
         types:
           description: |-
             Camara Event types eligible to be delivered by this subscription.
-            Note: the maximum number of event types per subscription will be decided at API project level
           type: array
           minItems: 1
           maxItems: 1
