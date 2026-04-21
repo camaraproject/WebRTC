@@ -222,6 +222,11 @@ paths:
         To subscribe and receive notifications about new calls, a
         `session-invitation` subscription is required using the `deviceId` related to a valid registration.
 
+        For WebRTC calling subscription scenarios, developers should not use
+        `initialEvent` or `subscriptionMaxEvents`. These attributes remain in
+        the schema for CAMARA compatibility, but they are not used by this API
+        for WebRTC calling subscriptions.
+
       operationId: createNotificationChannelSubscription
       parameters:
         - $ref: "#/components/parameters/x-correlator"
@@ -588,6 +593,11 @@ components:
         specifications.
 
         WebRTC specific event type attributes are included into `WebrtcSubscriptionDetail` schema.
+
+        For WebRTC calling subscriptions in this API, developers should use `subscriptionDetail`
+        and, optionally, `subscriptionExpireTime`. The predefined CAMARA attributes
+        `subscriptionMaxEvents` and `initialEvent` are kept for schema alignment and compatibility,
+        but they are not used for WebRTC calling subscription scenarios.
 
         Note: if a request is performed for several event type, all subscribed event will use same `config`
         parameters.
@@ -1507,7 +1517,7 @@ components:
         sinkCredential:
           credentialType: "ACCESSTOKEN"
           accessToken: "eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJKV1QiL.."
-          accessTokenExpireUtc: "2024-12-06T14:37:56.147Z"
+          accessTokenExpiresUtc: "2024-12-06T14:37:56.147Z"
           accessTokenType: "bearer"
         types:
           - org.camaraproject.webrtc-events.v0.registration-ends
@@ -1524,8 +1534,8 @@ components:
         the client aware of registration status updates from the server.
         (i.e. when a REGISTRATION expires).
 
-        The provided example will be able to receive up to 50 calls until
-        subscription is cancelled via server or by configuration timeout. Check
+        The example uses `sinkCredential` for authenticated event delivery and
+        a `subscriptionExpireTime` to control the subscription lifetime. Check
         callback examples to check some possible events received:
 
         - New incoming call
@@ -1533,13 +1543,16 @@ components:
       value:
         protocol: HTTP
         sink: https://notificationServer.opentelco.com
+        sinkCredential:
+          credentialType: "ACCESSTOKEN"
+          accessToken: "eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJKV1QiL.."
+          accessTokenExpiresUtc: "2024-12-06T14:37:56.147Z"
+          accessTokenType: "bearer"
         types:
           - org.camaraproject.webrtc-events.v0.session-invitation
         config:
           subscriptionDetail:
             deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
-          initialEvent: true
-          subscriptionMaxEvents: 50
           subscriptionExpireTime: "2024-11-17T13:18:23.682Z"
     SESSION_SUBSCRIPTION:
       description: |-
@@ -1551,16 +1564,22 @@ components:
         This could be used to remotely control the call or to handle the async
         session establishment. For instance, updating the user interface for
         different statuses: InProgress, Ringing, Cancel, etc.
+
+        The example uses `sinkCredential` for authenticated event delivery and
+        a `subscriptionExpireTime` to control the subscription lifetime.
       value:
         protocol: HTTP
         sink: https://notificationServer.opentelco.com
+        sinkCredential:
+          credentialType: "ACCESSTOKEN"
+          accessToken: "eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJKV1QiL.."
+          accessTokenExpiresUtc: "2024-12-06T14:37:56.147Z"
+          accessTokenType: "bearer"
         types:
           - org.camaraproject.webrtc-events.v0.session-status
         config:
           subscriptionDetail:
             deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
-          initialEvent: true
-          subscriptionMaxEvents: 50
           subscriptionExpireTime: "2024-11-17T13:18:23.682Z"
     UPDATE_SUBSCRIPTION:
       description: |-
