@@ -387,6 +387,63 @@ paths:
           $ref: "#/components/responses/Generic403"
         "404":
           $ref: "#/components/responses/Generic404"
+    put:
+      tags:
+        - Webrtc-events Subscription
+      summary: "Update a webrtc-events event subscription"
+      description: |-
+        Update a given webrtc-events subscription without changing its identity.
+
+        This operation is idempotent. Repeating the same update request results
+        in the same final subscription state.
+
+        Either or both of the following attributes may be updated:
+        - `sinkCredential`
+        - `config.subscriptionExpireTime`
+
+        The subscription `sink`, event types, and `config.subscriptionDetail`
+        are not modified by this operation.
+      operationId: updateNotificationChannelSubscription
+      security:
+        - openId:
+            - webrtc-events:update
+      parameters:
+        - $ref: "#/components/parameters/SubscriptionId"
+        - $ref: "#/components/parameters/x-correlator"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubscriptionUpdateRequest"
+            examples:
+              UPDATE_SUBSCRIPTION:
+                $ref: "#/components/examples/UPDATE_SUBSCRIPTION"
+      responses:
+        "200":
+          description: Updated
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+              examples:
+                UPDATED_SUBSCRIPTION:
+                  $ref: "#/components/examples/UPDATED_SUBSCRIPTION"
+        "400":
+          $ref: "#/components/responses/CreateSubscriptionBadRequest400"
+        "401":
+          $ref: "#/components/responses/Generic401"
+        "403":
+          $ref: "#/components/responses/SubscriptionPermissionDenied403"
+        "404":
+          $ref: "#/components/responses/Generic404"
+        "422":
+          $ref: "#/components/responses/CreateSubscriptionUnprocessableEntity422"
+        "429":
+          $ref: "#/components/responses/Generic429"
     delete:
       tags:
         - Webrtc-events Subscription
@@ -510,6 +567,20 @@ components:
         mapping:
           HTTP: "#/components/schemas/HTTPSubscriptionRequest"
 
+    SubscriptionUpdateRequest:
+      description: |-
+        The request for updating an existing event subscription.
+
+        Either or both of `sinkCredential` and `config.subscriptionExpireTime`
+        may be updated.
+      type: object
+      properties:
+        sinkCredential:
+          $ref: "#/components/schemas/SinkCredential"
+        config:
+          $ref: "#/components/schemas/SubscriptionUpdateConfig"
+      additionalProperties: false
+
     Config:
       description: |-
         Implementation-specific configuration parameters needed by the subscription manager for acquiring
@@ -544,6 +615,24 @@ components:
             Set to `true` by API consumer if consumer wants to get an event as soon as the subscription is created and current situation reflects event request.
             Example: Consumer request Roaming event. If consumer sets initialEvent to true and device is in roaming situation, an event is triggered
             Up to API project decision to keep it.
+
+    SubscriptionUpdateConfig:
+      description: |-
+        Configuration parameters that may be updated for an existing subscription.
+
+        For this API, only `subscriptionExpireTime` may be updated through
+        `PUT /subscriptions/{subscriptionId}`.
+      type: object
+      properties:
+        subscriptionExpireTime:
+          type: string
+          format: date-time
+          example: "2023-01-17T13:18:23.682Z"
+          description: |-
+            The updated subscription expiration time requested by the API consumer.
+            It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
+            and must have time zone.
+      additionalProperties: false
 
     Protocol:
       type: string
@@ -1473,6 +1562,35 @@ components:
           initialEvent: true
           subscriptionMaxEvents: 50
           subscriptionExpireTime: "2024-11-17T13:18:23.682Z"
+    UPDATE_SUBSCRIPTION:
+      description: |-
+        Example of updating an existing subscription. Either `sinkCredential`,
+        `config.subscriptionExpireTime`, or both may be updated.
+      value:
+        sinkCredential:
+          credentialType: "ACCESSTOKEN"
+          accessToken: "eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJKV1QiL..updated"
+          accessTokenExpiresUtc: "2025-05-01T14:37:56.147Z"
+          accessTokenType: "bearer"
+        config:
+          subscriptionExpireTime: "2025-05-01T13:18:23.682Z"
+    UPDATED_SUBSCRIPTION:
+      description: |-
+        Example of the updated subscription returned after a successful
+        subscription update operation.
+      value:
+        protocol: HTTP
+        sink: https://endpoint.example.com/sink
+        types:
+          - org.camaraproject.webrtc-events.v0.session-status
+        config:
+          subscriptionDetail:
+            deviceId: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+          subscriptionExpireTime: "2023-01-17T13:18:23.682Z"
+        id: "qs15-h556-rt89-1298"
+        startsAt: "2023-07-03T12:27:08.312Z"
+        expiresAt: "2023-07-03T12:27:08.312Z"
+        status: "ACTIVE"
     # Event examples
     NEW_SESSION_INCOMING:
       description: |-
