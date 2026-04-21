@@ -61,7 +61,7 @@ info:
     - **SDP**: Acronym for Session Description Protocol. The SDP is a format for
       describing multimedia communication sessions for the purposes of announcement
       and invitation.
-    - **WrtcSDPDescriptor**: Schema to include inside a JSON, a SDP body. You can
+    - **WrtcSdpDescriptor**: Schema to include inside a JSON, a SDP body. You can
       obtain an SDP for WebRTC calling using the WebRTC API provided by the browser
       or any other media library.
 
@@ -482,9 +482,9 @@ components:
         status:
           $ref: '#/components/schemas/SessionStatus'
         offer:
-          $ref: '#/components/schemas/WrtcSDPDescriptor'
+          $ref: '#/components/schemas/WrtcSdpDescriptor'
         answer:
-          $ref: '#/components/schemas/WrtcSDPDescriptor'
+          $ref: '#/components/schemas/WrtcSdpDescriptor'
         mediaSessionId:
           type: string
           description: >-
@@ -500,7 +500,7 @@ components:
             - EMERGENCY
         locationDetails:
           $ref: '#/components/schemas/LocationDetails'
-    WrtcSDPDescriptor:
+    WrtcSdpDescriptor:
       type: object
       description: |-
         **OFFER**: An inlined session description in SDP format [RFC4566].If XML syntax

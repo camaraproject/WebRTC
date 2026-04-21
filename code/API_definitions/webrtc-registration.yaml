@@ -149,7 +149,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/regSessionRequest'
+              $ref: '#/components/schemas/RegSessionRequest'
       responses:
         '200':
           description: Ok
@@ -159,7 +159,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/regSessionResponse'
+                $ref: '#/components/schemas/RegSessionResponse'
         '400':
           $ref: "#/components/responses/CreateSessionBadRequest400"
         '401':
@@ -202,7 +202,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/regSessionUpdate'
+              $ref: '#/components/schemas/RegSessionUpdate'
       responses:
         '200':
           description: Ok
@@ -212,7 +212,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/regSessionResponse'
+                $ref: '#/components/schemas/RegSessionResponse'
         '204':
           description: Updated the registration status (no content)
           headers:
@@ -288,7 +288,7 @@ components:
       type: string
       pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
       example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
-    regSessionRequest:
+    RegSessionRequest:
       type: object
       required:
         - deviceId
@@ -319,7 +319,7 @@ components:
             ▸ If the client omits this field, the server will set the expiry
               according to its own TTL policy and return the resulting
               `registrationExpireTime` in the response.
-    regSessionResponse:
+    RegSessionResponse:
       type: object
       required:
         - registrationId
@@ -341,7 +341,7 @@ components:
             and plan to refresh well in advance to avoid race conditions. A suggested margin is 120 seconds before expiry.
 
             It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-    regSessionUpdate:
+    RegSessionUpdate:
       type: object
       properties:
         registrationExpireTime:
