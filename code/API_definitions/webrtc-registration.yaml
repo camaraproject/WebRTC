@@ -315,7 +315,12 @@ components:
 
               and initiate a refresh *before* `ttl` elapses (a safety margin
               of ~120 s is recommended).
-
+              
+            ▸ If the client includes this field, the server evaluates the
+              requested expiry against its local policy and may shorten (but
+              must not extend) the requested value. A requested duration exceeding
+              the operator's allowed limit is overridden by the server.
+              
             ▸ If the client omits this field, the server will set the expiry
               according to its own TTL policy and return the resulting
               `registrationExpireTime` in the response.
