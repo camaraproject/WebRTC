@@ -237,6 +237,11 @@ paths:
         To subscribe and receive notifications about new calls, a
         `session-invitation` subscription is required using the `deviceId` related to a valid registration.
 
+        For WebRTC calling subscription scenarios, developers should not use
+        `initialEvent` or `subscriptionMaxEvents`. These attributes remain in
+        the schema for CAMARA compatibility, but they are not used by this API
+        for WebRTC calling subscriptions.
+
       operationId: createNotificationChannelSubscription
       parameters:
         - $ref: "#/components/parameters/x-correlator"
@@ -404,6 +409,63 @@ paths:
           $ref: "#/components/responses/Generic403"
         "404":
           $ref: "#/components/responses/Generic404"
+    put:
+      tags:
+        - Webrtc-events Subscription
+      summary: "Update a webrtc-events event subscription"
+      description: |-
+        Update a given webrtc-events subscription without changing its identity.
+
+        This operation is idempotent. Repeating the same update request results
+        in the same final subscription state.
+
+        Either or both of the following attributes may be updated:
+        - `sinkCredential`
+        - `config.subscriptionExpireTime`
+
+        The subscription `sink`, event types, and `config.subscriptionDetail`
+        are not modified by this operation.
+      operationId: updateNotificationChannelSubscription
+      security:
+        - openId:
+            - webrtc-events:update
+      parameters:
+        - $ref: "#/components/parameters/SubscriptionId"
+        - $ref: "#/components/parameters/x-correlator"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubscriptionUpdateRequest"
+            examples:
+              UPDATE_SUBSCRIPTION:
+                $ref: "#/components/examples/UPDATE_SUBSCRIPTION"
+      responses:
+        "200":
+          description: Updated
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+              examples:
+                UPDATED_SUBSCRIPTION:
+                  $ref: "#/components/examples/UPDATED_SUBSCRIPTION"
+        "400":
+          $ref: "#/components/responses/CreateSubscriptionBadRequest400"
+        "401":
+          $ref: "#/components/responses/Generic401"
+        "403":
+          $ref: "#/components/responses/SubscriptionPermissionDenied403"
+        "404":
+          $ref: "#/components/responses/Generic404"
+        "422":
+          $ref: "#/components/responses/CreateSubscriptionUnprocessableEntity422"
+        "429":
+          $ref: "#/components/responses/Generic429"
     delete:
       tags:
         - Webrtc-events Subscription
@@ -514,18 +576,28 @@ components:
         types:
           description: |-
             Camara Event types eligible to be delivered by this subscription.
-            Note: the maximum number of event types per subscription will be decided at API project level
+            Note: Multiple event types per subscription MAY be supported. If multi-event subscription is not supported, a 422 MULTIEVENT_SUBSCRIPTION_NOT_SUPPORTED error will be returned.
           type: array
           minItems: 1
-          maxItems: 1
+          maxItems: 3
           items:
             $ref: "#/components/schemas/SubscriptionEventType"
         config:
           $ref: "#/components/schemas/Config"
-      discriminator:
-        propertyName: protocol
-        mapping:
-          HTTP: "#/components/schemas/HTTPSubscriptionRequest"
+
+    SubscriptionUpdateRequest:
+      description: |-
+        The request for updating an existing event subscription.
+
+        Either or both of `sinkCredential` and `config.subscriptionExpireTime`
+        may be updated.
+      type: object
+      properties:
+        sinkCredential:
+          $ref: "#/components/schemas/SinkCredential"
+        config:
+          $ref: "#/components/schemas/SubscriptionUpdateConfig"
+      additionalProperties: false
 
     Config:
       description: |-
@@ -534,6 +606,11 @@ components:
         specifications.
 
         WebRTC specific event type attributes are included into `WebrtcSubscriptionDetail` schema.
+
+        For WebRTC calling subscriptions in this API, developers should use `subscriptionDetail`
+        and, optionally, `subscriptionExpireTime`. The predefined CAMARA attributes
+        `subscriptionMaxEvents` and `initialEvent` are kept for schema alignment and compatibility,
+        but they are not used for WebRTC calling subscription scenarios.
 
         Note: if a request is performed for several event type, all subscribed event will use same `config`
         parameters.
@@ -561,6 +638,24 @@ components:
             Set to `true` by API consumer if consumer wants to get an event as soon as the subscription is created and current situation reflects event request.
             Example: Consumer request Roaming event. If consumer sets initialEvent to true and device is in roaming situation, an event is triggered
             Up to API project decision to keep it.
+
+    SubscriptionUpdateConfig:
+      description: |-
+        Configuration parameters that may be updated for an existing subscription.
+
+        For this API, only `subscriptionExpireTime` may be updated through
+        `PUT /subscriptions/{subscriptionId}`.
+      type: object
+      properties:
+        subscriptionExpireTime:
+          type: string
+          format: date-time
+          example: "2023-01-17T13:18:23.682Z"
+          description: |-
+            The updated subscription expiration time requested by the API consumer.
+            It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
+            and must have time zone.
+      additionalProperties: false
 
     Protocol:
       type: string
@@ -670,7 +765,6 @@ components:
         types:
           description: |-
             Camara Event types eligible to be delivered by this subscription.
-            Note: the maximum number of event types per subscription will be decided at API project level
           type: array
           minItems: 1
           maxItems: 1
@@ -709,10 +803,6 @@ components:
             - EXPIRED
             - INACTIVE
             - DELETED
-      discriminator:
-        propertyName: protocol
-        mapping:
-          HTTP: '#/components/schemas/HTTPSubscriptionResponse'
 
     SubscriptionAsync:
       description: Response for a event-type subscription request managed asynchronously (Creation or Deletion)
@@ -1555,7 +1645,7 @@ components:
         sinkCredential:
           credentialType: "ACCESSTOKEN"
           accessToken: "eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJKV1QiL.."
-          accessTokenExpireUtc: "2024-12-06T14:37:56.147Z"
+          accessTokenExpiresUtc: "2024-12-06T14:37:56.147Z"
           accessTokenType: "bearer"
         types:
           - org.camaraproject.webrtc-events.v0.registration-ends
@@ -1572,8 +1662,8 @@ components:
         the client aware of registration status updates from the server.
         (i.e. when a REGISTRATION expires).
 
-        The provided example will be able to receive up to 50 calls until
-        subscription is cancelled via server or by configuration timeout. Check
+        The example uses `sinkCredential` for authenticated event delivery and
+        a `subscriptionExpireTime` to control the subscription lifetime. Check
         callback examples to check some possible events received:
 
         - New incoming call
@@ -1581,13 +1671,16 @@ components:
       value:
         protocol: HTTP
         sink: https://notificationServer.opentelco.com
+        sinkCredential:
+          credentialType: "ACCESSTOKEN"
+          accessToken: "eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJKV1QiL.."
+          accessTokenExpiresUtc: "2024-12-06T14:37:56.147Z"
+          accessTokenType: "bearer"
         types:
           - org.camaraproject.webrtc-events.v0.session-invitation
         config:
           subscriptionDetail:
             deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
-          initialEvent: true
-          subscriptionMaxEvents: 50
           subscriptionExpireTime: "2024-11-17T13:18:23.682Z"
     SESSION_SUBSCRIPTION:
       description: |-
@@ -1599,17 +1692,52 @@ components:
         This could be used to remotely control the call or to handle the async
         session establishment. For instance, updating the user interface for
         different statuses: InProgress, Ringing, Cancel, etc.
+
+        The example uses `sinkCredential` for authenticated event delivery and
+        a `subscriptionExpireTime` to control the subscription lifetime.
       value:
         protocol: HTTP
         sink: https://notificationServer.opentelco.com
+        sinkCredential:
+          credentialType: "ACCESSTOKEN"
+          accessToken: "eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJKV1QiL.."
+          accessTokenExpiresUtc: "2024-12-06T14:37:56.147Z"
+          accessTokenType: "bearer"
         types:
           - org.camaraproject.webrtc-events.v0.session-status
         config:
           subscriptionDetail:
             deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
-          initialEvent: true
-          subscriptionMaxEvents: 50
           subscriptionExpireTime: "2024-11-17T13:18:23.682Z"
+    UPDATE_SUBSCRIPTION:
+      description: |-
+        Example of updating an existing subscription. Either `sinkCredential`,
+        `config.subscriptionExpireTime`, or both may be updated.
+      value:
+        sinkCredential:
+          credentialType: "ACCESSTOKEN"
+          accessToken: "eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJKV1QiL..updated"
+          accessTokenExpiresUtc: "2025-05-01T14:37:56.147Z"
+          accessTokenType: "bearer"
+        config:
+          subscriptionExpireTime: "2025-05-01T13:18:23.682Z"
+    UPDATED_SUBSCRIPTION:
+      description: |-
+        Example of the updated subscription returned after a successful
+        subscription update operation.
+      value:
+        protocol: HTTP
+        sink: https://endpoint.example.com/sink
+        types:
+          - org.camaraproject.webrtc-events.v0.session-status
+        config:
+          subscriptionDetail:
+            deviceId: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+          subscriptionExpireTime: "2023-01-17T13:18:23.682Z"
+        id: "qs15-h556-rt89-1298"
+        startsAt: "2023-07-03T12:27:08.312Z"
+        expiresAt: "2023-07-03T12:27:08.312Z"
+        status: "ACTIVE"
     # Event examples
     NEW_SESSION_INCOMING:
       description: |-
