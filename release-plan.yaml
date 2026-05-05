@@ -34,7 +34,7 @@ dependencies:
 apis:
   - api_name: webrtc-call-handling
     target_api_version: 0.4.0
-    target_api_status: public
+    target_api_status: rc
     main_contacts:
       - stroncoso
       - pradeepachar-mavenir
@@ -42,7 +42,7 @@ apis:
       - teikuran
   - api_name: webrtc-events
     target_api_version: 0.3.0
-    target_api_status: public
+    target_api_status: rc
     main_contacts:
       - stroncoso
       - pradeepachar-mavenir
@@ -50,7 +50,7 @@ apis:
       - teikuran
   - api_name: webrtc-registration
     target_api_version: 0.4.0
-    target_api_status: public
+    target_api_status: rc
     main_contacts:
       - stroncoso
       - pradeepachar-mavenir
