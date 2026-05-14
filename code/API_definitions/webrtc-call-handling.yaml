@@ -502,7 +502,7 @@ components:
           $ref: '#/components/schemas/LocationDetails'
 
     MediaSessionCreate:
-      description: Request body for creating a main session
+      description: Request body for creating a main session (POST request)
       allOf:
         - $ref: '#/components/schemas/MediaSessionInformation'
         - type: object
@@ -512,7 +512,7 @@ components:
             - offer
 
     MediaSessionResponse:
-      description: Representation of a media session resource
+      description: Representation of a media session resource (POST/PUT/GET response)
       allOf:
         - $ref: '#/components/schemas/MediaSessionInformation'
         - type: object
@@ -524,7 +524,7 @@ components:
             - mediaSessionId
   
     MediaSessionStatusChange:
-      description: Request body for updating the status of a media session
+      description: Request body for updating the status of a media session (PUT request)
       type: object
       required:
         - status
