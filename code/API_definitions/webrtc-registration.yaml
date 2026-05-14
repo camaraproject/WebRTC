@@ -78,8 +78,7 @@ info:
     repository.
 
     **Behaviour on registration expiration:**
-    - Ongoing media sessions MAY be terminated when the registration expires
-      based on operator's policy.
+    - Ongoing media sessions MAY be terminated when the registration expires.
     - Event subscriptions created via webrtc-events API are not affected.
 
     # Authorization and authentication
