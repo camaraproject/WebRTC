@@ -144,15 +144,13 @@ info:
 
     **Located calls**
 
-    The CAMARA WebRTC API provides an standardization way to locate caller
+    The CAMARA WebRTC API provides a standardized way to locate caller
     origin. If provided by the network, it helps to contextualize the calls
-    in aim of enhanced security, routing or any other use case. The located
-    calls include a `originatorLocationDetails` object on the `session-invitation`
-    event that could be parsed and used by the API consumer.
-
-    As each party can share its own location, there are two separated objects
-    `originatorLocationDetails` and `receiverLocationDetails`, both serving
-    the same purpose and implementing the `locationDetails` schema.
+    in aim of enhanced security, routing or any other use case. Located
+    calls include a `locationDetails` object describing the location of the
+    party that generated the event. Any party (originating or answering)
+    MAY include `locationDetails` in events and updates it sends; the field
+    always refers to the sender's own device location.
 
     The `locationDetails` schema follows PIDF-LO concepts (3GPP TS 24.229,
     RFC 4119, RFC 5139, RFC 5491) with either a circle or ellipsoid shape.
@@ -998,12 +996,8 @@ components:
         sequenceNumber:
           type: integer
           description: The sequence number of the notification sent to client
-        originatorLocationDetails:
-          description: Location of the call originator's device, as provided by the originating party.
-          allOf:
-            - $ref: '#/components/schemas/LocationDetails'
-        receiverLocationDetails:
-          description: Location of the call receiver's device, as provided by the answering party.
+        locationDetails:
+          description: Location of the party that generated this event.
           allOf:
             - $ref: '#/components/schemas/LocationDetails'
 
