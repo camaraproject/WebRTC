@@ -968,9 +968,9 @@ components:
             - NotReachable
             - Busy
         offer:
-          $ref: '#/components/schemas/WrtcSDPDescriptor'
+          $ref: '#/components/schemas/WrtcSdpDescriptor'
         answer:
-          $ref: '#/components/schemas/WrtcSDPDescriptor'
+          $ref: '#/components/schemas/WrtcSdpDescriptor'
         mediaSessionId:
           type: string
           description: The media session ID created by the network. The mediaSessionId shall not be included in POST requests by the client, but must be included in the notifications from the network to client.
@@ -1000,7 +1000,7 @@ components:
             - receiverAddress
             - status
 
-    WrtcSDPDescriptor:
+    WrtcSdpDescriptor:
       type: object
       properties:
         sdp:
