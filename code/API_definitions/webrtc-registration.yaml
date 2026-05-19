@@ -77,6 +77,10 @@ info:
     Check for extra details on each of these APIs already present on the WebRTC
     repository.
 
+    **Behaviour on registration expiration:**
+    - Ongoing media sessions MAY be terminated when the registration expires.
+    - Event subscriptions created via webrtc-events API are not affected.
+
     # Authorization and authentication
 
     The "Camara Security and Interoperability Profile" provides details of how an
