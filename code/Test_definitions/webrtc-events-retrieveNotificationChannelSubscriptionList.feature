@@ -1,6 +1,6 @@
-Feature: CAMARA WebRTC Events, vwip - Operation getListSubscriptions
+Feature: CAMARA WebRTC Events, vwip - Operation retrieveNotificationChannelSubscriptionList
 
-  Background: Common getListSubscriptions setup
+  Background: Common retrieveNotificationChannelSubscriptionList setup
     Given an environment at "apiRoot"
     And the resource "/webrtc-events/vwip/subscriptions"                                                              |
     And the header "Content-Type" is set to "application/json"
@@ -9,7 +9,7 @@ Feature: CAMARA WebRTC Events, vwip - Operation getListSubscriptions
     And the path parameter "subscriptionId" is set by default to a existing register session
     # Properties not explicitly overwitten in the Scenarios can take any values compliant with the schema
 
-  @webrtc_events_getListSubscriptions_01_generic_success_scenario
+  @webrtc_events_retrieveNotificationChannelSubscriptionList_01_generic_success_scenario
   Scenario: Retrieve a list of webrtc-events event subscription
     When the client sends a GET request to "/subscriptions"
     Then the response status code should be 200
@@ -20,7 +20,7 @@ Feature: CAMARA WebRTC Events, vwip - Operation getListSubscriptions
 
   # Generic 401 errors
 
-  @webrtc_events_getListSubscriptions_401.1_no_authorization_header
+  @webrtc_events_retrieveNotificationChannelSubscriptionList_401.1_no_authorization_header
   Scenario: No Authorization header
     Given the header "Authorization" is removed
     And the request body is set to a valid request body
@@ -30,7 +30,7 @@ Feature: CAMARA WebRTC Events, vwip - Operation getListSubscriptions
     And the response property "$.code" is "UNAUTHENTICATED"
     And the response property "$.message" contains a user friendly text
 
-  @webrtc_events_getListSubscriptions_401.2_expired_access_token
+  @webrtc_events_retrieveNotificationChannelSubscriptionList_401.2_expired_access_token
   Scenario: Expired access token
     Given the header "Authorization" is set to an expired access token
     And the request body is set to a valid request body
@@ -40,7 +40,7 @@ Feature: CAMARA WebRTC Events, vwip - Operation getListSubscriptions
     And the response property "$.code" is "UNAUTHENTICATED"
     And the response property "$.message" contains a user friendly text
 
-  @webrtc_events_getListSubscriptions_401.3_invalid_access_token
+  @webrtc_events_retrieveNotificationChannelSubscriptionList_401.3_invalid_access_token
   Scenario: Invalid access token
     Given the header "Authorization" is set to an invalid access token
     And the request body is set to a valid request body
