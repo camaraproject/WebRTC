@@ -59,7 +59,9 @@ info:
 
     This API allows to create device registrations. These, identified by a unique
     `registrationId` can be updated and terminated via this API and its methods.
-    - **POST**: Create a new device registration using a valid authorization token.
+    - **GET**: Retrieve an existing device registration via its unique `registrationId`,
+      or retrieve all active registrations for a device via `deviceId` query parameter
+    - **POST**: Create a new device registration using a valid authorization token. Returns `201 Created` on success.
     - **PUT**: Update a device registration via its unique `registrationId`
     - **DELETE**: Finish an existing device registration via its unique `registrationId`
     To receive server-side updates about new voice-video sessions, you need to
@@ -76,6 +78,10 @@ info:
 
     Check for extra details on each of these APIs already present on the WebRTC
     repository.
+
+    **Behaviour on registration expiration:**
+    - Ongoing media sessions MAY be terminated when the registration expires.
+    - Event subscriptions created via webrtc-events API are not affected.
 
     # Authorization and authentication
 
@@ -130,6 +136,81 @@ tags:
     description: Operations to manage device registration with the network
 paths:
   /sessions:
+    get:
+      tags:
+        - Registration
+      summary: Retrieve all registrations for a device
+      description: |-
+        Retrieve all active registrations associated with a given `deviceId`.
+
+        This endpoint allows an API consumer to recover registration state
+        after a network disconnection or application restart, where the
+        `registrationId` has been lost but the `deviceId` is known.
+
+        Returns an empty array if no active registrations exist for the
+        given `deviceId`. It is not possible to retrieve registrations
+        belonging to other devices.
+      operationId: getRegistrationsByDeviceId
+      parameters:
+        - $ref: '#/components/parameters/x-correlator'
+        - name: deviceId
+          in: query
+          required: true
+          description: |-
+            The deviceId of the client in UUID format. Only registrations
+            associated with this deviceId will be returned.
+          schema:
+            type: string
+            format: uuid
+      security:
+        - openId:
+            - webrtc-registration:sessions:read
+      responses:
+        '200':
+          description: |-
+            List of active registrations for the given deviceId.
+            Returns an empty array if no active registrations exist.
+          headers:
+            x-correlator:
+              $ref: '#/components/headers/x-correlator'
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 10
+                items:
+                  $ref: '#/components/schemas/regSessionResponse'
+              examples:
+                MultipleRegistrations:
+                  summary: Device with multiple active registrations (multi-MSISDN)
+                  value:
+                    - regInfo:
+                        phoneNumber: "+123456789"
+                        regStatus: Registered
+                      registrationId: "a1b2c3d4-1234-5678-abcd-ef0123456789"
+                      expiresAt: "2026-05-05T13:32:17.358Z"
+                    - regInfo:
+                        phoneNumber: "+198765432"
+                        regStatus: Registered
+                      registrationId: "b2c3d4e5-5678-9012-efgh-ab0123456789"
+                      expiresAt: "2026-05-05T14:00:00.000Z"
+                SingleRegistration:
+                  summary: Device with a single active registration
+                  value:
+                    - regInfo:
+                        phoneNumber: "+123456789"
+                        regStatus: Registered
+                      registrationId: "a1b2c3d4-1234-5678-abcd-ef0123456789"
+                      expiresAt: "2026-05-05T13:32:17.358Z"
+                NoRegistrations:
+                  summary: No active registrations for the deviceId
+                  value: []
+        '400':
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
     post:
       tags:
         - Registration
@@ -151,8 +232,8 @@ paths:
             schema:
               $ref: '#/components/schemas/RegSessionRequest'
       responses:
-        '200':
-          description: Ok
+        '201':
+          description: Created
           headers:
             x-correlator:
               $ref: "#/components/headers/x-correlator"
@@ -167,6 +248,55 @@ paths:
         '403':
           $ref: "#/components/responses/CreateSessionForbidden403"
   /sessions/{registrationId}:
+    get:
+      tags:
+        - Registration
+      summary: Retrieve a device registration
+      description: |-
+        Retrieve an existing registration by its `registrationId`.
+
+        This endpoint allows an API consumer to confirm whether a registration
+        is still active and retrieve its current state. A typical use case is
+        state recovery after a network disconnection or application restart,
+        where the client has a previously stored `registrationId` and needs to
+        verify it is still valid before attempting to create calls or subscribe
+        to events.
+
+        Returns `404` if the registration does not exist or has expired.
+      operationId: getRegistrationById
+      parameters:
+        - $ref: '#/components/parameters/x-correlator'
+        - $ref: '#/components/parameters/pathParamRegistrationId'
+      security:
+        - openId:
+            - webrtc-registration:sessions:read
+      responses:
+        '200':
+          description: Registration details retrieved successfully
+          headers:
+            x-correlator:
+              $ref: '#/components/headers/x-correlator'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/regSessionResponse'
+              examples:
+                ActiveRegistration:
+                  summary: Active registration response
+                  value:
+                    regInfo:
+                      phoneNumber: "+123456789"
+                      regStatus: Registered
+                    registrationId: "a1b2c3d4-1234-5678-abcd-ef0123456789"
+                    expiresAt: "2026-05-05T13:32:17.358Z"
+        '400':
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
+        '404':
+          $ref: '#/components/responses/Generic404'
     put:
       tags:
         - Registration
@@ -295,7 +425,7 @@ components:
       properties:
         deviceId:
           type: string
-          pattern: uuid
+          format: uuid
           description: |-
             The deviceId of the client in UUID format. A unique identifier for
             the physical device where a registration is initiated. Generated

@@ -1,6 +1,6 @@
-Feature: CAMARA WebRTC Events, vwip - Operation createSubscription
+Feature: CAMARA WebRTC Events, vwip - Operation createNotificationChannelSubscription
 
-  Background: Common createSubscription setup
+  Background: Common createNotificationChannelSubscription setup
     Given an environment at "apiRoot"
     And the resource "/webrtc-events/vwip/subscriptions"                                                              |
     And the header "Content-Type" is set to "application/json"
@@ -9,7 +9,7 @@ Feature: CAMARA WebRTC Events, vwip - Operation createSubscription
     And the request body is set by default to a request body compliant with the schema at "/components/schemas/SubscriptionRequest"
     # Properties not explicitly overwritten in the Scenarios can take any values compliant with the schema
 
-  @webrtc_events_createSubscription_01_generic_success_scenario
+  @webrtc_events_createNotificationChannelSubscription_01_generic_success_scenario
   Scenario: Create a webrtc-events event subscription
     When the client sends a POST request to "/sessions" with the following payload:
       """
@@ -38,7 +38,7 @@ Feature: CAMARA WebRTC Events, vwip - Operation createSubscription
 
   # Generic 400 errors
 
-  @webrtc_events_createSubscription_400.1_no_request_body
+  @webrtc_events_createNotificationChannelSubscription_400.1_no_request_body
   Scenario: Missing request body
     Given the request body is not included
     When the HTTP "POST" request is sent
@@ -47,7 +47,7 @@ Feature: CAMARA WebRTC Events, vwip - Operation createSubscription
     And the response property "$.code" is "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
 
-  @webrtc_events_createSubscription_400.2_empty_request_body
+  @webrtc_events_createNotificationChannelSubscription_400.2_empty_request_body
   Scenario: Empty object as request body
     Given the request body is set to "{}"
     When the HTTP "POST" request is sent
@@ -58,7 +58,7 @@ Feature: CAMARA WebRTC Events, vwip - Operation createSubscription
 
   # Generic 401 errors
 
-  @webrtc_events_createSubscription_401.1_no_authorization_header
+  @webrtc_events_createNotificationChannelSubscription_401.1_no_authorization_header
   Scenario: No Authorization header
     Given the header "Authorization" is removed
     And the request body is set to a valid request body
@@ -68,7 +68,7 @@ Feature: CAMARA WebRTC Events, vwip - Operation createSubscription
     And the response property "$.code" is "UNAUTHENTICATED"
     And the response property "$.message" contains a user friendly text
 
-  @webrtc_events_createSubscription_401.2_expired_access_token
+  @webrtc_events_createNotificationChannelSubscription_401.2_expired_access_token
   Scenario: Expired access token
     Given the header "Authorization" is set to an expired access token
     And the request body is set to a valid request body
@@ -78,7 +78,7 @@ Feature: CAMARA WebRTC Events, vwip - Operation createSubscription
     And the response property "$.code" is "UNAUTHENTICATED"
     And the response property "$.message" contains a user friendly text
 
-  @webrtc_events_createSubscription_401.3_invalid_access_token
+  @webrtc_events_createNotificationChannelSubscription_401.3_invalid_access_token
   Scenario: Invalid access token
     Given the header "Authorization" is set to an invalid access token
     And the request body is set to a valid request body
