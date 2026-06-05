@@ -551,6 +551,7 @@ components:
       properties:
         status:
           type: integer
+          format: int32
           description: HTTP response status code
         code:
           type: string
@@ -638,6 +639,7 @@ components:
             It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
         subscriptionMaxEvents:
           type: integer
+          format: int32
           description: Identifies the maximum number of event reports to be generated (>=1) requested by the API consumer - Once this number is reached, the subscription ends. Up to API project decision to keep it.
           minimum: 1
           example: 5
@@ -1027,6 +1029,7 @@ components:
           description: The description of the event that has happened within the session
         sequenceNumber:
           type: integer
+          format: int32
           description: The sequence number of the notification sent to client
         locationDetails:
           description: Location of the party that generated this event.

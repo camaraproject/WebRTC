@@ -541,6 +541,7 @@ components:
       properties:
         status:
           type: integer
+          format: int32
           description: HTTP response status code
         code:
           type: string
