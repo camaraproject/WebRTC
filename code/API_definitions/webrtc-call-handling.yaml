@@ -535,7 +535,7 @@ components:
             guarantee of any particular server-side action or behavior.
           allOf:
             - $ref: '#/components/schemas/LocationDetails'
-    WrtcSDPDescriptor:
+    WrtcSdpDescriptor:
       type: object
       description: |-
         **OFFER**: An inlined session description in SDP format [RFC4566].If XML syntax

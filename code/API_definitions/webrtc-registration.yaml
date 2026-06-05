@@ -179,7 +179,7 @@ paths:
                 type: array
                 maxItems: 10
                 items:
-                  $ref: '#/components/schemas/regSessionResponse'
+                  $ref: '#/components/schemas/RegSessionResponse'
               examples:
                 MultipleRegistrations:
                   summary: Device with multiple active registrations (multi-MSISDN)
@@ -279,7 +279,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/regSessionResponse'
+                $ref: '#/components/schemas/RegSessionResponse'
               examples:
                 ActiveRegistration:
                   summary: Active registration response
