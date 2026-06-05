@@ -542,6 +542,8 @@ components:
         status:
           type: integer
           format: int32
+          minimum: 100
+          maximum: 599
           description: HTTP response status code
         code:
           type: string
