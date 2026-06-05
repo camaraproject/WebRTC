@@ -474,6 +474,7 @@ components:
       explode: false
       schema:
         type: string
+        maxLength: 256
     pathParamMediaSessionId:
       name: mediaSessionId
       in: path
@@ -483,6 +484,7 @@ components:
       explode: false
       schema:
         type: string
+        maxLength: 256
     x-correlator:
       name: x-correlator
       in: header
@@ -494,6 +496,7 @@ components:
       description: Correlator string, UUID format recommended but any string matching the pattern can be used
       type: string
       pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+      maxLength: 256
       example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
     MediaSessionInformation:
       description: Information about a WebRTC media session including originator and receiver identities, SDP offer/answer, and call status
@@ -503,12 +506,14 @@ components:
           $ref: '#/components/schemas/Address'
         originatorName:
           type: string
+          maxLength: 256
           description: Friendly name of the call originator
           example: 'Alice'
         receiverAddress:
           $ref: '#/components/schemas/Address'
         receiverName:
           type: string
+          maxLength: 256
           description: Friendly name of the call terminator
           example: 'Bob'
         status:
@@ -519,6 +524,7 @@ components:
           $ref: '#/components/schemas/WrtcSDPDescriptor'
         mediaSessionId:
           type: string
+          maxLength: 256
           description: >-
             The media session ID created by the network. The mediaSessionId shall not be
             included in POST requests by the client, but must be included in the notifications
@@ -553,6 +559,7 @@ components:
       properties:
         sdp:
           type: string
+          maxLength: 65536
           description: |-
             An inlined session description in SDP format [RFC4566].If XML syntax is used, the content of this element SHALL be embedded in a CDATA section
     SessionStatus:
@@ -588,14 +595,17 @@ components:
           description: HTTP response status code
         code:
           type: string
+          maxLength: 96
           description: Friendly Code to describe the error
         message:
           type: string
+          maxLength: 512
           description: A human readable description of what the event represent
     Address:
       type: string
       description: Subscriber address (Sender or Receiver)
       pattern: '^(tel:\+[0-9]{5,15}|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|urn:service:sos(?:\.[a-z0-9](?:[a-z0-9\-]{0,30}[a-z0-9])?)*)$'
+      maxLength: 256
       example: 'tel:+11234567899'
     LocationDetails:
       type: object
@@ -651,6 +661,7 @@ components:
         timestamp:
           type: string
           format: date-time
+          maxLength: 64
           description: The timestamp (in ISO 8601 format) indicating when the location
             information was Calculated. \nThis is crucial for emergency services to
             assess the timeliness of the data. if not provided current timestamp will

@@ -538,6 +538,7 @@ components:
       description: Correlator string, UUID format recommended but any string matching the pattern can be used
       type: string
       pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+      maxLength: 256
       example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
 
     ErrorInfo:
@@ -553,9 +554,11 @@ components:
           description: HTTP response status code
         code:
           type: string
+          maxLength: 96
           description: A human-readable code to describe the error
         message:
           type: string
+          maxLength: 512
           description: A human-readable description of what the event represents
 
     SubscriptionRequest:
@@ -573,6 +576,7 @@ components:
           type: string
           format: uri
           pattern: ^https:\/\/.+$
+          maxLength: 1024
           description: The address to which events shall be delivered using the selected protocol.
           example: "https://endpoint.example.com/sink"
         sinkCredential:
@@ -627,6 +631,7 @@ components:
         subscriptionExpireTime:
           type: string
           format: date-time
+          maxLength: 64
           example: 2023-01-17T13:18:23.682Z
           description: |-
             The subscription expiration time (in date-time format) requested by the API consumer.
@@ -654,6 +659,7 @@ components:
         subscriptionExpireTime:
           type: string
           format: date-time
+          maxLength: 64
           example: "2023-01-17T13:18:23.682Z"
           description: |-
             The updated subscription expiration time requested by the API consumer.
@@ -694,9 +700,11 @@ components:
             accessToken:
               description: REQUIRED. An access token is a previously acquired token granting access to the target resource.
               type: string
+              maxLength: 8192
             accessTokenExpiresUtc:
               type: string
               format: date-time
+              maxLength: 64
               description: |
                 REQUIRED. An absolute (UTC) timestamp at which the token shall be considered expired.
                 In the case of an ACCESS_TOKEN_EXPIRED termination reason, implementation should notify the client before the expiration date.
@@ -727,6 +735,7 @@ components:
         deviceId:
           type: string
           format: uuid
+          maxLength: 36
           description: |-
             The device-id of the client in UUID format. A unique identifier for
             the physical device where a registration is initiated. Generated
@@ -765,6 +774,7 @@ components:
           type: string
           format: uri
           pattern: ^https:\/\/.+$
+          maxLength: 1024
           description: The address to which events shall be delivered using the selected protocol.
           example: "https://endpoint.example.com/sink"
         types:
@@ -782,6 +792,7 @@ components:
         startsAt:
           type: string
           format: date-time
+          maxLength: 64
           description: |
             Date when the event subscription will begin/began
             It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
@@ -789,6 +800,7 @@ components:
         expiresAt:
           type: string
           format: date-time
+          maxLength: 64
           description: |
             Date when the event subscription will expire. Only provided when `subscriptionExpireTime` is indicated by API client or Telco Operator has specific policy about that.
             It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
@@ -818,11 +830,13 @@ components:
 
     SubscriptionId:
       type: string
+      maxLength: 256
       description: The unique identifier of the subscription in the scope of the subscription manager. When this information is contained within an event notification, this concept SHALL be referred as `subscriptionId` as per [Commonalities Event Notification Model](https://github.com/camaraproject/Commonalities/blob/main/documentation/API-design-guidelines.md#122-event-notification).
       example: qs15-h556-rt89-1298
 
     RegistrationId:
       type: string
+      maxLength: 256
       description: The unique identifier of the WebRTC registration.
       example: ln3C-ttOSk-ObcQ7A0-tYO1LXqy
 
@@ -838,11 +852,13 @@ components:
       properties:
         id:
           type: string
+          maxLength: 256
           description: identifier of this event, that must be unique in the source context.
         source:
           $ref: "#/components/schemas/Source"
         type:
           type: string
+          maxLength: 512
           description: |-
             event-type that describes type of notification
         specversion:
@@ -875,6 +891,7 @@ components:
       type: string
       format: uri-reference
       minLength: 1
+      maxLength: 2048
       description: |-
         Identifies the context in which an event happened - be a non-empty `URI-reference` like:
         - URI with a DNS authority:
@@ -890,6 +907,7 @@ components:
     DateTime:
       type: string
       format: date-time
+      maxLength: 64
       description: |-
         Timestamp of when the occurrence happened.
         It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
@@ -954,18 +972,22 @@ components:
           type: string
           description: Sender (originator) address
           pattern: '^(tel:\+[0-9]{5,15}|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})$'
+          maxLength: 256
           example: 'tel:+11234567899'
         originatorName:
           type: string
+          maxLength: 256
           description: Friendly name of the call originator
           example: 'Alice'
         receiverAddress:
           type: string
           description: Receiver (terminator) address
           pattern: '^(tel:\+[0-9]{5,15}|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})$'
+          maxLength: 256
           example: 'tel:+11234567899'
         receiverName:
           type: string
+          maxLength: 256
           description: Friendly name of the call terminator
           example: 'Bob'
         status:
@@ -996,10 +1018,12 @@ components:
           $ref: '#/components/schemas/WrtcSDPDescriptor'
         mediaSessionId:
           type: string
+          maxLength: 256
           description: The media session ID created by the network. The mediaSessionId shall not be included in POST requests by the client, but must be included in the notifications from the network to client.
           example: '0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF'
         reason:
           type: string
+          maxLength: 2048
           description: The description of the event that has happened within the session
         sequenceNumber:
           type: integer
@@ -1035,6 +1059,7 @@ components:
       properties:
         sdp:
           type: string
+          maxLength: 65536
           description: |-
             An inlined session description in SDP format [RFC4566].If XML syntax is used, the content of this element SHALL be embedded in a CDATA section
 
@@ -1064,6 +1089,7 @@ components:
           $ref: "#/components/schemas/TerminationReason"
         terminationDescription:
           type: string
+          maxLength: 2048
           description: Human-readable explanation of why the subscription was terminated
 
     TerminationReason:
@@ -1107,6 +1133,7 @@ components:
           $ref: "#/components/schemas/RegistrationId"
         terminationDescription:
           type: string
+          maxLength: 2048
           description: Human-readable explanation of why the registration was terminated
         terminationReason:
           $ref: "#/components/schemas/RegistrationTerminationReason"
@@ -1150,6 +1177,7 @@ components:
             NOTE: Use/Applicability of this concept has not been discussed in Commonalities under the scope of Meta Release v0.4. When required by an API project as an option to meet a UC/Requirement, please generate an issue for Commonalities discussion about it.
           additionalProperties:
             type: string
+            maxLength: 512
         method:
           type: string
           description: The HTTP method to use for sending the message.
@@ -1209,6 +1237,7 @@ components:
         timestamp:
           type: string
           format: date-time
+          maxLength: 64
           description: The timestamp (in ISO 8601 format) indicating when the location
             information was Calculated. \nThis is crucial for emergency services to
             assess the timeliness of the data. if not provided current timestamp will
