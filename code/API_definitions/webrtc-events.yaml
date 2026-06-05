@@ -714,6 +714,7 @@ components:
           `deviceId` related to a valid registration.
         - org.camaraproject.webrtc-events.v0.session-status requires a
           `deviceId` related to a valid registration.
+      type: object
       required:
         - deviceId
       properties:
@@ -821,6 +822,7 @@ components:
 
     CloudEvent:
       description: The notification callback
+      type: object
       required:
         - id
         - source
