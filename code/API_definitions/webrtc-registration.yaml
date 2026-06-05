@@ -435,7 +435,7 @@ components:
           format: date-time
           description: |-
             Optional **absolute** expiry moment for this registration.
-            It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
+            It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must include a time offset.
 
             ▸ **Devices without a trustworthy clock** (e.g. Wi-Fi-only tablets
               or other non-SIM hardware) SHOULD treat the value as an
@@ -446,9 +446,19 @@ components:
               and initiate a refresh *before* `ttl` elapses (a safety margin
               of ~120 s is recommended).
 
+            ▸ If the client includes a value exceeding the operator's allowed maximum,
+              the server caps the value and returns the authoritative expiry in `expiresAt`.
+
+            ▸ If the client includes a value within the operator's allowed range, the
+              requested value is applied as-is.
+
+            ▸ If the client includes a value below the operator's allowed minimum,
+              a `400 - OUT_OF_RANGE` error response is returned.
+
             ▸ If the client omits this field, the server will set the expiry
-              according to its own TTL policy and return the resulting
-              `registrationExpireTime` in the response.
+              according to its own TTL policy and return the authoritative expiry in
+              `expiresAt` in the response.
+
     regSessionResponse:
       type: object
       required:
@@ -479,13 +489,20 @@ components:
           format: date-time
           description: |-
             Optional **absolute** UTC timestamp that *requests* a new expiry.
-            The server will honour the value only if it is **later than the
-            operator's minimum TTL** and **earlier than operator maximum TTL**;
-            otherwise it falls back to its own policy (see refresh algorithm
-            above).
+            It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must include a time offset.
 
-            If omitted, the server always extends the expiry by its configured
-            TTL, measured from the moment the refresh is received.
+            If the client includes a value exceeding the operator's allowed maximum,
+            the server caps the value and returns the authoritative expiry in `expiresAt`.
+
+            If the client includes a value within the operator's allowed range, the
+            requested value is applied as-is.
+
+            If the client includes a value below the operator's allowed minimum,
+            a `400 - OUT_OF_RANGE` error response is returned.
+
+            If the client omits this field, the server extends the expiry
+            according to its own TTL policy and returns the authoritative
+            expiry in `expiresAt`.
 
             It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
     RegistrationStatus:
