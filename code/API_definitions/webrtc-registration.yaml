@@ -391,6 +391,7 @@ components:
   securitySchemes:
     openId:
       type: openIdConnect
+      description: OpenID Connect authentication via discovery metadata.
       openIdConnectUrl: https://example.com/.well-known/openid-configuration
   headers:
     x-correlator:
@@ -415,10 +416,12 @@ components:
         type: string
   schemas:
     XCorrelator:
+      description: Correlator string, UUID format recommended but any string matching the pattern can be used
       type: string
       pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
       example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
     regSessionRequest:
+      description: Request body for creating a new WebRTC device registration
       type: object
       required:
         - deviceId
@@ -460,6 +463,7 @@ components:
               `expiresAt` in the response.
 
     regSessionResponse:
+      description: Response body returned after successfully creating or refreshing a WebRTC device registration
       type: object
       required:
         - registrationId
@@ -482,6 +486,7 @@ components:
 
             It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
     regSessionUpdate:
+      description: Request body for refreshing an existing WebRTC device registration
       type: object
       properties:
         registrationExpireTime:
@@ -506,10 +511,12 @@ components:
 
             It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
     RegistrationStatus:
+      description: Current registration status of the WebRTC device
       type: string
       enum:
         - Registered
     RegistrationInformation:
+      description: Information about the registered device including phone number and registration status
       type: object
       properties:
         phoneNumber:
@@ -517,6 +524,7 @@ components:
         regStatus:
           $ref: '#/components/schemas/RegistrationStatus'
     ErrorInfo:
+      description: A structured error response providing details about a failed request, including the HTTP status code, an error code, and a human-readable message
       type: object
       required:
         - status

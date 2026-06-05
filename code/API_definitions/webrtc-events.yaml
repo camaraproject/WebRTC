@@ -505,11 +505,15 @@ components:
   securitySchemes:
     openId:
       type: openIdConnect
+      description: OpenID Connect authentication via discovery metadata.
       openIdConnectUrl: https://example.com/.well-known/openid-configuration
     notificationsBearerAuth:
       type: http
       scheme: bearer
       bearerFormat: "{$request.body#/sinkCredential.credentialType}"
+      description: |-
+        Bearer token for notification delivery. Token format is determined
+        by `sinkCredential.credentialType` in the subscription request.
   parameters:
     SubscriptionId:
       name: subscriptionId
@@ -531,11 +535,13 @@ components:
         $ref: "#/components/schemas/XCorrelator"
   schemas:
     XCorrelator:
+      description: Correlator string, UUID format recommended but any string matching the pattern can be used
       type: string
       pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
       example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
 
     ErrorInfo:
+      description: A structured error response providing details about a failed request, including the HTTP status code, an error code, and a human-readable message
       type: object
       required:
         - status
@@ -1004,6 +1010,7 @@ components:
             - $ref: '#/components/schemas/LocationDetails'
 
     MediaSessionStatusUpdate:
+      description: MediaSession information emitted on a session-status event
       allOf:
         - $ref: "#/components/schemas/MediaSession"
         - type: object
@@ -1012,6 +1019,7 @@ components:
             - status
 
     MediaSessionInvite:
+      description: MediaSession information emitted on a session-invitation event
       allOf:
         - $ref: "#/components/schemas/MediaSession"
         - type: object
@@ -1022,6 +1030,7 @@ components:
             - status
 
     WrtcSDPDescriptor:
+      description: SDP descriptor object carrying an inlined Session Description Protocol payload
       type: object
       properties:
         sdp:
@@ -1055,6 +1064,7 @@ components:
           $ref: "#/components/schemas/TerminationReason"
         terminationDescription:
           type: string
+          description: Human-readable explanation of why the subscription was terminated
 
     TerminationReason:
       type: string
@@ -1097,6 +1107,7 @@ components:
           $ref: "#/components/schemas/RegistrationId"
         terminationDescription:
           type: string
+          description: Human-readable explanation of why the registration was terminated
         terminationReason:
           $ref: "#/components/schemas/RegistrationTerminationReason"
 
@@ -1110,6 +1121,7 @@ components:
         - REGISTRATION_EXPIRED
 
     HTTPSubscriptionRequest:
+      description: Subscription request for HTTP-based event delivery.
       allOf:
         - $ref: "#/components/schemas/SubscriptionRequest"
         - type: object
@@ -1118,6 +1130,7 @@ components:
               $ref: "#/components/schemas/HTTPSettings"
 
     HTTPSubscriptionResponse:
+      description: Subscription resource returned for HTTP-based event delivery.
       allOf:
         - $ref: "#/components/schemas/Subscription"
         - type: object
@@ -1126,6 +1139,7 @@ components:
               $ref: "#/components/schemas/HTTPSettings"
 
     HTTPSettings:
+      description: HTTP protocol settings for event delivery.
       type: object
       properties:
         headers:
@@ -1200,6 +1214,7 @@ components:
             assess the timeliness of the data. if not provided current timestamp will
             be used by default"
     CircleCoordinates:
+      description: Geographic coordinates defining a circular area by center point and radius
       type: object
       required:
         - latitude
@@ -1219,6 +1234,7 @@ components:
           format: float
           description: Radius of the circle in meters, indicating the uncertainty.
     EllipsoidCoordinates:
+      description: Geographic coordinates defining an ellipsoidal uncertainty area in the WGS84 geocentric coordinate system
       type: object
       required:
         - latitude
