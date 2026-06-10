@@ -61,7 +61,7 @@ info:
     - **SDP**: Acronym for Session Description Protocol. The SDP is a format for
       describing multimedia communication sessions for the purposes of announcement
       and invitation.
-    - **WrtcSDPDescriptor**: Schema to include inside a JSON, a SDP body. You can
+    - **WrtcSdpDescriptor**: Schema to include inside a JSON, a SDP body. You can
       obtain an SDP for WebRTC calling using the WebRTC API provided by the browser
       or any other media library.
 
@@ -457,6 +457,7 @@ components:
   securitySchemes:
     openId:
       type: openIdConnect
+      description: OpenID Connect authentication via discovery metadata.
       openIdConnectUrl: https://example.com/.well-known/openid-configuration
   headers:
     x-correlator:
@@ -473,6 +474,7 @@ components:
       explode: false
       schema:
         type: string
+        maxLength: 256
     pathParamMediaSessionId:
       name: mediaSessionId
       in: path
@@ -482,6 +484,7 @@ components:
       explode: false
       schema:
         type: string
+        maxLength: 256
     x-correlator:
       name: x-correlator
       in: header
@@ -490,32 +493,38 @@ components:
         $ref: "#/components/schemas/XCorrelator"
   schemas:
     XCorrelator:
+      description: Correlator string, UUID format recommended but any string matching the pattern can be used
       type: string
       pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+      maxLength: 256
       example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
     MediaSessionInformation:
+      description: Information about a WebRTC media session including originator and receiver identities, SDP offer/answer, and call status
       type: object
       properties:
         originatorAddress:
           $ref: '#/components/schemas/Address'
         originatorName:
           type: string
+          maxLength: 256
           description: Friendly name of the call originator
           example: 'Alice'
         receiverAddress:
           $ref: '#/components/schemas/Address'
         receiverName:
           type: string
+          maxLength: 256
           description: Friendly name of the call terminator
           example: 'Bob'
         status:
           $ref: '#/components/schemas/SessionStatus'
         offer:
-          $ref: '#/components/schemas/WrtcSDPDescriptor'
+          $ref: '#/components/schemas/WrtcSdpDescriptor'
         answer:
-          $ref: '#/components/schemas/WrtcSDPDescriptor'
+          $ref: '#/components/schemas/WrtcSdpDescriptor'
         mediaSessionId:
           type: string
+          maxLength: 256
           description: >-
             The media session ID created by the network. The mediaSessionId shall not be
             included in POST requests by the client, but must be included in the notifications
@@ -535,7 +544,7 @@ components:
             guarantee of any particular server-side action or behavior.
           allOf:
             - $ref: '#/components/schemas/LocationDetails'
-    WrtcSDPDescriptor:
+    WrtcSdpDescriptor:
       type: object
       description: |-
         **OFFER**: An inlined session description in SDP format [RFC4566].If XML syntax
@@ -550,6 +559,7 @@ components:
       properties:
         sdp:
           type: string
+          maxLength: 65536
           description: |-
             An inlined session description in SDP format [RFC4566].If XML syntax is used, the content of this element SHALL be embedded in a CDATA section
     SessionStatus:
@@ -573,6 +583,7 @@ components:
         - Busy
       example: Ringing
     ErrorInfo:
+      description: A structured error response providing details about a failed request, including the HTTP status code, an error code, and a human-readable message
       type: object
       required:
         - status
@@ -581,17 +592,23 @@ components:
       properties:
         status:
           type: integer
+          format: int32
+          minimum: 100
+          maximum: 599
           description: HTTP response status code
         code:
           type: string
+          maxLength: 96
           description: Friendly Code to describe the error
         message:
           type: string
+          maxLength: 512
           description: A human readable description of what the event represent
     Address:
       type: string
       description: Subscriber address (Sender or Receiver)
       pattern: '^(tel:\+[0-9]{5,15}|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|urn:service:sos(?:\.[a-z0-9](?:[a-z0-9\-]{0,30}[a-z0-9])?)*)$'
+      maxLength: 256
       example: 'tel:+11234567899'
     LocationDetails:
       type: object
@@ -647,11 +664,13 @@ components:
         timestamp:
           type: string
           format: date-time
+          maxLength: 64
           description: The timestamp (in ISO 8601 format) indicating when the location
             information was Calculated. \nThis is crucial for emergency services to
             assess the timeliness of the data. if not provided current timestamp will
             be used by default"
     CircleCoordinates:
+      description: Geographic coordinates defining a circular area by center point and radius
       type: object
       required:
         - latitude
@@ -671,6 +690,7 @@ components:
           format: float
           description: Radius of the circle in meters, indicating the uncertainty.
     EllipsoidCoordinates:
+      description: Geographic coordinates defining an ellipsoidal uncertainty area in the WGS84 geocentric coordinate system
       type: object
       required:
         - latitude
@@ -708,6 +728,7 @@ components:
   examples:
     exampleRegularMediaSessionRequest:
       summary: Regular call initiation with media information
+      description: Example of a standard outbound call request body with SDP offer
       value:
         originatorAddress: tel:+17085852753
         originatorName: tel:+17085852753
@@ -716,6 +737,7 @@ components:
         offer:
           sdp: "v=0\r\no=- 8066321617929821805 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 42988 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:2448:7a05:9b11:66f2:c9e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:1645903805 1 udp 2122262783 2001:e0:410:2448:7a05:9b11:66f2:c9e 42988 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:4eKp\r\na=ice-pwd:D4sF5Pv9vx9ggaqxBlHbAFMx\r\na=ice-options:trickle renomination\r\na=mid:audio\r\n [...]"
     exampleMediaSessionResponse:
+      description: Example response body returned after successfully creating a media session
       value:
         originatorAddress: 'tel:+17085852753'
         originatorName: 'tel:+17085852753'
@@ -726,28 +748,33 @@ components:
         status: Initial
         mediaSessionId: 0AEE1B58BAEEDA3EABA42B32EBB3DFE0DEAD3F90AE0CEB9EEB0C0F703E199FC00E7C6E648F50EE885FF0CE6C7E1CEE795EDD
     exampleSessionStatus183InProgress:
+      description: Session status update indicating the call is in progress (183 Session Progress)
       value:
         receiverSessionStatus:
           status: InProgress
           answer:
             sdp: "v=0\r\no=- 8066321617929821805 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 42988 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:2448:7a05:9b11:66f2:c9e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:1645903805 1 udp 2122262783 2001:e0:410:2448:7a05:9b11:66f2:c9e 42988 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:4eKp\r\na=ice-pwd:D4sF5Pv9vx9ggaqxBlHbAFMx\r\na=ice-options:trickle renomination\r\na=mid:audio\r\n [...]"
     exampleSessionStatus180Ringing:
+      description: Session status update indicating the remote end is ringing (180 Ringing)
       value:
         receiverSessionStatus:
           status: Ringing
     exampleSessionStatus200Connected:
+      description: Session status update indicating the call has been answered and connected (200 OK)
       value:
         receiverSessionStatus:
           status: Connected
           answer:
             sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\n [...]"
     exampleSessionStatusHold:
+      description: Session status update indicating the call has been placed on hold
       value:
         ReceiverSessionStatus:
           status: Hold
           answer:
             sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\n [...]"
     exampleSessionStatusResume:
+      description: Session status update indicating a held call has been resumed
       value:
         ReceiverSessionStatus:
           status: Resume
@@ -755,6 +782,7 @@ components:
             sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\n [...]"
     exampleSessionStatusConnectedWithLocation:
       summary: Answering party accepts the call and shares their device location
+      description: Session status update for a connected call where the answering party shares device location
       value:
         status: Connected
         answer:
@@ -772,6 +800,7 @@ components:
           timestamp: '2025-10-06T19:32:10Z'
     exampleSessionStatusLocationUpdate:
       summary: Post-setup location update by either party
+      description: Session status update carrying a location update from either call party after the session is established
       value:
         status: Connected
         locationDetails:
@@ -787,6 +816,7 @@ components:
           timestamp: '2025-10-06T19:45:00Z'
     exampleEmergencyMediaSessionRequest:
       summary: Emergency call initiation with location details
+      description: Example request body for initiating an emergency call with caller location details
       value:
         originatorAddress: 'tel:+17085852753'
         originatorName: Alice
@@ -809,6 +839,7 @@ components:
           timestamp: '2025-10-06T19:31:25Z'
     exampleLocatedMediaSessionRequest:
       summary: Regular call initiation with location details
+      description: Example request body for a regular call that includes caller location details
       value:
         originatorAddress: 'tel:+17085852753'
         originatorName: Alice
