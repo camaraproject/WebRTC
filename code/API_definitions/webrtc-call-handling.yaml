@@ -541,18 +541,20 @@ components:
             - offer
     MediaSessionResponse:
       description: Representation of a media session resource (POST/PUT/GET response)
+      type: object
+      required:
+        - originatorAddress
+        - receiverAddress
+        - status
+        - offer
+        - mediaSessionId
       allOf:
         - $ref: '#/components/schemas/MediaSessionInformation'
         - type: object
-          required:
-            - originatorAddress
-            - receiverAddress
-            - status
-            - offer
-            - mediaSessionId
           properties:
             mediaSessionId:
               type: string
+              maxLength: 256
               description: >-
                 The media session ID created by the network.
               example: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
@@ -775,12 +777,14 @@ components:
         mediaSessionId: 0AEE1B58BAEEDA3EABA42B32EBB3DFE0DEAD3F90AE0CEB9EEB0C0F703E199FC00E7C6E648F50EE885FF0CE6C7E1CEE795EDD
     exampleStatusChangeConnected:
       summary: Confirm session is established and provide the SDP answer
+      description: Example request body used to confirm that the media session is connected and to provide the SDP answer
       value:
         status: Connected
         answer:
           sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
     exampleStatusChangeRinging:
       summary: Notify that the receiver endpoint is ringing
+      description: Example request body used to notify that the receiver endpoint is ringing
       value:
         status: Ringing
     exampleSessionStatus183InProgress:
