@@ -1,8 +1,8 @@
-Feature: CAMARA WebRTC Call Handling, vwip - Operation getSessionDetailsById
+Feature: CAMARA WebRTC Call Handling, v0.4.0-rc.1 - Operation getSessionDetailsById
 
   Background: Common getSessionDetailsById setup
     Given an environment at "apiRoot"
-    And the resource "/webrtc-call-handling/vwip/sessions/{mediaSessionId}"                                                              |
+    And the resource "/webrtc-call-handling/v0.4rc1/sessions/{mediaSessionId}"                                                              |
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"

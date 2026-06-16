@@ -1,0 +1,19 @@
+repository:
+  repository_name: WebRTC
+  release_tag: r3.1
+  release_type: pre-release-rc
+  release_date: null
+  src_commit_sha: a9f1a4b193ca2dad412f0236c3a6d612ff63d1ec
+apis:
+- api_name: webrtc-call-handling
+  api_version: 0.4.0-rc.1
+  api_title: WebRTC Call Handling
+- api_name: webrtc-events
+  api_version: 0.3.0-rc.1
+  api_title: WebRTC Events
+- api_name: webrtc-registration
+  api_version: 0.4.0-rc.1
+  api_title: WebRTC Registration Service
+dependencies:
+  commonalities_release: r4.2 (0.8.0-rc.2)
+  identity_consent_management_release: r4.2 (0.5.0)
