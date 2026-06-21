@@ -642,9 +642,9 @@ components:
           - a home local number (as defined in 3GPP TS 24.229 subclause 5.1.2A.1.5) qualified by a `phone-context`
             parameter identifying the home network numbering plan.
         - A SIP URI :
-          - standard SIP URI;
-          - The user part MAY contain a home local number qualified by a `phone-context` parameter, in which case
-            the `user=phone` URI parameter SHALL be appended;
+          - SIP URI with a generic user part;
+          - SIP URI with a home local number (`user=phone`). The user part MAY contain a home local number qualified by
+            a `phone-context` parameter, in which case the `user=phone` URI parameter SHALL be appended;
           - an emergency service URN; or
           - anonymous SIP URI
 
