@@ -650,8 +650,8 @@ components:
 
         The reserved value `sip:anonymous@anonymous.invalid` (as defined in RFC 3323) MAY be used to indicate
         that the calling party identity is withheld within the trust domain. When `sip:anonymous@anonymous.invalid` is set
-        as the `originatorAddress`, the session SHALL be handled as an anonymous call origination, and the originator's identity
-        SHALL NOT be presented to the receiver. This value SHALL NOT be used as the `receiverAddress`.
+        as the `originatorAddress`, the session SHALL be handled as an anonymous call origination.
+        This value SHALL NOT be used as the `receiverAddress`.
 
       pattern: '^(tel:\+[1-9][0-9]{4,14}|tel:[0-9*#]{1,15};phone-context=(?:\+[1-9][0-9]{0,14}|[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+)|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|sip:[0-9*#]{1,15};phone-context=(?:\+[1-9][0-9]{0,14}|[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+)@[A-Za-z0-9.-]+\.[A-Za-z]{2,};user=phone|urn:service:sos(?:\.[a-z0-9](?:[a-z0-9\-]{0,30}[a-z0-9])?)*|sip:anonymous@anonymous\.invalid)$'
       example: 'tel:+11234567899'
