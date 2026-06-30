@@ -17,7 +17,7 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation createNotification
         "protocol": "HTTP",
         "sink": "https://notificationServer.opentelco.com",
         "types": [
-          "org.camaraproject.webrtc-events.v0.session-invitation"
+          "org.camaraproject.webrtc-events-subscriptions.v0.session-invitation"
         ],
         "config": {
           "subscriptionDetail": {

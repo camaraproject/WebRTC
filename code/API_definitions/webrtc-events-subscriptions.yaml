@@ -68,21 +68,21 @@ info:
 
     Following event types are managed for this API:
 
-    - `org.camaraproject.webrtc-events.v0.session-status`
+    - `org.camaraproject.webrtc-events-subscriptions.v0.session-status`
 
       - Events triggered for any media session related event (e.g. far end new
         media endpoints)
 
-    - `org.camaraproject.webrtc-events.v0.session-invitation`
+    - `org.camaraproject.webrtc-events-subscriptions.v0.session-invitation`
 
       - Events triggered when a new session is requested (e.g. incoming call
         received)
 
-    - `org.camaraproject.webrtc-events.v0.registration-ends`
+    - `org.camaraproject.webrtc-events-subscriptions.v0.registration-ends`
 
       - Events triggered when a webrtc registration is terminated (e.g. webrtc registration expired)
 
-    Note: Additionally to these list, ``org.camaraproject.webrtc-events.v0.subscription-ended``
+    Note: Additionally to these list, ``org.camaraproject.webrtc-events-subscriptions.v0.subscription-ended``
     notification `type` is sent when the subscription ends.
     This notification does not require dedicated subscription.
 
@@ -100,7 +100,7 @@ info:
 
     Find more information at the Schema description.
 
-    A `org.camaraproject.webrtc-events.v0.session-status` event includes
+    A `org.camaraproject.webrtc-events-subscriptions.v0.session-status` event includes
     session information updates. With the same schema that is used with the
     WebRTC Call Handling API, when retrieving information from the
     `GET /webrtc-call-handling/session/{mediaSessionId}` endpoint.
@@ -126,7 +126,7 @@ info:
 
     Find more information at the Schema description.
 
-    A `org.camaraproject.webrtc-events.v0.session-invitation` event
+    A `org.camaraproject.webrtc-events-subscriptions.v0.session-invitation` event
     includes information about new requested sessions (incoming calls), it
     requires a valid registration on the network.
 
@@ -157,7 +157,7 @@ info:
 
     ## 3. Subscription ends (subscription-ended)
 
-    A `org.camaraproject.webrtc-events.v0.subscription-ended` event indicates that
+    A `org.camaraproject.webrtc-events-subscriptions.v0.subscription-ended` event indicates that
     the endpoint will no longer be notified when a new event occurs. From
     the developer's point of view, receiving the subscription-ended event should
     signal the need to check the event subscription status and attempt to refresh
@@ -165,7 +165,7 @@ info:
 
     ## 4. Registration ends (`registration-ends`)
 
-    A `org.camaraproject.webrtc-events.v0.registration-ends` event indicates that a previously active registration has ended and is no longer valid.
+    A `org.camaraproject.webrtc-events-subscriptions.v0.registration-ends` event indicates that a previously active registration has ended and is no longer valid.
     From a developer's point of view, reception of the `registration-ends` event should be treated as a signal to renew the WebRTC registration in order to continue receiving or initiating calls for the registered phone number.
 
     # Authorization and authentication
@@ -228,9 +228,9 @@ paths:
       description: |-
         Create a webrtc-events event subscription. For the corresponding type:
 
-        - `org.camaraproject.webrtc-events.v0.session-invitation`: new calls event
-        - `org.camaraproject.webrtc-events.v0.session-status`: updates on specific call
-        - `org.camaraproject.webrtc-events.v0.registration-ends`: registration termination event
+        - `org.camaraproject.webrtc-events-subscriptions.v0.session-invitation`: new calls event
+        - `org.camaraproject.webrtc-events-subscriptions.v0.session-status`: updates on specific call
+        - `org.camaraproject.webrtc-events-subscriptions.v0.registration-ends`: registration termination event
 
         To subscribe and receive notifications about new calls, a
         `session-invitation` subscription is required using the `deviceId` related to a valid registration.
@@ -245,9 +245,9 @@ paths:
         - $ref: "#/components/parameters/x-correlator"
       security:
         - openId:
-            - webrtc-events:org.camaraproject.webrtc-events.v0.session-status:create
-            - webrtc-events:org.camaraproject.webrtc-events.v0.session-invitation:create
-            - webrtc-events:org.camaraproject.webrtc-events.v0.registration-ends:create
+            - webrtc-events-subscriptions:org.camaraproject.webrtc-events-subscriptions.v0.session-status:create
+            - webrtc-events-subscriptions:org.camaraproject.webrtc-events-subscriptions.v0.session-invitation:create
+            - webrtc-events-subscriptions:org.camaraproject.webrtc-events-subscriptions.v0.registration-ends:create
       requestBody:
         content:
           application/json:
@@ -354,7 +354,7 @@ paths:
         - $ref: "#/components/parameters/x-correlator"
       security:
         - openId:
-            - webrtc-events:read
+            - webrtc-events-subscriptions:read
       responses:
         "200":
           description: List of event subscription details
@@ -386,7 +386,7 @@ paths:
       operationId: retrieveNotificationChannelSubscription
       security:
         - openId:
-            - webrtc-events:read
+            - webrtc-events-subscriptions:read
       parameters:
         - $ref: "#/components/parameters/SubscriptionId"
         - $ref: "#/components/parameters/x-correlator"
@@ -427,7 +427,7 @@ paths:
       operationId: updateNotificationChannelSubscription
       security:
         - openId:
-            - webrtc-events:update
+            - webrtc-events-subscriptions:update
       parameters:
         - $ref: "#/components/parameters/SubscriptionId"
         - $ref: "#/components/parameters/x-correlator"
@@ -475,7 +475,7 @@ paths:
         to stop receiving notifications about this event subscription.
       security:
         - openId:
-            - webrtc-events:delete
+            - webrtc-events-subscriptions:delete
       parameters:
         - $ref: "#/components/parameters/SubscriptionId"
         - $ref: "#/components/parameters/x-correlator"
@@ -730,9 +730,9 @@ components:
     WebrtcSubscriptionDetail:
       description: |-
         The detail of the requested event subscription.
-        - org.camaraproject.webrtc-events.v0.session-invitation requires a
+        - org.camaraproject.webrtc-events-subscriptions.v0.session-invitation requires a
           `deviceId` related to a valid registration.
-        - org.camaraproject.webrtc-events.v0.session-status requires a
+        - org.camaraproject.webrtc-events-subscriptions.v0.session-status requires a
           `deviceId` related to a valid registration.
       type: object
       required:
@@ -751,18 +751,18 @@ components:
       type: string
       description: |-
         event-type - Event triggered when an event-type event occurred
-        - `org.camaraproject.webrtc-events.v0.session-status`
+        - `org.camaraproject.webrtc-events-subscriptions.v0.session-status`
           - Events triggered for any media session related event (e.g. far end new media endpoints)
-        - `org.camaraproject.webrtc-events.v0.session-invitation`
+        - `org.camaraproject.webrtc-events-subscriptions.v0.session-invitation`
           - Events triggered for any media endpoint registration event (e.g. incoming session)
-        - `org.camaraproject.webrtc-events.v0.registration-ends`
+        - `org.camaraproject.webrtc-events-subscriptions.v0.registration-ends`
           - Events triggered for registration termination (e.g. incoming session)
 
         `subscription-ended` is not supported for subscription. It is sent by default
       enum:
-        - org.camaraproject.webrtc-events.v0.session-status
-        - org.camaraproject.webrtc-events.v0.session-invitation
-        - org.camaraproject.webrtc-events.v0.registration-ends
+        - org.camaraproject.webrtc-events-subscriptions.v0.session-status
+        - org.camaraproject.webrtc-events-subscriptions.v0.session-invitation
+        - org.camaraproject.webrtc-events-subscriptions.v0.registration-ends
 
     Subscription:
       description: Represents a event-type subscription.
@@ -848,81 +848,26 @@ components:
 
     CloudEvent:
       description: The notification callback
-      type: object
-      required:
-        - id
-        - source
-        - specversion
-        - type
-        - time
-      properties:
-        id:
-          type: string
-          maxLength: 256
-          description: identifier of this event, that must be unique in the source context.
-        source:
-          $ref: "#/components/schemas/Source"
-        type:
-          type: string
-          maxLength: 512
-          description: |-
-            event-type that describes type of notification
-        specversion:
-          type: string
-          description: Version of the specification to which this event conforms (must be 1.0 if it conforms to cloudevents 1.0.2 version)
-          enum:
-            - "1.0"
-        datacontenttype:
-          type: string
-          description: 'media-type that describes the event payload encoding, must be "application/json" for CAMARA APIs'
-          enum:
-            - application/json
-        data:
-          type: object
-          description: |-
-            Event details payload. Depending of the event type, it will will include one of the data structures defined on this specification. Along with the subscription-ended, that is an authomatic event.
-
-            Check the introduction documentation and the other CAMARA WebRTC APIs for extra info about data structures included on the events.
-        time:
-          $ref: "#/components/schemas/DateTime"
-      discriminator:
-        propertyName: "type"
-        mapping:
-          org.camaraproject.webrtc-events.v0.session-invitation: "#/components/schemas/EventSessionInvitation"
-          org.camaraproject.webrtc-events.v0.session-status: "#/components/schemas/EventSessionStatus"
-          org.camaraproject.webrtc-events.v0.subscription-ended: "#/components/schemas/EventSubscriptionEnded"
-          org.camaraproject.webrtc-events.v0.registration-ends: "#/components/schemas/EventRegistrationEnds"
-
-    Source:
-      type: string
-      format: uri-reference
-      minLength: 1
-      maxLength: 2048
-      description: |-
-        Identifies the context in which an event happened - be a non-empty `URI-reference` like:
-        - URI with a DNS authority:
-          * https://github.com/cloudevents
-          * mailto:cncf-wg-serverless@lists.cncf.io
-        - Universally-unique URN with a UUID:
-          * urn:uuid:6e8bc430-9c3a-11d9-9669-0800200c9a66
-        - Application-specific identifier:
-          * /cloudevents/spec/pull/123
-          * 1-555-123-4567
-      example: "https://notificationSendServer12.supertelco.com"
-
-    DateTime:
-      type: string
-      format: date-time
-      maxLength: 64
-      description: |-
-        Timestamp of when the occurrence happened.
-        It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-      example: "2018-04-05T17:31:00Z"
+      allOf:
+        - $ref: "../common/CAMARA_event_common.yaml#/components/schemas/CloudEvent"
+        - type: object
+          properties:
+            type:
+              type: string
+              maxLength: 512
+              description: event-type that describes type of notification
+          discriminator:
+            propertyName: "type"
+            mapping:
+              org.camaraproject.webrtc-events-subscriptions.v0.session-invitation: "#/components/schemas/EventSessionInvitation"
+              org.camaraproject.webrtc-events-subscriptions.v0.session-status: "#/components/schemas/EventSessionStatus"
+              org.camaraproject.webrtc-events-subscriptions.v0.subscription-ended: "#/components/schemas/EventSubscriptionEnded"
+              org.camaraproject.webrtc-events-subscriptions.v0.registration-ends: "#/components/schemas/EventRegistrationEnds"
 
     ############################################
     EventSessionInvitation:
       description: |-
-        A `org.camaraproject.webrtc-events.v0.session-invitation` event includes an specific type of session
+        A `org.camaraproject.webrtc-events-subscriptions.v0.session-invitation` event includes an specific type of session
         update for new requested sessions. It is emitted when the endpoint is associated with a valid
         registration and the endpoint is susbcribed to recive new incoming calls.
 
@@ -939,12 +884,12 @@ components:
               $ref: "#/components/schemas/MediaSessionInvite"
             type:
               enum:
-                - org.camaraproject.webrtc-events.v0.session-invitation
+                - org.camaraproject.webrtc-events-subscriptions.v0.session-invitation
 
     ############################################
     EventSessionStatus:
       description: |-
-        A `org.camaraproject.webrtc-events.v0.session-status` event includes the session updates provided by
+        A `org.camaraproject.webrtc-events-subscriptions.v0.session-status` event includes the session updates provided by
         the server. This will include actions form the endpoint and the server (far end).
 
         In general terms, it is received each time that an event happens within the session, and include
@@ -961,7 +906,7 @@ components:
               $ref: "#/components/schemas/MediaSessionStatusUpdate"
             type:
               enum:
-                - org.camaraproject.webrtc-events.v0.session-status
+                - org.camaraproject.webrtc-events-subscriptions.v0.session-status
 
     ############################################
     MediaSession:
@@ -1082,7 +1027,7 @@ components:
               $ref: "#/components/schemas/SubscriptionEnded"
             type:
               enum:
-                - org.camaraproject.webrtc-events.v0.subscription-ended
+                - org.camaraproject.webrtc-events-subscriptions.v0.subscription-ended
 
     SubscriptionEnded:
       description: Event detail structure for SUBSCRIPTION_ENDED event
@@ -1128,7 +1073,7 @@ components:
               $ref: "#/components/schemas/RegistrationEnds"
             type:
               enum:
-                - org.camaraproject.webrtc-events.v0.registration-ends
+                - org.camaraproject.webrtc-events-subscriptions.v0.registration-ends
 
     RegistrationEnds:
       description: Event detail structure for REGISTRATION_ENDS event. registrationExpireTime is absolute UTC. Clients SHOULD refresh in advance; otherwise a REGISTRATION_EXPIRED terminationReason will be emitted.
@@ -1697,7 +1642,7 @@ components:
           accessTokenExpiresUtc: "2024-12-06T14:37:56.147Z"
           accessTokenType: "bearer"
         types:
-          - org.camaraproject.webrtc-events.v0.registration-ends
+          - org.camaraproject.webrtc-events-subscriptions.v0.registration-ends
         config:
           subscriptionDetail:
             deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
@@ -1726,7 +1671,7 @@ components:
           accessTokenExpiresUtc: "2024-12-06T14:37:56.147Z"
           accessTokenType: "bearer"
         types:
-          - org.camaraproject.webrtc-events.v0.session-invitation
+          - org.camaraproject.webrtc-events-subscriptions.v0.session-invitation
         config:
           subscriptionDetail:
             deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
@@ -1753,7 +1698,7 @@ components:
           accessTokenExpiresUtc: "2024-12-06T14:37:56.147Z"
           accessTokenType: "bearer"
         types:
-          - org.camaraproject.webrtc-events.v0.session-status
+          - org.camaraproject.webrtc-events-subscriptions.v0.session-status
         config:
           subscriptionDetail:
             deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
@@ -1778,7 +1723,7 @@ components:
         protocol: HTTP
         sink: https://endpoint.example.com/sink
         types:
-          - org.camaraproject.webrtc-events.v0.session-status
+          - org.camaraproject.webrtc-events-subscriptions.v0.session-status
         config:
           subscriptionDetail:
             deviceId: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
@@ -1803,7 +1748,7 @@ components:
       value:
         id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
         source: https://notificationServer.opentelco.com
-        type: org.camaraproject.webrtc-events.v0.session-invitation
+        type: org.camaraproject.webrtc-events-subscriptions.v0.session-invitation
         specversion: "1.0"
         datacontenttype: application/json
         time: 2024-11-05T05:40:23.682Z
@@ -1828,7 +1773,7 @@ components:
       value:
         id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
         source: https://notificationServer.opentelco.com
-        type: org.camaraproject.webrtc-events.v0.session-invitation
+        type: org.camaraproject.webrtc-events-subscriptions.v0.session-invitation
         specversion: "1.0"
         datacontenttype: application/json
         time: 2024-11-05T05:40:23.682Z
@@ -1872,7 +1817,7 @@ components:
       value:
         id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
         source: https://notificationServer.opentelco.com
-        type: org.camaraproject.webrtc-events.v0.registration-ends
+        type: org.camaraproject.webrtc-events-subscriptions.v0.registration-ends
         specversion: "1.0"
         datacontenttype: application/json
         time: 2024-11-05T05:40:23.682Z
@@ -1897,7 +1842,7 @@ components:
       value:
         id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
         source: https://notificationServer.opentelco.com
-        type: org.camaraproject.webrtc-events.v0.session-status
+        type: org.camaraproject.webrtc-events-subscriptions.v0.session-status
         specversion: "1.0"
         datacontenttype: application/json
         time: 2024-11-05T05:40:23.682Z
@@ -1931,7 +1876,7 @@ components:
       value:
         id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
         source: https://notificationServer.opentelco.com
-        type: org.camaraproject.webrtc-events.v0.subscription-ended
+        type: org.camaraproject.webrtc-events-subscriptions.v0.subscription-ended
         specversion: "1.0"
         datacontenttype: application/json
         time: 2024-11-05T05:40:23.682Z
