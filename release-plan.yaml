@@ -25,7 +25,7 @@ repository:
 # Dependencies on Commonalities and ICM releases (tags)
 # Update per ReleaseManagement requirements for each release cycle
 dependencies:
-  commonalities_release: r4.2
+  commonalities_release: r4.3
   identity_consent_management_release: r4.2
 
 # APIs in this repository
@@ -40,7 +40,7 @@ apis:
       - pradeepachar-mavenir
       - deepakjaiswal1
       - teikuran
-  - api_name: webrtc-events
+  - api_name: webrtc-events-subscriptions
     target_api_version: 0.3.0
     target_api_status: rc
     main_contacts:
