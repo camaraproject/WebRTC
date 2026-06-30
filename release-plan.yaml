@@ -40,7 +40,7 @@ apis:
       - pradeepachar-mavenir
       - deepakjaiswal1
       - teikuran
-  - api_name: webrtc-events-subscriptions
+  - api_name: webrtc-events
     target_api_version: 0.3.0
     target_api_status: rc
     main_contacts:
