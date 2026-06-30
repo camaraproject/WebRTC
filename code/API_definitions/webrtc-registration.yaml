@@ -223,26 +223,35 @@ paths:
       description: |-
         Create a new device registration in the network using a client-supplied
         `deviceId`. The subscriber identifier (`phoneNumber`) for the
-        registration is derived from the API consumer's access token, not from
-        the request body. On success, the server returns a server-allocated
-        `registrationId` (UUID) that the client uses for all subsequent
-        operations on this registration.
+        registration is determined by the type of access token used:
+
+        - With a **three-legged access token**, the `phoneNumber` is resolved
+          server-side from the token and MUST NOT be provided in the request
+          body (otherwise `422 UNNECESSARY_IDENTIFIER`).
+        - With a **two-legged access token**, the token carries no subscriber
+          identity, so the API consumer MUST provide the `phoneNumber` in the
+          request body (otherwise `422 MISSING_IDENTIFIER`).
+
+        On success, the server returns a server-allocated `registrationId`
+        (UUID) that the client uses for all subsequent operations on this
+        registration.
 
         **Uniqueness constraint:**
 
         An active registration is uniquely identified by the combination of the
-        client-supplied `deviceId` and the `phoneNumber` resolved from the
-        access token. Only one active registration is allowed per
-        (`deviceId`, `phoneNumber`) combination at any time.
+        client-supplied `deviceId` and the `phoneNumber` bound to the
+        registration (resolved from the access token for three-legged tokens, or
+        supplied in the request body for two-legged tokens). Only one active
+        registration is allowed per (`deviceId`, `phoneNumber`) combination at
+        any time.
 
         - If the API consumer issues a POST whose (`deviceId`, `phoneNumber`)
           matches an existing active registration, the server **does not**
           modify or replace it. The request is rejected with `409 ALREADY_EXISTS`.
         - The same `deviceId` MAY be used to create additional registrations
-          concurrently, provided each request is authorized by an access token
-          bound to a different `phoneNumber` (e.g. multi-line / multi-MSISDN
-          devices). Per-user and per-MSISDN limits still apply and are
-          enforced via `403` responses.
+          concurrently, provided each is bound to a different `phoneNumber`
+          (e.g. multi-line / multi-MSISDN devices). Per-user and per-MSISDN
+          limits still apply and are enforced via `403` responses.
 
         To recover from a `409`, the API consumer SHOULD:
           1. Call `GET /sessions?deviceId={deviceId}` to enumerate active
@@ -284,6 +293,8 @@ paths:
           $ref: "#/components/responses/CreateSessionForbidden403"
         '409':
           $ref: "#/components/responses/CreateSessionConflict409"
+        '422':
+          $ref: "#/components/responses/CreateSessionUnprocessable422"
   /sessions/{registrationId}:
     get:
       tags:
@@ -473,6 +484,27 @@ components:
             The deviceId of the client in UUID format. A unique identifier for
             the physical device where a registration is initiated. Generated
             by the WebRTC application, and consistent within the same device.
+        phoneNumber:
+          description: |-
+            The phone number (MSISDN, in E.164 format) of the subscriber whose
+            identity is to be bound to this registration.
+
+            Whether this field is allowed or required depends on the type of
+            access token used (see CAMARA Identity and Consent Management):
+
+            - **Three-legged access token** (carries subscriber identity): the
+              `phoneNumber` is resolved server-side from the token and MUST NOT
+              be provided in the request body. If it is provided, the request is
+              rejected with `422 UNNECESSARY_IDENTIFIER`.
+            - **Two-legged access token** (no subscriber identity): the API
+              consumer MUST provide the `phoneNumber` in the request body to
+              indicate which subscriber the registration applies to. If it is
+              omitted, the request is rejected with `422 MISSING_IDENTIFIER`.
+
+            The effective phone number bound to the registration is returned in
+            `regInfo.phoneNumber` in the response.
+          allOf:
+            - $ref: '#/components/schemas/PhoneNumber'
         registrationExpireTime:
           type: string
           format: date-time
@@ -720,6 +752,38 @@ components:
                 status: 409
                 code: ALREADY_EXISTS
                 message: An active registration already exists for the supplied deviceId and the phoneNumber resolved from the access token.
+    CreateSessionUnprocessable422:
+      description: Unprocessable Content
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 422
+                  code:
+                    enum:
+                      - MISSING_IDENTIFIER
+                      - UNNECESSARY_IDENTIFIER
+          examples:
+            CREATE_422_MISSING_IDENTIFIER:
+              description: phoneNumber is required but was not provided (two-legged access token)
+              value:
+                status: 422
+                code: MISSING_IDENTIFIER
+                message: The phoneNumber must be provided in the request body when using a two-legged access token.
+            CREATE_422_UNNECESSARY_IDENTIFIER:
+              description: phoneNumber must not be provided as it is resolved from the access token (three-legged access token)
+              value:
+                status: 422
+                code: UNNECESSARY_IDENTIFIER
+                message: The phoneNumber must not be provided in the request body when using a three-legged access token; it is resolved from the token.
     # Generic responses
     Generic400:
       description: Bad Request
