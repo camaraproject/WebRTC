@@ -634,10 +634,28 @@ components:
           description: A human readable description of what the event represent
     Address:
       type: string
-      description: Subscriber address (Sender or Receiver)
-      pattern: '^(tel:\+[0-9]{5,15}|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|urn:service:sos(?:\.[a-z0-9](?:[a-z0-9\-]{0,30}[a-z0-9])?)*)$'
-      maxLength: 256
+      description: >-
+        Subscriber address (Sender or Receiver).
+        The following formats are supported:
+        - A TEL URI :
+          - an international format; or
+          - a home local number (as defined in 3GPP TS 24.229 subclause 5.1.2A.1.5) qualified by a `phone-context`
+            parameter identifying the home network numbering plan.
+        - A SIP URI :
+          - SIP URI with a generic user part;
+          - SIP URI with a home local number (`user=phone`). The user part MAY contain a home local number qualified by
+            a `phone-context` parameter, in which case the `user=phone` URI parameter SHALL be appended;
+          - an emergency service URN; or
+          - anonymous SIP URI
+
+        The reserved value `sip:anonymous@anonymous.invalid` (as defined in RFC 3323) MAY be used to indicate
+        that the calling party identity is withheld within the trust domain. When `sip:anonymous@anonymous.invalid` is set
+        as the `originatorAddress`, the session SHALL be handled as an anonymous call origination.
+        This value SHALL NOT be used as the `receiverAddress`.
+
+      pattern: '^(tel:\+[1-9][0-9]{4,14}|tel:[0-9*#]{1,15};phone-context=(?:\+[1-9][0-9]{0,14}|[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+)|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|sip:[0-9*#]{1,15};phone-context=(?:\+[1-9][0-9]{0,14}|[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+)@[A-Za-z0-9.-]+\.[A-Za-z]{2,};user=phone|urn:service:sos(?:\.[a-z0-9](?:[a-z0-9\-]{0,30}[a-z0-9])?)*|sip:anonymous@anonymous\.invalid)$'
       example: 'tel:+11234567899'
+      maxLength: 256
     LocationDetails:
       type: object
       description: >-
