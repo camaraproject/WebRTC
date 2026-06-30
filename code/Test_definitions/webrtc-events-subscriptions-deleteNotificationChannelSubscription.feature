@@ -10,7 +10,7 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation deleteNotification
     # Properties not explicitly overwitten in the Scenarios can take any values compliant with the schema
 
   @webrtc_events_deleteNotificationChannelSubscription_01_generic_success_scenario
-  Scenario: Retrieve a webrtc-events event subscription
+  Scenario: Retrieve a webrtc-events-subscriptions event subscription
     Given an existing events subscription with "subscriptionId" as "qs15-h556-rt89-1298"
     And the path parameter "subscriptionId" is set to the value for that subscription
     When the client sends a DELETE request to "/subscriptions/qs15-h556-rt89-1298"

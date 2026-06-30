@@ -10,7 +10,7 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation retrieveNotificati
     # Properties not explicitly overwitten in the Scenarios can take any values compliant with the schema
 
   @webrtc_events_retrieveNotificationChannelSubscriptionList_01_generic_success_scenario
-  Scenario: Retrieve a list of webrtc-events event subscription
+  Scenario: Retrieve a list of webrtc-events-subscriptions event subscription
     When the client sends a GET request to "/subscriptions"
     Then the response status code should be 200
     And the response header "x-correlator" has same value as the request header "x-correlator"
