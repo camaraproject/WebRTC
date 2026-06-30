@@ -40,14 +40,6 @@ apis:
       - pradeepachar-mavenir
       - deepakjaiswal1
       - teikuran
-  - api_name: webrtc-events
-    target_api_version: 0.3.0
-    target_api_status: rc
-    main_contacts:
-      - stroncoso
-      - pradeepachar-mavenir
-      - deepakjaiswal1
-      - teikuran
   - api_name: webrtc-registration
     target_api_version: 0.4.0
     target_api_status: rc
