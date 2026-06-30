@@ -16,9 +16,9 @@ WebRTC Call Handling
 * webrtc-call-handling-deleteSessionById.feature
 * webrtc-call-handling-updateSessionStatus.feature
 
-WebRTC Events
+WebRTC Events Subscriptions
 
-* webrtc-events-createNotificationChannelSubscription.feature
-* webrtc-events-retrieveNotificationChannelSubscriptionList.feature
-* webrtc-events-retrieveNotificationChannelSubscription.feature
-* webrtc-events-deleteNotificationChannelSubscription.feature
+* webrtc-events-subscriptions-createNotificationChannelSubscription.feature
+* webrtc-events-subscriptions-retrieveNotificationChannelSubscriptionList.feature
+* webrtc-events-subscriptions-retrieveNotificationChannelSubscription.feature
+* webrtc-events-subscriptions-deleteNotificationChannelSubscription.feature

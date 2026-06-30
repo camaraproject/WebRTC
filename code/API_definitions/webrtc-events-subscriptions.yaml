@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: WebRTC Events
+  title: WebRTC Events Subscriptions
   description: |-
     # Introduction
 
@@ -209,7 +209,7 @@ externalDocs:
   description: Product documentation at CAMARA
   url: https://github.com/camaraproject/WebRTC
 servers:
-  - url: "{apiRoot}/webrtc-events/vwip"
+  - url: "{apiRoot}/webrtc-events-subscriptions/vwip"
     variables:
       apiRoot:
         default: http://localhost:9091
