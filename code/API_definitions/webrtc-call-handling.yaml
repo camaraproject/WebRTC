@@ -33,7 +33,7 @@ info:
           notify the network about any modification on your side of the calls.
         - Ability to hangup the call. Stop the transmission, and delete your audio
           and video session.
-      - An additional subscription to webrtc-events API is required to receive
+      - An additional subscription to webrtc-events-subscriptions API is required to receive
         incoming events from network side (ex. remote hangup event).
 
     # Relevant terms and definitions
@@ -76,7 +76,7 @@ info:
     - **PUT**: Update the status of a session via its unique `mediaSessionId`
 
     To receive updates from the network about the session establishment process, you
-    must use `webrtc-events` API.
+    must use `webrtc-events-subscriptions` API.
 
     ## 1. Creating a call
 
@@ -128,9 +128,9 @@ info:
 
     Following this point, your call is progressing and the network will inform
     about extra information required and connection status via de the
-    webrtc-events API.
+    webrtc-events-subscriptions API.
 
-    Check webrtc-events API inline documentation and supporting documents
+    Check webrtc-events-subscriptions API inline documentation and supporting documents
     for further information.
 
     ## 2. Hanging up a call
@@ -144,7 +144,7 @@ info:
 
     ## 3. Picking up a call
 
-    Using the `webrtc-events` API, you can receive events from the network, these
+    Using the `webrtc-events-subscriptions` API, you can receive events from the network, these
     events could include the `session-invitation` event. This means that someone
     is calling you.
 

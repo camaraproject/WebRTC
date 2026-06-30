@@ -25,7 +25,7 @@ info:
         - Ability to create Registration sessions on the network, this grants
           access to create new audio and video sessions.
         - Ability to update or remove Registration sessions on the network
-      - An additional subscription to webrtc-events API is required to receive
+      - An additional subscription to webrtc-events-subscriptions API is required to receive
         incoming calls.
 
     # Relevant terms and definitions
@@ -69,14 +69,14 @@ info:
     - **PUT**: Update a device registration via its unique `registrationId`
     - **DELETE**: Finish an existing device registration via its unique `registrationId`
     To receive server-side updates about new voice-video sessions, you need to
-    use `webrtc-events` API.
+    use `webrtc-events-subscriptions` API.
 
     The main concept of the API is pretty straightforward: a subscriber needs a
     session to create calls, so you will need a subscription on your device before
     attempt any audio/video call.
 
     Once you create a session, you can:
-    - Use `webrtc-events` API to create a subscription and receive incoming calls.
+    - Use `webrtc-events-subscriptions` API to create a subscription and receive incoming calls.
     - Use `webrtc-call-handling` API to create a audio/video session and create
       an outgoing call.
 
@@ -85,7 +85,7 @@ info:
 
     **Behaviour on registration expiration:**
     - Ongoing media sessions MAY be terminated when the registration expires.
-    - Event subscriptions created via webrtc-events API are not affected.
+    - Event subscriptions created via webrtc-events-subscriptions API are not affected.
 
     # Authorization and authentication
 

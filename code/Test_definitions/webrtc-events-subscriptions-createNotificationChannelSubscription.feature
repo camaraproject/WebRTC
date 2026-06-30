@@ -1,8 +1,8 @@
-Feature: CAMARA WebRTC Events, vwip - Operation createNotificationChannelSubscription
+Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation createNotificationChannelSubscription
 
   Background: Common createNotificationChannelSubscription setup
     Given an environment at "apiRoot"
-    And the resource "/webrtc-events/vwip/subscriptions"                                                              |
+    And the resource "/webrtc-events-subscriptions/vwip/subscriptions"                                                              |
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
@@ -10,14 +10,14 @@ Feature: CAMARA WebRTC Events, vwip - Operation createNotificationChannelSubscri
     # Properties not explicitly overwritten in the Scenarios can take any values compliant with the schema
 
   @webrtc_events_createNotificationChannelSubscription_01_generic_success_scenario
-  Scenario: Create a webrtc-events event subscription
+  Scenario: Create a webrtc-events-subscriptions event subscription
     When the client sends a POST request to "/sessions" with the following payload:
       """
       {
         "protocol": "HTTP",
         "sink": "https://notificationServer.opentelco.com",
         "types": [
-          "org.camaraproject.webrtc-events.v0.session-invitation"
+          "org.camaraproject.webrtc-events-subscriptions.v0.session-invitation"
         ],
         "config": {
           "subscriptionDetail": {

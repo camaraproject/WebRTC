@@ -1,8 +1,8 @@
-Feature: CAMARA WebRTC Events, vwip - Operation retrieveNotificationChannelSubscription
+Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation retrieveNotificationChannelSubscription
 
   Background: Common retrieveNotificationChannelSubscription setup
     Given an environment at "apiRoot"
-    And the resource "/webrtc-events/vwip/subscriptions/{subscriptionId}"                                                              |
+    And the resource "/webrtc-events-subscriptions/vwip/subscriptions/{subscriptionId}"                                                              |
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
@@ -10,7 +10,7 @@ Feature: CAMARA WebRTC Events, vwip - Operation retrieveNotificationChannelSubsc
     # Properties not explicitly overwitten in the Scenarios can take any values compliant with the schema
 
   @webrtc_events_retrieveNotificationChannelSubscription_01_generic_success_scenario
-  Scenario: Retrieve a webrtc-events event subscription
+  Scenario: Retrieve a webrtc-events-subscriptions event subscription
     Given an existing events subscription with "subscriptionId" as "qs15-h556-rt89-1298"
     And the path parameter "subscriptionId" is set to the value for that voice-video session
     When the client sends a GET request to "/subscriptions/qs15-h556-rt89-1298"
