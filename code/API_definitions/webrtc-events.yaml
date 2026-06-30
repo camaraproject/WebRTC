@@ -955,8 +955,7 @@ components:
         - $ref: "#/components/schemas/CloudEvent"
         - type: object
           required:
-            - mediaSessionId
-            - status
+            - data
           properties:
             data:
               $ref: "#/components/schemas/MediaSessionStatusUpdate"
