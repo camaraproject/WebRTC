@@ -501,6 +501,11 @@ components:
               indicate which subscriber the registration applies to. If it is
               omitted, the request is rejected with `422 MISSING_IDENTIFIER`.
 
+            For two-legged tokens, if the API consumer is not authorized to use
+            the supplied `phoneNumber`, the request is rejected with
+            `403 PERMISSION_DENIED` (a generic message is returned to avoid
+            disclosing whether the number exists).
+
             The effective phone number bound to the registration is returned in
             `regInfo.phoneNumber` in the response.
           allOf:
@@ -704,6 +709,12 @@ components:
                 status: 403
                 code: INVALID_TOKEN_CONTEXT
                 message: "device is not consistent with access token."
+            CREATE_403_PHONENUMBER_NOT_ALLOWED:
+              description: The requested phoneNumber is not authorized for this API consumer (two-legged access token). A generic message is returned to avoid disclosing whether the number exists or is provisioned.
+              value:
+                status: 403
+                code: PERMISSION_DENIED
+                message: The API consumer is not authorized to register the requested phoneNumber.
             CREATE_403_MAX_REGISTRATION_PER_USER:
               # summary: Max registration per user
               value:
