@@ -198,18 +198,13 @@ info:
 
     As a specific rule, error `501 - NOT_IMPLEMENTED` can be only a possible
     error response if it is explicitly documented in the API.
-
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: wip
-  x-camara-commonalities: 0.6
-
-externalDocs:
-  description: Product documentation at CAMARA
-  url: https://github.com/camaraproject/WebRTC
+  version: 0.3.0-rc.1
+  x-camara-commonalities: 0.8.0
 servers:
-  - url: "{apiRoot}/webrtc-events-subscriptions/vwip"
+  - url: '{apiRoot}/webrtc-events-subscriptions/v0.3rc1'
     variables:
       apiRoot:
         default: http://localhost:9091
@@ -219,12 +214,15 @@ tags:
     description: |-
       Operations to manage event subscriptions for WebRTC Event APIs.
       Directly related with webrtc-call-handling and webrtc-registration.
+externalDocs:
+  description: Product documentation at CAMARA
+  url: https://github.com/camaraproject/WebRTC
 paths:
   /subscriptions:
     post:
       tags:
         - Webrtc-events Subscription
-      summary: "Create a webrtc-events event subscription"
+      summary: Create a webrtc-events event subscription
       description: |-
         Create a webrtc-events event subscription. For the corresponding type:
 
@@ -239,10 +237,9 @@ paths:
         `initialEvent` or `subscriptionMaxEvents`. These attributes remain in
         the schema for CAMARA compatibility, but they are not used by this API
         for WebRTC calling subscriptions.
-
       operationId: createNotificationChannelSubscription
       parameters:
-        - $ref: "#/components/parameters/x-correlator"
+        - $ref: '#/components/parameters/x-correlator'
       security:
         - openId:
             - webrtc-events-subscriptions:org.camaraproject.webrtc-events-subscriptions.v0.session-status:create
@@ -252,20 +249,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SubscriptionRequest"
+              $ref: '#/components/schemas/SubscriptionRequest'
             examples:
               INVITE_SUBSCRIPTION (session-invitation):
-                $ref: "#/components/examples/INVITE_SUBSCRIPTION"
+                $ref: '#/components/examples/INVITE_SUBSCRIPTION'
               SESSION_SUBSCRIPTION (session-status):
-                $ref: "#/components/examples/SESSION_SUBSCRIPTION"
+                $ref: '#/components/examples/SESSION_SUBSCRIPTION'
               REGISTRATION_ENDS_SUBSCRIPTION (registration-ends):
-                $ref: "#/components/examples/REGISTRATION_ENDS_SUBSCRIPTION"
+                $ref: '#/components/examples/REGISTRATION_ENDS_SUBSCRIPTION'
         required: true
       callbacks:
         notifications:
-          "{$request.body#/sink}":
+          '{$request.body#/sink}':
             post:
-              summary: "notifications callback"
+              summary: notifications callback
               description: |-
                 Important: this endpoint is to be implemented by the API
                 consumer. The webrtc-events server will call this endpoint
@@ -273,94 +270,91 @@ paths:
                 have to be replaced accordingly with WG API specific semantic.
               operationId: createNotificationChannelSubscription
               parameters:
-                - $ref: "#/components/parameters/x-correlator"
+                - $ref: '#/components/parameters/x-correlator'
               requestBody:
                 required: true
                 content:
                   application/cloudevents+json:
                     schema:
-                      $ref: "#/components/schemas/CloudEvent"
+                      $ref: '#/components/schemas/CloudEvent'
                     examples:
                       NEW_SESSION_INCOMING (session-invitation):
-                        $ref: "#/components/examples/NEW_SESSION_INCOMING"
+                        $ref: '#/components/examples/NEW_SESSION_INCOMING'
                       NEW_LOCATED_SESSION_INCOMING (session-invitation):
-                        $ref: "#/components/examples/NEW_LOCATED_SESSION_INCOMING"
+                        $ref: '#/components/examples/NEW_LOCATED_SESSION_INCOMING'
                       SESSION_UPDATE (session-status):
-                        $ref: "#/components/examples/SESSION_UPDATE"
+                        $ref: '#/components/examples/SESSION_UPDATE'
                       REGISTRATION_EXPIRED (registration-ends):
-                        $ref: "#/components/examples/REGISTRATION_ENDS"
+                        $ref: '#/components/examples/REGISTRATION_ENDS'
                       SUBSCRIPTION_ENDED (subscription-ended):
-                        $ref: "#/components/examples/SUBSCRIPTION_ENDED"
+                        $ref: '#/components/examples/SUBSCRIPTION_ENDED'
               responses:
-                "204":
+                '204':
                   description: Successful notification
                   headers:
                     x-correlator:
-                      $ref: "#/components/headers/x-correlator"
-                "400":
-                  $ref: "#/components/responses/Generic400"
-                "401":
-                  $ref: "#/components/responses/Generic401"
-                "403":
-                  $ref: "#/components/responses/Generic403"
-                "410":
-                  $ref: "#/components/responses/Generic410"
-                "429":
-                  $ref: "#/components/responses/Generic429"
+                      $ref: '#/components/headers/x-correlator'
+                '400':
+                  $ref: '#/components/responses/Generic400'
+                '401':
+                  $ref: '#/components/responses/Generic401'
+                '403':
+                  $ref: '#/components/responses/Generic403'
+                '410':
+                  $ref: '#/components/responses/Generic410'
+                '429':
+                  $ref: '#/components/responses/Generic429'
               security:
                 - {}
                 - notificationsBearerAuth: []
-
       responses:
-        "201":
+        '201':
           description: Created
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Subscription"
-        "202":
+                $ref: '#/components/schemas/Subscription'
+        '202':
           description: Request accepted to be processed. It applies for async creation process.
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SubscriptionAsync"
-        "400":
-          $ref: "#/components/responses/CreateSubscriptionBadRequest400"
-        "401":
-          $ref: "#/components/responses/Generic401"
-        "403":
-          $ref: "#/components/responses/SubscriptionPermissionDenied403"
-        "409":
-          $ref: "#/components/responses/Generic409"
-        "422":
-          $ref: "#/components/responses/CreateSubscriptionUnprocessableEntity422"
-        "429":
-          $ref: "#/components/responses/Generic429"
+                $ref: '#/components/schemas/SubscriptionAsync'
+        '400':
+          $ref: '#/components/responses/CreateSubscriptionBadRequest400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/SubscriptionPermissionDenied403'
+        '409':
+          $ref: '#/components/responses/Generic409'
+        '422':
+          $ref: '#/components/responses/CreateSubscriptionUnprocessableEntity422'
+        '429':
+          $ref: '#/components/responses/Generic429'
     get:
       tags:
         - Webrtc-events Subscription
-      summary: "Retrieve a list of webrtc-events event subscription"
-      description:
-        Retrieve **a list** of webrtc-events subscription(s) with detailed
-        information. Including configuration data and current status.
+      summary: Retrieve a list of webrtc-events event subscription
+      description: Retrieve **a list** of webrtc-events subscription(s) with detailed information. Including configuration data and current status.
       operationId: retrieveNotificationChannelSubscriptionList
       parameters:
-        - $ref: "#/components/parameters/x-correlator"
+        - $ref: '#/components/parameters/x-correlator'
       security:
         - openId:
             - webrtc-events-subscriptions:read
       responses:
-        "200":
+        '200':
           description: List of event subscription details
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
           content:
             application/json:
               schema:
@@ -369,17 +363,17 @@ paths:
                 maxItems: 100
                 items:
                   $ref: '#/components/schemas/Subscription'
-        "400":
-          $ref: "#/components/responses/Generic400"
-        "401":
-          $ref: "#/components/responses/Generic401"
-        "403":
-          $ref: "#/components/responses/Generic403"
+        '400':
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
   /subscriptions/{subscriptionId}:
     get:
       tags:
         - Webrtc-events Subscription
-      summary: "Retrieve a webrtc-events event subscription"
+      summary: Retrieve a webrtc-events event subscription
       description: |
         Retrieve webrtc-events subscription detailed information for a given
         subscription. Including configuration data and current status.
@@ -388,30 +382,30 @@ paths:
         - openId:
             - webrtc-events-subscriptions:read
       parameters:
-        - $ref: "#/components/parameters/SubscriptionId"
-        - $ref: "#/components/parameters/x-correlator"
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/x-correlator'
       responses:
-        "200":
+        '200':
           description: OK
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Subscription"
-        "400":
-          $ref: "#/components/responses/SubscriptionIdRequired400"
-        "401":
-          $ref: "#/components/responses/Generic401"
-        "403":
-          $ref: "#/components/responses/Generic403"
-        "404":
-          $ref: "#/components/responses/Generic404"
+                $ref: '#/components/schemas/Subscription'
+        '400':
+          $ref: '#/components/responses/SubscriptionIdRequired400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
+        '404':
+          $ref: '#/components/responses/Generic404'
     put:
       tags:
         - Webrtc-events Subscription
-      summary: "Update a webrtc-events event subscription"
+      summary: Update a webrtc-events event subscription
       description: |-
         Update a given webrtc-events subscription without changing its identity.
 
@@ -429,46 +423,46 @@ paths:
         - openId:
             - webrtc-events-subscriptions:update
       parameters:
-        - $ref: "#/components/parameters/SubscriptionId"
-        - $ref: "#/components/parameters/x-correlator"
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/x-correlator'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SubscriptionUpdateRequest"
+              $ref: '#/components/schemas/SubscriptionUpdateRequest'
             examples:
               UPDATE_SUBSCRIPTION:
-                $ref: "#/components/examples/UPDATE_SUBSCRIPTION"
+                $ref: '#/components/examples/UPDATE_SUBSCRIPTION'
       responses:
-        "200":
+        '200':
           description: Updated
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Subscription"
+                $ref: '#/components/schemas/Subscription'
               examples:
                 UPDATED_SUBSCRIPTION:
-                  $ref: "#/components/examples/UPDATED_SUBSCRIPTION"
-        "400":
-          $ref: "#/components/responses/CreateSubscriptionBadRequest400"
-        "401":
-          $ref: "#/components/responses/Generic401"
-        "403":
-          $ref: "#/components/responses/SubscriptionPermissionDenied403"
-        "404":
-          $ref: "#/components/responses/Generic404"
-        "422":
-          $ref: "#/components/responses/CreateSubscriptionUnprocessableEntity422"
-        "429":
-          $ref: "#/components/responses/Generic429"
+                  $ref: '#/components/examples/UPDATED_SUBSCRIPTION'
+        '400':
+          $ref: '#/components/responses/CreateSubscriptionBadRequest400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/SubscriptionPermissionDenied403'
+        '404':
+          $ref: '#/components/responses/Generic404'
+        '422':
+          $ref: '#/components/responses/CreateSubscriptionUnprocessableEntity422'
+        '429':
+          $ref: '#/components/responses/Generic429'
     delete:
       tags:
         - Webrtc-events Subscription
-      summary: "Delete a webrtc-events event subscription"
+      summary: Delete a webrtc-events event subscription
       operationId: deleteNotificationChannelSubscription
       description: |
         API endpoint to delete a given webrtc-events subscription. Action done
@@ -477,31 +471,31 @@ paths:
         - openId:
             - webrtc-events-subscriptions:delete
       parameters:
-        - $ref: "#/components/parameters/SubscriptionId"
-        - $ref: "#/components/parameters/x-correlator"
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/x-correlator'
       responses:
-        "204":
-          description: webrtc-events subscription deleted
-          headers:
-            x-correlator:
-              $ref: "#/components/headers/x-correlator"
-        "202":
+        '202':
           description: Request accepted to be processed. It applies for async deletion process.
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SubscriptionAsync"
-        "400":
-          $ref: "#/components/responses/SubscriptionIdRequired400"
-        "401":
-          $ref: "#/components/responses/Generic401"
-        "403":
-          $ref: "#/components/responses/Generic403"
-        "404":
-          $ref: "#/components/responses/Generic404"
+                $ref: '#/components/schemas/SubscriptionAsync'
+        '204':
+          description: webrtc-events subscription deleted
+          headers:
+            x-correlator:
+              $ref: '#/components/headers/x-correlator'
+        '400':
+          $ref: '#/components/responses/SubscriptionIdRequired400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
+        '404':
+          $ref: '#/components/responses/Generic404'
 components:
   securitySchemes:
     openId:
@@ -511,7 +505,7 @@ components:
     notificationsBearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: "{$request.body#/sinkCredential.credentialType}"
+      bearerFormat: '{$request.body#/sinkCredential.credentialType}'
       description: |-
         Bearer token for notification delivery. Token format is determined
         by `sinkCredential.credentialType` in the subscription request.
@@ -522,26 +516,25 @@ components:
       description: Subscription identifier that was obtained from the create event subscription operation
       required: true
       schema:
-        $ref: "#/components/schemas/SubscriptionId"
+        $ref: '#/components/schemas/SubscriptionId'
     x-correlator:
       name: x-correlator
       in: header
       description: Correlation id for the different services
       schema:
-        $ref: "#/components/schemas/XCorrelator"
+        $ref: '#/components/schemas/XCorrelator'
   headers:
     x-correlator:
       description: Correlation id for the different services
       schema:
-        $ref: "#/components/schemas/XCorrelator"
+        $ref: '#/components/schemas/XCorrelator'
   schemas:
     XCorrelator:
       description: Correlator string, UUID format recommended but any string matching the pattern can be used
       type: string
       pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
       maxLength: 256
-      example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
-
+      example: b4333c46-49c0-4f62-80d7-f0ef930f1c46
     ErrorInfo:
       description: A structured error response providing details about a failed request, including the HTTP status code, an error code, and a human-readable message
       type: object
@@ -564,7 +557,6 @@ components:
           type: string
           maxLength: 512
           description: A human-readable description of what the event represents
-
     SubscriptionRequest:
       description: The request for creating a event-type event subscription
       type: object
@@ -575,16 +567,16 @@ components:
         - types
       properties:
         protocol:
-          $ref: "#/components/schemas/Protocol"
+          $ref: '#/components/schemas/Protocol'
         sink:
           type: string
           format: uri
           pattern: ^https:\/\/.+$
           maxLength: 1024
           description: The address to which events shall be delivered using the selected protocol.
-          example: "https://endpoint.example.com/sink"
+          example: https://endpoint.example.com/sink
         sinkCredential:
-          $ref: "#/components/schemas/SinkCredential"
+          $ref: '#/components/schemas/SinkCredential'
         types:
           description: |-
             Camara Event types eligible to be delivered by this subscription.
@@ -593,10 +585,9 @@ components:
           minItems: 1
           maxItems: 3
           items:
-            $ref: "#/components/schemas/SubscriptionEventType"
+            $ref: '#/components/schemas/SubscriptionEventType'
         config:
-          $ref: "#/components/schemas/Config"
-
+          $ref: '#/components/schemas/Config'
     SubscriptionUpdateRequest:
       description: |-
         The request for updating an existing event subscription.
@@ -606,11 +597,10 @@ components:
       type: object
       properties:
         sinkCredential:
-          $ref: "#/components/schemas/SinkCredential"
+          $ref: '#/components/schemas/SinkCredential'
         config:
-          $ref: "#/components/schemas/SubscriptionUpdateConfig"
+          $ref: '#/components/schemas/SubscriptionUpdateConfig'
       additionalProperties: false
-
     Config:
       description: |-
         Implementation-specific configuration parameters needed by the subscription manager for acquiring
@@ -631,12 +621,12 @@ components:
         - subscriptionDetail
       properties:
         subscriptionDetail:
-          $ref: "#/components/schemas/WebrtcSubscriptionDetail"
+          $ref: '#/components/schemas/WebrtcSubscriptionDetail'
         subscriptionExpireTime:
           type: string
           format: date-time
           maxLength: 64
-          example: 2023-01-17T13:18:23.682Z
+          example: '2023-01-17T13:18:23.682Z'
           description: |-
             The subscription expiration time (in date-time format) requested by the API consumer.
             It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
@@ -653,7 +643,6 @@ components:
             Set to `true` by API consumer if consumer wants to get an event as soon as the subscription is created and current situation reflects event request.
             Example: Consumer request Roaming event. If consumer sets initialEvent to true and device is in roaming situation, an event is triggered
             Up to API project decision to keep it.
-
     SubscriptionUpdateConfig:
       description: |-
         Configuration parameters that may be updated for an existing subscription.
@@ -666,19 +655,18 @@ components:
           type: string
           format: date-time
           maxLength: 64
-          example: "2023-01-17T13:18:23.682Z"
+          example: '2023-01-17T13:18:23.682Z'
           description: |-
             The updated subscription expiration time requested by the API consumer.
             It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
             and must have time zone.
       additionalProperties: false
-
     Protocol:
       type: string
-      enum: ["HTTP"]
+      enum:
+        - HTTP
       description: Identifier of a delivery protocol. Only HTTP is allowed for now
-      example: "HTTP"
-
+      example: HTTP
     SinkCredential:
       description: A sink credential provides authentication or authorization information necessary to enable delivery of events to a target.
       type: object
@@ -693,14 +681,14 @@ components:
       discriminator:
         propertyName: credentialType
         mapping:
-          ACCESSTOKEN: "#/components/schemas/AccessTokenCredential"
+          ACCESSTOKEN: '#/components/schemas/AccessTokenCredential'
       required:
         - credentialType
     AccessTokenCredential:
       type: object
       description: An access token credential.
       allOf:
-        - $ref: "#/components/schemas/SinkCredential"
+        - $ref: '#/components/schemas/SinkCredential'
         - type: object
           properties:
             accessToken:
@@ -716,7 +704,7 @@ components:
                 In the case of an ACCESS_TOKEN_EXPIRED termination reason, implementation should notify the client before the expiration date.
                 If the access token is a JWT and registered "exp" (Expiration Time) claim is present, the two expiry times should match.
                 It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-              example: "2023-07-03T12:27:08.312Z"
+              example: '2023-07-03T12:27:08.312Z'
             accessTokenType:
               description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)).
               type: string
@@ -726,7 +714,6 @@ components:
             - accessToken
             - accessTokenExpiresUtc
             - accessTokenType
-
     WebrtcSubscriptionDetail:
       description: |-
         The detail of the requested event subscription.
@@ -746,7 +733,6 @@ components:
             The device-id of the client in UUID format. A unique identifier for
             the physical device where a registration is initiated. Generated
             by the WebRTC application, and consistent within the same device.
-
     SubscriptionEventType:
       type: string
       description: |-
@@ -763,7 +749,6 @@ components:
         - org.camaraproject.webrtc-events-subscriptions.v0.session-status
         - org.camaraproject.webrtc-events-subscriptions.v0.session-invitation
         - org.camaraproject.webrtc-events-subscriptions.v0.registration-ends
-
     Subscription:
       description: Represents a event-type subscription.
       type: object
@@ -775,22 +760,21 @@ components:
         - id
       properties:
         protocol:
-          $ref: "#/components/schemas/Protocol"
+          $ref: '#/components/schemas/Protocol'
         sink:
           type: string
           format: uri
           pattern: ^https:\/\/.+$
           maxLength: 1024
           description: The address to which events shall be delivered using the selected protocol.
-          example: "https://endpoint.example.com/sink"
+          example: https://endpoint.example.com/sink
         types:
-          description: |-
-            Camara Event types eligible to be delivered by this subscription.
+          description: Camara Event types eligible to be delivered by this subscription.
           type: array
           minItems: 1
           maxItems: 1
           items:
-            $ref: "#/components/schemas/SubscriptionEventType"
+            $ref: '#/components/schemas/SubscriptionEventType'
         config:
           $ref: '#/components/schemas/Config'
         id:
@@ -802,7 +786,7 @@ components:
           description: |
             Date when the event subscription will begin/began
             It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-          example: "2023-07-03T12:27:08.312Z"
+          example: '2023-07-03T12:27:08.312Z'
         expiresAt:
           type: string
           format: date-time
@@ -810,7 +794,7 @@ components:
           description: |
             Date when the event subscription will expire. Only provided when `subscriptionExpireTime` is indicated by API client or Telco Operator has specific policy about that.
             It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-          example: "2023-07-03T12:27:08.312Z"
+          example: '2023-07-03T12:27:08.312Z'
         status:
           type: string
           description: |-
@@ -826,30 +810,26 @@ components:
             - EXPIRED
             - INACTIVE
             - DELETED
-
     SubscriptionAsync:
       description: Response for a event-type subscription request managed asynchronously (Creation or Deletion)
       type: object
       properties:
         id:
-          $ref: "#/components/schemas/SubscriptionId"
-
+          $ref: '#/components/schemas/SubscriptionId'
     SubscriptionId:
       type: string
       maxLength: 256
       description: The unique identifier of the subscription in the scope of the subscription manager. When this information is contained within an event notification, this concept SHALL be referred as `subscriptionId` as per [Commonalities Event Notification Model](https://github.com/camaraproject/Commonalities/blob/main/documentation/API-design-guidelines.md#122-event-notification).
       example: qs15-h556-rt89-1298
-
     RegistrationId:
       type: string
       maxLength: 256
       description: The unique identifier of the WebRTC registration.
       example: ln3C-ttOSk-ObcQ7A0-tYO1LXqy
-
     CloudEvent:
       description: The notification callback
       allOf:
-        - $ref: "../common/CAMARA_event_common.yaml#/components/schemas/CloudEvent"
+        - $ref: '#/components/schemas/CloudEvent-2'
         - type: object
           properties:
             type:
@@ -857,14 +837,12 @@ components:
               maxLength: 512
               description: event-type that describes type of notification
           discriminator:
-            propertyName: "type"
+            propertyName: type
             mapping:
-              org.camaraproject.webrtc-events-subscriptions.v0.session-invitation: "#/components/schemas/EventSessionInvitation"
-              org.camaraproject.webrtc-events-subscriptions.v0.session-status: "#/components/schemas/EventSessionStatus"
-              org.camaraproject.webrtc-events-subscriptions.v0.subscription-ended: "#/components/schemas/EventSubscriptionEnded"
-              org.camaraproject.webrtc-events-subscriptions.v0.registration-ends: "#/components/schemas/EventRegistrationEnds"
-
-    ############################################
+              org.camaraproject.webrtc-events-subscriptions.v0.session-invitation: '#/components/schemas/EventSessionInvitation'
+              org.camaraproject.webrtc-events-subscriptions.v0.session-status: '#/components/schemas/EventSessionStatus'
+              org.camaraproject.webrtc-events-subscriptions.v0.subscription-ended: '#/components/schemas/EventSubscriptionEnded'
+              org.camaraproject.webrtc-events-subscriptions.v0.registration-ends: '#/components/schemas/EventRegistrationEnds'
     EventSessionInvitation:
       description: |-
         A `org.camaraproject.webrtc-events-subscriptions.v0.session-invitation` event includes an specific type of session
@@ -875,18 +853,16 @@ components:
         contextualize (call subject, branding info, etc). It MUST include a mediaSessionId, to allow the
         endpoint to subscribe to this new call session.
       allOf:
-        - $ref: "#/components/schemas/CloudEvent"
+        - $ref: '#/components/schemas/CloudEvent'
         - type: object
           required:
             - data
           properties:
             data:
-              $ref: "#/components/schemas/MediaSessionInvite"
+              $ref: '#/components/schemas/MediaSessionInvite'
             type:
               enum:
                 - org.camaraproject.webrtc-events-subscriptions.v0.session-invitation
-
-    ############################################
     EventSessionStatus:
       description: |-
         A `org.camaraproject.webrtc-events-subscriptions.v0.session-status` event includes the session updates provided by
@@ -897,49 +873,46 @@ components:
 
         Most common use is for SDP updates and signaling updates regarding call status.
       allOf:
-        - $ref: "#/components/schemas/CloudEvent"
+        - $ref: '#/components/schemas/CloudEvent'
         - type: object
           required:
             - data
           properties:
             data:
-              $ref: "#/components/schemas/MediaSessionStatusUpdate"
+              $ref: '#/components/schemas/MediaSessionStatusUpdate'
             type:
               enum:
                 - org.camaraproject.webrtc-events-subscriptions.v0.session-status
-
-    ############################################
     MediaSession:
-      description: |-
-        A prototype for media session infomration on Webrtc events. Used as event data schemas for session updates.
+      description: A prototype for media session infomration on Webrtc events. Used as event data schemas for session updates.
       type: object
       required:
         - mediaSessionId
       properties:
         subscriptionId:
-          $ref: "#/components/schemas/SubscriptionId"
+          $ref: '#/components/schemas/SubscriptionId'
         originatorAddress:
           type: string
           description: Sender (originator) address
-          pattern: '^(tel:\+[0-9]{5,15}|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})$'
+          pattern: ^(tel:\+[0-9]{5,15}|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})$
           maxLength: 256
-          example: 'tel:+11234567899'
+          example: tel:+11234567899
         originatorName:
           type: string
           maxLength: 256
           description: Friendly name of the call originator
-          example: 'Alice'
+          example: Alice
         receiverAddress:
           type: string
           description: Receiver (terminator) address
-          pattern: '^(tel:\+[0-9]{5,15}|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})$'
+          pattern: ^(tel:\+[0-9]{5,15}|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})$
           maxLength: 256
-          example: 'tel:+11234567899'
+          example: tel:+11234567899
         receiverName:
           type: string
           maxLength: 256
           description: Friendly name of the call terminator
-          example: 'Bob'
+          example: Bob
         status:
           type: string
           description: |-
@@ -970,7 +943,7 @@ components:
           type: string
           maxLength: 256
           description: The media session ID created by the network. The mediaSessionId shall not be included in POST requests by the client, but must be included in the notifications from the network to client.
-          example: '0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF'
+          example: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
         reason:
           type: string
           maxLength: 2048
@@ -985,27 +958,24 @@ components:
           description: Location of the party that generated this event.
           allOf:
             - $ref: '#/components/schemas/LocationDetails'
-
     MediaSessionStatusUpdate:
       description: MediaSession information emitted on a session-status event
       allOf:
-        - $ref: "#/components/schemas/MediaSession"
+        - $ref: '#/components/schemas/MediaSession'
         - type: object
           description: MediaSession information emitted on a EventSessionStatus event
           required:
             - status
-
     MediaSessionInvite:
       description: MediaSession information emitted on a session-invitation event
       allOf:
-        - $ref: "#/components/schemas/MediaSession"
+        - $ref: '#/components/schemas/MediaSession'
         - type: object
           description: MediaSession information emitted on a EventSessionInvitation event
           required:
             - originatorAddress
             - receiverAddress
             - status
-
     WrtcSdpDescriptor:
       description: SDP descriptor object carrying an inlined Session Description Protocol payload
       type: object
@@ -1013,22 +983,18 @@ components:
         sdp:
           type: string
           maxLength: 65536
-          description: |-
-            An inlined session description in SDP format [RFC4566].If XML syntax is used, the content of this element SHALL be embedded in a CDATA section
-
-    # CloudEvent and CAMARA standard
+          description: An inlined session description in SDP format [RFC4566].If XML syntax is used, the content of this element SHALL be embedded in a CDATA section
     EventSubscriptionEnded:
       description: event structure for event subscription ends
       allOf:
-        - $ref: "#/components/schemas/CloudEvent"
+        - $ref: '#/components/schemas/CloudEvent'
         - type: object
           properties:
             data:
-              $ref: "#/components/schemas/SubscriptionEnded"
+              $ref: '#/components/schemas/SubscriptionEnded'
             type:
               enum:
                 - org.camaraproject.webrtc-events-subscriptions.v0.subscription-ended
-
     SubscriptionEnded:
       description: Event detail structure for SUBSCRIPTION_ENDED event
       type: object
@@ -1037,14 +1003,13 @@ components:
         - terminationReason
       properties:
         subscriptionId:
-          $ref: "#/components/schemas/SubscriptionId"
+          $ref: '#/components/schemas/SubscriptionId'
         terminationReason:
-          $ref: "#/components/schemas/TerminationReason"
+          $ref: '#/components/schemas/TerminationReason'
         terminationDescription:
           type: string
           maxLength: 2048
           description: Human-readable explanation of why the subscription was terminated
-
     TerminationReason:
       type: string
       description: |-
@@ -1059,22 +1024,19 @@ components:
         - SUBSCRIPTION_EXPIRED
         - ACCESS_TOKEN_EXPIRED
         - SUBSCRIPTION_DELETED
-
-    # WebRTC Registration Ends event
     EventRegistrationEnds:
       description: event structure for event subscription ends
       allOf:
-        - $ref: "#/components/schemas/CloudEvent"
+        - $ref: '#/components/schemas/CloudEvent'
         - type: object
           required:
             - data
           properties:
             data:
-              $ref: "#/components/schemas/RegistrationEnds"
+              $ref: '#/components/schemas/RegistrationEnds'
             type:
               enum:
                 - org.camaraproject.webrtc-events-subscriptions.v0.registration-ends
-
     RegistrationEnds:
       description: Event detail structure for REGISTRATION_ENDS event. registrationExpireTime is absolute UTC. Clients SHOULD refresh in advance; otherwise a REGISTRATION_EXPIRED terminationReason will be emitted.
       type: object
@@ -1083,14 +1045,13 @@ components:
         - terminationReason
       properties:
         registrationId:
-          $ref: "#/components/schemas/RegistrationId"
+          $ref: '#/components/schemas/RegistrationId'
         terminationDescription:
           type: string
           maxLength: 2048
           description: Human-readable explanation of why the registration was terminated
         terminationReason:
-          $ref: "#/components/schemas/RegistrationTerminationReason"
-
+          $ref: '#/components/schemas/RegistrationTerminationReason'
     RegistrationTerminationReason:
       type: string
       description: |-
@@ -1099,25 +1060,22 @@ components:
       enum:
         - NETWORK_TERMINATED
         - REGISTRATION_EXPIRED
-
     HTTPSubscriptionRequest:
       description: Subscription request for HTTP-based event delivery.
       allOf:
-        - $ref: "#/components/schemas/SubscriptionRequest"
+        - $ref: '#/components/schemas/SubscriptionRequest'
         - type: object
           properties:
             protocolSettings:
-              $ref: "#/components/schemas/HTTPSettings"
-
+              $ref: '#/components/schemas/HTTPSettings'
     HTTPSubscriptionResponse:
       description: Subscription resource returned for HTTP-based event delivery.
       allOf:
-        - $ref: "#/components/schemas/Subscription"
+        - $ref: '#/components/schemas/Subscription'
         - type: object
           properties:
             protocolSettings:
-              $ref: "#/components/schemas/HTTPSettings"
-
+              $ref: '#/components/schemas/HTTPSettings'
     HTTPSettings:
       description: HTTP protocol settings for event delivery.
       type: object
@@ -1138,11 +1096,7 @@ components:
             - POST
     LocationDetails:
       type: object
-      description: >-
-        Details about a party's location and related information. This object adheres to
-        3GPP TS 24.229, RFC 4119, RFC 5139, and RFC 5491 for PIDF-LO compatibility.
-        Providing this information is specific to certain use cases and does not imply a
-        guarantee of any particular server-side action or behavior.
+      description: Details about a party's location and related information. This object adheres to 3GPP TS 24.229, RFC 4119, RFC 5139, and RFC 5491 for PIDF-LO compatibility. Providing this information is specific to certain use cases and does not imply a guarantee of any particular server-side action or behavior.
       properties:
         shape:
           type: string
@@ -1154,8 +1108,7 @@ components:
           oneOf:
             - $ref: '#/components/schemas/CircleCoordinates'
             - $ref: '#/components/schemas/EllipsoidCoordinates'
-          description: The coordinates of the caller's location, specific to the chosen
-            shape.
+          description: The coordinates of the caller's location, specific to the chosen shape.
         method:
           type: string
           enum:
@@ -1163,14 +1116,9 @@ components:
             - DBH
             - DBH_HELO
             - Other
-          description: 'The method used to obtain the location information.
-
-            * **GPS:** Global Positioning System (highly accurate)
-            * **DBH:** Device-Based Hybrid
-            * **DBH_HELO:** Device-Based Hybrid using Apple Hybridized Emergency Location
-            * **Other:** Other methods (e.g., landmarks, IP Based etc.)
-
-            '
+          description: |
+            The method used to obtain the location information.
+            * **GPS:** Global Positioning System (highly accurate) * **DBH:** Device-Based Hybrid * **DBH_HELO:** Device-Based Hybrid using Apple Hybridized Emergency Location * **Other:** Other methods (e.g., landmarks, IP Based etc.)
         confidence:
           type: object
           description: The confidence level of the location information.
@@ -1180,8 +1128,7 @@ components:
               enum:
                 - normal
                 - uniform
-              description: The probability density function (PDF) associated with the
-                confidence value.
+              description: The probability density function (PDF) associated with the confidence value.
             value:
               type: number
               minimum: 0
@@ -1191,10 +1138,7 @@ components:
           type: string
           format: date-time
           maxLength: 64
-          description: The timestamp (in ISO 8601 format) indicating when the location
-            information was Calculated. \nThis is crucial for emergency services to
-            assess the timeliness of the data. if not provided current timestamp will
-            be used by default"
+          description: The timestamp (in ISO 8601 format) indicating when the location information was Calculated. \nThis is crucial for emergency services to assess the timeliness of the data. if not provided current timestamp will be used by default"
     CircleCoordinates:
       description: Geographic coordinates defining a circular area by center point and radius
       type: object
@@ -1251,18 +1195,81 @@ components:
         orientation:
           type: number
           description: Orientation of the ellipsoid in degrees.
-
+    Source:
+      type: string
+      format: uri-reference
+      minLength: 1
+      maxLength: 2048
+      description: |
+        Identifies the context in which an event happened - be a non-empty `URI-reference` like:
+        - URI with a DNS authority:
+          * https://github.com/cloudevents
+          * mailto:cncf-wg-serverless@lists.cncf.io
+        - Universally-unique URN with a UUID:
+          * urn:uuid:6e8bc430-9c3a-11d9-9669-0800200c9a66
+        - Application-specific identifier:
+          * /cloudevents/spec/pull/123
+          * 1-555-123-4567
+      example: https://notificationSendServer12.example.com
+    DateTime:
+      type: string
+      format: date-time
+      maxLength: 64
+      description: Timestamp. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
+      example: '2018-04-05T17:31:00Z'
+    CloudEvent-2:
+      type: object
+      description: |
+        CloudEvents 1.0 specification envelope.
+        This schema is the stable base for all CAMARA event notifications.
+        It imposes no constraints on `type` values or `data` structure —
+        those concerns belong to the API-specific and lifecycle group schemas.
+      required:
+        - id
+        - source
+        - specversion
+        - type
+        - time
+      properties:
+        id:
+          type: string
+          maxLength: 256
+          description: Identifier of this event, unique within the source context.
+        source:
+          $ref: '#/components/schemas/Source'
+        type:
+          type: string
+          maxLength: 512
+          description: |
+            Identifies the event type. CAMARA APIs use reverse-DNS notation:
+            `org.camaraproject.<api-name>.<event-version>.<event-name>`
+            The api-name segment makes each type globally unique across API groups.
+        specversion:
+          type: string
+          description: Version of the specification to which this event conforms (must be 1.0 if it conforms to cloudevents 1.0.2 version)
+          enum:
+            - '1.0'
+        datacontenttype:
+          type: string
+          description: media-type that describes the event payload encoding, must be "application/json" for CAMARA APIs
+          enum:
+            - application/json
+        data:
+          type: object
+          description: Event details payload. Structure is defined by each concrete event schema.
+        time:
+          $ref: '#/components/schemas/DateTime'
   responses:
     CreateSubscriptionBadRequest400:
       description: Problem with the client request
       headers:
         x-correlator:
-          $ref: "#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -1317,12 +1324,12 @@ components:
       description: Problem with the client request
       headers:
         x-correlator:
-          $ref: "#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -1342,12 +1349,12 @@ components:
       description: Problem with the client request
       headers:
         x-correlator:
-          $ref: "#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -1368,17 +1375,17 @@ components:
               value:
                 status: 400
                 code: INVALID_ARGUMENT
-                message: "Expected property is missing: subscriptionId"
+                message: 'Expected property is missing: subscriptionId'
     Generic401:
       description: Authentication problem with the client request
       headers:
         x-correlator:
-          $ref: "#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -1398,12 +1405,12 @@ components:
       description: Client does not have sufficient permission
       headers:
         x-correlator:
-          $ref: "#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -1423,12 +1430,12 @@ components:
       description: Client does not have sufficient permission
       headers:
         x-correlator:
-          $ref: "#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -1449,18 +1456,18 @@ components:
               description: Inconsistent access token for requested subscription
               value:
                 status: 403
-                code: "SUBSCRIPTION_MISMATCH"
-                message: "Inconsistent access token for requested events subscription"
+                code: SUBSCRIPTION_MISMATCH
+                message: Inconsistent access token for requested events subscription
     Generic404:
       description: Resource Not Found
       headers:
         x-correlator:
-          $ref: "#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -1480,12 +1487,12 @@ components:
       description: Conflict
       headers:
         x-correlator:
-          $ref: "#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -1512,12 +1519,12 @@ components:
       description: Gone
       headers:
         x-correlator:
-          $ref: "#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -1537,12 +1544,12 @@ components:
       description: Unprocessable Entity
       headers:
         x-correlator:
-          $ref: "#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -1597,12 +1604,12 @@ components:
       description: Too Many Requests
       headers:
         x-correlator:
-          $ref: "#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -1626,7 +1633,6 @@ components:
                 code: TOO_MANY_REQUESTS
                 message: Rate limit reached.
   examples:
-    # Subscription examples
     REGISTRATION_ENDS_SUBSCRIPTION:
       description: |-
         A sample of `registration-ends` subscription for registrationId
@@ -1637,15 +1643,15 @@ components:
         protocol: HTTP
         sink: https://notificationServer.opentelco.com
         sinkCredential:
-          credentialType: "ACCESSTOKEN"
-          accessToken: "eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJKV1QiL.."
-          accessTokenExpiresUtc: "2024-12-06T14:37:56.147Z"
-          accessTokenType: "bearer"
+          credentialType: ACCESSTOKEN
+          accessToken: eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJKV1QiL..
+          accessTokenExpiresUtc: '2024-12-06T14:37:56.147Z'
+          accessTokenType: bearer
         types:
           - org.camaraproject.webrtc-events-subscriptions.v0.registration-ends
         config:
           subscriptionDetail:
-            deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
+            deviceId: 7d444840-9dc0-11d1-b245-5ffdce74fad2
     INVITE_SUBSCRIPTION:
       description: |-
         A sample of media `session-invitation` subscription for phone number
@@ -1666,16 +1672,16 @@ components:
         protocol: HTTP
         sink: https://notificationServer.opentelco.com
         sinkCredential:
-          credentialType: "ACCESSTOKEN"
-          accessToken: "eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJKV1QiL.."
-          accessTokenExpiresUtc: "2024-12-06T14:37:56.147Z"
-          accessTokenType: "bearer"
+          credentialType: ACCESSTOKEN
+          accessToken: eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJKV1QiL..
+          accessTokenExpiresUtc: '2024-12-06T14:37:56.147Z'
+          accessTokenType: bearer
         types:
           - org.camaraproject.webrtc-events-subscriptions.v0.session-invitation
         config:
           subscriptionDetail:
-            deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
-          subscriptionExpireTime: "2024-11-17T13:18:23.682Z"
+            deviceId: 7d444840-9dc0-11d1-b245-5ffdce74fad2
+          subscriptionExpireTime: '2024-11-17T13:18:23.682Z'
     SESSION_SUBSCRIPTION:
       description: |-
         A sample of media `session-status` subscription for a specific
@@ -1693,28 +1699,28 @@ components:
         protocol: HTTP
         sink: https://notificationServer.opentelco.com
         sinkCredential:
-          credentialType: "ACCESSTOKEN"
-          accessToken: "eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJKV1QiL.."
-          accessTokenExpiresUtc: "2024-12-06T14:37:56.147Z"
-          accessTokenType: "bearer"
+          credentialType: ACCESSTOKEN
+          accessToken: eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJKV1QiL..
+          accessTokenExpiresUtc: '2024-12-06T14:37:56.147Z'
+          accessTokenType: bearer
         types:
           - org.camaraproject.webrtc-events-subscriptions.v0.session-status
         config:
           subscriptionDetail:
-            deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
-          subscriptionExpireTime: "2024-11-17T13:18:23.682Z"
+            deviceId: 7d444840-9dc0-11d1-b245-5ffdce74fad2
+          subscriptionExpireTime: '2024-11-17T13:18:23.682Z'
     UPDATE_SUBSCRIPTION:
       description: |-
         Example of updating an existing subscription. Either `sinkCredential`,
         `config.subscriptionExpireTime`, or both may be updated.
       value:
         sinkCredential:
-          credentialType: "ACCESSTOKEN"
-          accessToken: "eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJKV1QiL..updated"
-          accessTokenExpiresUtc: "2025-05-01T14:37:56.147Z"
-          accessTokenType: "bearer"
+          credentialType: ACCESSTOKEN
+          accessToken: eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJKV1QiL..updated
+          accessTokenExpiresUtc: '2025-05-01T14:37:56.147Z'
+          accessTokenType: bearer
         config:
-          subscriptionExpireTime: "2025-05-01T13:18:23.682Z"
+          subscriptionExpireTime: '2025-05-01T13:18:23.682Z'
     UPDATED_SUBSCRIPTION:
       description: |-
         Example of the updated subscription returned after a successful
@@ -1726,13 +1732,12 @@ components:
           - org.camaraproject.webrtc-events-subscriptions.v0.session-status
         config:
           subscriptionDetail:
-            deviceId: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-          subscriptionExpireTime: "2023-01-17T13:18:23.682Z"
-        id: "qs15-h556-rt89-1298"
-        startsAt: "2023-07-03T12:27:08.312Z"
-        expiresAt: "2023-07-03T12:27:08.312Z"
-        status: "ACTIVE"
-    # Event examples
+            deviceId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+          subscriptionExpireTime: '2023-01-17T13:18:23.682Z'
+        id: qs15-h556-rt89-1298
+        startsAt: '2023-07-03T12:27:08.312Z'
+        expiresAt: '2023-07-03T12:27:08.312Z'
+        status: ACTIVE
     NEW_SESSION_INCOMING:
       description: |-
         Example of `session-invitation` event.
@@ -1746,23 +1751,23 @@ components:
         an *existing session* is the **type**. A `session-invitation` describes
         on its content, all information required to initiate a new voice-video call.
       value:
-        id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
+        id: VzYQCOClM6Kc7Xmyq7mP58Jx
         source: https://notificationServer.opentelco.com
         type: org.camaraproject.webrtc-events-subscriptions.v0.session-invitation
-        specversion: "1.0"
+        specversion: '1.0'
         datacontenttype: application/json
-        time: 2024-11-05T05:40:23.682Z
+        time: '2024-11-05T05:40:23.682Z'
         data:
-          subscriptionId: "qs15-h556-rt89-1298"
-          originatorAddress: "tel:+11234567899"
-          originatorName: "Alice"
-          receiverAddress: "tel:+11234998765"
-          receiverName: "Bob"
-          status: "Initial"
+          subscriptionId: qs15-h556-rt89-1298
+          originatorAddress: tel:+11234567899
+          originatorName: Alice
+          receiverAddress: tel:+11234998765
+          receiverName: Bob
+          status: Initial
           offer:
             sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0"
-          mediaSessionId: "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
-          reason: "New subscriber incoming call"
+          mediaSessionId: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
+          reason: New subscriber incoming call
           sequenceNumber: 1
     NEW_LOCATED_SESSION_INCOMING:
       description: |-
@@ -1771,23 +1776,23 @@ components:
         An extended example of `session-invitation` that includes location
         details within the `LocationDetails` object
       value:
-        id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
+        id: VzYQCOClM6Kc7Xmyq7mP58Jx
         source: https://notificationServer.opentelco.com
         type: org.camaraproject.webrtc-events-subscriptions.v0.session-invitation
-        specversion: "1.0"
+        specversion: '1.0'
         datacontenttype: application/json
-        time: 2024-11-05T05:40:23.682Z
+        time: '2024-11-05T05:40:23.682Z'
         data:
-          subscriptionId: "qs15-h556-rt89-1298"
-          originatorAddress: "tel:+11234567899"
-          originatorName: "Alice"
-          receiverAddress: "tel:+11234998765"
-          receiverName: "Bob"
-          status: "Initial"
+          subscriptionId: qs15-h556-rt89-1298
+          originatorAddress: tel:+11234567899
+          originatorName: Alice
+          receiverAddress: tel:+11234998765
+          receiverName: Bob
+          status: Initial
           offer:
             sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0"
-          mediaSessionId: "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
-          reason: "New subscriber incoming call"
+          mediaSessionId: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
+          reason: New subscriber incoming call
           sequenceNumber: 1
           locationDetails:
             shape: Circle
@@ -1815,17 +1820,17 @@ components:
         the registration is not valid anymore, detailing on
         `terminationDescription` the root cause of the registration removal.
       value:
-        id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
+        id: VzYQCOClM6Kc7Xmyq7mP58Jx
         source: https://notificationServer.opentelco.com
         type: org.camaraproject.webrtc-events-subscriptions.v0.registration-ends
-        specversion: "1.0"
+        specversion: '1.0'
         datacontenttype: application/json
-        time: 2024-11-05T05:40:23.682Z
+        time: '2024-11-05T05:40:23.682Z'
         data:
           subscriptionId: qs15-h556-rt89-1298
           registrationId: xsmcaum3z4zw4l0cu4w115m0
           terminationReason: REGISTRATION_EXPIRED
-          terminationDescription: "SIP re-registration required"
+          terminationDescription: SIP re-registration required
     SESSION_UPDATE:
       description: |-
         Example of `session-status` events.
@@ -1840,25 +1845,25 @@ components:
         establish a voice-video channel and start transmitting and receiving
         media.
       value:
-        id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
+        id: VzYQCOClM6Kc7Xmyq7mP58Jx
         source: https://notificationServer.opentelco.com
         type: org.camaraproject.webrtc-events-subscriptions.v0.session-status
-        specversion: "1.0"
+        specversion: '1.0'
         datacontenttype: application/json
-        time: 2024-11-05T05:40:23.682Z
+        time: '2024-11-05T05:40:23.682Z'
         data:
-          subscriptionId: "qs15-h556-rt89-1298"
-          originatorAddress: "tel:+11234567899"
-          originatorName: "Alice"
-          receiverAddress: "tel:+11234998765"
-          receiverName: "Bob"
+          subscriptionId: qs15-h556-rt89-1298
+          originatorAddress: tel:+11234567899
+          originatorName: Alice
+          receiverAddress: tel:+11234998765
+          receiverName: Bob
           status: InProgress
           offer:
             sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\n [...]"
           answer:
             sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\n [...]"
-          mediaSessionId: "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
-          reason: "Answer SDP update"
+          mediaSessionId: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
+          reason: Answer SDP update
           sequenceNumber: 3
     SUBSCRIPTION_ENDED:
       description: |-
@@ -1874,13 +1879,13 @@ components:
         the subscription is not valid anymore, detailing on
         `terminationDescription` the root cause of the subscription remove.
       value:
-        id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
+        id: VzYQCOClM6Kc7Xmyq7mP58Jx
         source: https://notificationServer.opentelco.com
         type: org.camaraproject.webrtc-events-subscriptions.v0.subscription-ended
-        specversion: "1.0"
+        specversion: '1.0'
         datacontenttype: application/json
-        time: 2024-11-05T05:40:23.682Z
+        time: '2024-11-05T05:40:23.682Z'
         data:
           subscriptionId: qs15-h556-rt89-1298
           terminationReason: SUBSCRIPTION_EXPIRED
-          terminationDescription: "Subscription expired"
+          terminationDescription: Subscription expired
