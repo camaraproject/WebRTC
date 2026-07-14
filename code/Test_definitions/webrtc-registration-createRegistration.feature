@@ -6,7 +6,7 @@ Feature: CAMARA WebRTC Registration, vwip - Operation createRegistration
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
-    And the request body is set by default to a request body compliant with the schema at "/components/schemas/regSessionRequest"
+    And the request body is set by default to a request body compliant with the schema at "/components/schemas/RegSessionRequest"
     # Properties not explicitly overwritten in the Scenarios can take any values compliant with the schema
 
   @webrtc_registration_createRegistration_01_generic_success_scenario
@@ -17,7 +17,7 @@ Feature: CAMARA WebRTC Registration, vwip - Operation createRegistration
         "deviceId": "7d444840-9dc0-11d1-b245-5ffdce74fad2"
       }
       """
-    Then the response status code should be 200
+    Then the response status code should be 201
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response body must contain a "registrationId"
 

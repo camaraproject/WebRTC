@@ -38,7 +38,7 @@ Feature: CAMARA WebRTC Registration, vwip - Operation deleteRegistrationById
     And the response property "$.code" is "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
 
-  @webrtc_registration_deleteRegistration_400.2_empty_request
+  @webrtc_registration_deleteRegistrationById_400.2_empty_request
   Scenario: Empty object as request path
     Given the path parameter "registrationId" is set to ""
     When the HTTP "DELETE" request is sent
