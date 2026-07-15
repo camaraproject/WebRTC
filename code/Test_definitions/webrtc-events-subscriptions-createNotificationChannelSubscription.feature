@@ -11,7 +11,7 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation createNotification
 
   @webrtc_events_createNotificationChannelSubscription_01_generic_success_scenario
   Scenario: Create a webrtc-events-subscriptions event subscription
-    When the client sends a POST request to "/sessions" with the following payload:
+    When the client sends a POST request to "/subscriptions" with the following payload:
       """
       {
         "protocol": "HTTP",
