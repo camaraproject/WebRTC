@@ -217,14 +217,16 @@ paths:
       description: |-
         Create a new device registration in the network using a client-supplied
         `deviceId`. The subscriber identifier (`phoneNumber`) for the
-        registration is determined by the type of access token used:
+        registration depends on the type of access token used:
 
-        - With a **three-legged access token**, the `phoneNumber` is resolved
-          server-side from the token and MUST NOT be provided in the request
-          body (otherwise `422 UNNECESSARY_IDENTIFIER`).
-        - With a **two-legged access token**, the token carries no subscriber
-          identity, so the API consumer MUST provide the `phoneNumber` in the
-          request body (otherwise `422 MISSING_IDENTIFIER`).
+        - With a **three-legged access token**, the API consumer MUST NOT
+          include `phoneNumber` in the request body; it is resolved server-side
+          from the token. A request that includes it is rejected with
+          `422 UNNECESSARY_IDENTIFIER`.
+        - With a **two-legged access token**, the API consumer MUST include
+          `phoneNumber` in the request body, since the token carries no
+          subscriber identity. A request that omits it is rejected with
+          `422 MISSING_IDENTIFIER`.
 
         On success, the server returns a server-allocated `registrationId`
         (UUID) that the client uses for all subsequent operations on this
@@ -484,21 +486,23 @@ components:
             identity is to be bound to this registration.
 
             Whether this field is allowed or required depends on the type of
-            access token used (see CAMARA Identity and Consent Management):
+            access token used (see CAMARA Identity and Consent Management).
 
-            - **Three-legged access token** (carries subscriber identity): the
-              `phoneNumber` is resolved server-side from the token and MUST NOT
-              be provided in the request body. If it is provided, the request is
-              rejected with `422 UNNECESSARY_IDENTIFIER`.
-            - **Two-legged access token** (no subscriber identity): the API
-              consumer MUST provide the `phoneNumber` in the request body to
-              indicate which subscriber the registration applies to. If it is
-              omitted, the request is rejected with `422 MISSING_IDENTIFIER`.
+            **Client requirements:**
 
-            For two-legged tokens, if the API consumer is not authorized to use
-            the supplied `phoneNumber`, the request is rejected with
-            `403 PERMISSION_DENIED` (a generic message is returned to avoid
-            disclosing whether the number exists).
+            - When using a **three-legged access token**, the API consumer
+              MUST NOT include `phoneNumber` in the request body. The subscriber
+              identity is carried by the token and is resolved server-side.
+            - When using a **two-legged access token**, the API consumer MUST
+              include `phoneNumber` in the request body, because the token does
+              not carry a subscriber identity.
+
+            **Server behaviour:**
+
+            - If a `phoneNumber` is provided with a three-legged access token,
+              the request is rejected with `422 UNNECESSARY_IDENTIFIER`.
+            - If a `phoneNumber` is omitted with a two-legged access token, the
+              request is rejected with `422 MISSING_IDENTIFIER`.
 
             The effective phone number bound to the registration is returned in
             `regInfo.phoneNumber` in the response.
