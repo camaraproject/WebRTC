@@ -102,23 +102,29 @@ Changes documented below are compared to version 0.3.0.
 
 ### Breaking changes
 
-* N/A
+* enhance: possibly breaking down MediaSessionInformation into distinct schema at PR [#164](https://github.com/camaraproject/WebRTC/pull/164)
 
 ### Added
 
-* N/A
+* feat: add Emergency Calling support (callType + PIDF-LO location) at PR [#120](https://github.com/camaraproject/WebRTC/pull/120)
+* feat: use optional originatorLocationDetails as part of the call request at PR [#142](https://github.com/camaraproject/WebRTC/pull/142)
+* feat: add anonymous call origination (sip:anonymous@anonymous.invalid) and home local number support to the Address schema at PR [#178](https://github.com/camaraproject/WebRTC/pull/178)
 
 ### Changed
 
-* N/A
+* enhance: possibly breaking down MediaSessionInformation into distinct schema at PR [#164](https://github.com/camaraproject/WebRTC/pull/164)
+* task: sync common files (error responses, headers, security schemes) to Commonalities r4.2 at PR [#172](https://github.com/camaraproject/WebRTC/pull/172)
+* task: sync common files (error responses, headers, security schemes) to Commonalities r4.3 at PR [#193](https://github.com/camaraproject/WebRTC/pull/193)
+* task: add mandatory info.description templates (authorization and authentication, additional error responses, request body strictness) at PR [#202](https://github.com/camaraproject/WebRTC/pull/202)
 
 ### Fixed
 
-* N/A
+* fix: Commonalities v4.2 alignment at PR [#174](https://github.com/camaraproject/WebRTC/pull/174)
 
 ### Removed
 
-* N/A
+* fix: remove reason and sequenceNumber fields from MediaSessionInformation at PR [#119](https://github.com/camaraproject/WebRTC/pull/119)
+* fix: remove clientCorrelator, serverCorrelator, callObjectRef, and offerRequired at PR [#124](https://github.com/camaraproject/WebRTC/pull/124)
 
 ## webrtc-events-subscriptions 0.3.0-rc.1
 
@@ -131,23 +137,34 @@ Changes documented below are compared to version 0.3.0.
 
 ### Breaking changes
 
-* N/A
+* fix: decouple WebRTC-Events subscriptions from specific media session or registration at PR [#126](https://github.com/camaraproject/WebRTC/pull/126)
+* fix: CloudEvent structure review and rename API to webrtc-events-subscriptions at PR [#183](https://github.com/camaraproject/WebRTC/pull/183)
+* task: rename events API and bump commonalities release at PR [#185](https://github.com/camaraproject/WebRTC/pull/185)
 
 ### Added
 
-* N/A
+* feat: add PUT /subscriptions/{subscriptionId} to update sink credentials and duration at PR [#152](https://github.com/camaraproject/WebRTC/pull/152)
+* feat: require differentiating originator and receiver location in event payloads at PR [#142](https://github.com/camaraproject/WebRTC/pull/142)
+* fix: support multiple event types per subscription at PR [#156](https://github.com/camaraproject/WebRTC/pull/156)
 
 ### Changed
 
-* N/A
+* fix: decouple WebRTC-Events subscriptions from specific media session or registration at PR [#126](https://github.com/camaraproject/WebRTC/pull/126)
+* fix: CloudEvent structure review and rename API to webrtc-events-subscriptions at PR [#183](https://github.com/camaraproject/WebRTC/pull/183)
+* task: rename events API and bump commonalities release at PR [#185](https://github.com/camaraproject/WebRTC/pull/185)
+* fix: update WebRTC subscription examples and developer guidance at PR [#151](https://github.com/camaraproject/WebRTC/pull/151)
+* fix: Commonalities v4.2 alignment at PR [#174](https://github.com/camaraproject/WebRTC/pull/174)
+* task: sync common files (error responses, headers, security schemes, CloudEvent template) to Commonalities r4.2 at PR [#172](https://github.com/camaraproject/WebRTC/pull/172)
+* task: sync common files (error responses, headers, security schemes, CloudEvent template) to Commonalities r4.3 at PR [#193](https://github.com/camaraproject/WebRTC/pull/193)
+* task: add mandatory info.description templates (authorization and authentication, additional error responses, request body strictness) at PR [#202](https://github.com/camaraproject/WebRTC/pull/202)
 
 ### Fixed
 
-* N/A
+* fix: correct example field name accessTokenExpireUtc to accessTokenExpiresUtc at PR [#151](https://github.com/camaraproject/WebRTC/pull/151)
 
 ### Removed
 
-* N/A
+* fix: remove clientCorrelator, serverCorrelator, callObjectRef, and offerRequired at PR [#124](https://github.com/camaraproject/WebRTC/pull/124)
 
 ## webrtc-registration 0.4.0-rc.1
 
@@ -162,19 +179,28 @@ Changes documented below are compared to version 0.3.0.
 
 ### Breaking changes
 
-* N/A
+* feat: add optional phoneNumber to POST /sessions with strict token-type handling at PR [#187](https://github.com/camaraproject/WebRTC/pull/187)
 
 ### Added
 
-* N/A
+* feat: add GET /sessions and GET /sessions/{registrationId} at PR [#169](https://github.com/camaraproject/WebRTC/pull/169)
+* feat: add optional phoneNumber to POST /sessions with strict token-type handling at PR [#187](https://github.com/camaraproject/WebRTC/pull/187)
 
 ### Changed
 
-* N/A
+* fix: clarification on the POST /sessions operation at PR [#180](https://github.com/camaraproject/WebRTC/pull/180)
+* fix: clarification on registration expiration at PR [#166](https://github.com/camaraproject/WebRTC/pull/166)
+* fix: clarification on registrationExpireTime at PR [#165](https://github.com/camaraproject/WebRTC/pull/165)
+* task: sync common files (error responses, headers, security schemes) to Commonalities r4.2 at PR [#172](https://github.com/camaraproject/WebRTC/pull/172)
+* task: sync common files (error responses, headers, security schemes) to Commonalities r4.3 at PR [#193](https://github.com/camaraproject/WebRTC/pull/193)
+* task: add mandatory info.description templates (authorization and authentication, additional error responses, request body strictness) at PR [#202](https://github.com/camaraproject/WebRTC/pull/202)
+* fix: clarify registration retrieval scoping by phoneNumber and correct example registrationId at PR [#204](https://github.com/camaraproject/WebRTC/pull/204)
+* fix: clarify client-side phoneNumber requirements per token type at PR [#205](https://github.com/camaraproject/WebRTC/pull/205)
 
 ### Fixed
 
-* N/A
+* fix: correct POST /sessions response code from 200 to 201 and deviceId field format at PR [#169](https://github.com/camaraproject/WebRTC/pull/169)
+* fix: Commonalities v4.2 alignment at PR [#174](https://github.com/camaraproject/WebRTC/pull/174)
 
 ### Removed
 
