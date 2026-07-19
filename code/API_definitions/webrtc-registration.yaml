@@ -139,11 +139,19 @@ paths:
         - Registration
       summary: Retrieve all registrations for a device
       description: |-
-        Retrieve all active registrations associated with a given `deviceId`.
+        Retrieve the active registrations associated with a given `deviceId`
+        that are authorized for the access token used in the request.
 
         This endpoint allows an API consumer to recover registration state
         after a network disconnection or application restart, where the
         `registrationId` has been lost but the `deviceId` is known.
+
+        Because `deviceId` is a client-generated identifier and is NOT
+        guaranteed to be globally unique, the same `deviceId` value may be
+        shared across registrations bound to different `phoneNumber`s. Only
+        the registrations bound to a `phoneNumber` authorized by the access
+        token are returned; registrations bound to any other `phoneNumber
+        are not included in the response.
 
         Returns an empty array if no active registrations exist for the
         given `deviceId`. It is not possible to retrieve registrations
@@ -191,7 +199,7 @@ paths:
                     - regInfo:
                         phoneNumber: "+198765432"
                         regStatus: Registered
-                      registrationId: "b2c3d4e5-5678-9012-efgh-ab0123456789"
+                      registrationId: "b2c3d4e5-5678-9012-efab-ab0123456789"
                       expiresAt: "2026-05-05T14:00:00.000Z"
                 SingleRegistration:
                   summary: Device with a single active registration
