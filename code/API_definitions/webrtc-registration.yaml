@@ -150,7 +150,7 @@ paths:
         guaranteed to be globally unique, the same `deviceId` value may be
         shared across registrations bound to different `phoneNumber`s. Only
         the registrations bound to a `phoneNumber` authorized by the access
-        token are returned; registrations bound to any other `phoneNumber
+        token are returned; registrations bound to any other `phoneNumber`
         are not included in the response.
 
         Returns an empty array if no active registrations exist for the

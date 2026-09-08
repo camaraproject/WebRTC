@@ -274,7 +274,7 @@ paths:
                 content:
                   application/cloudevents+json:
                     schema:
-                      $ref: "#/components/schemas/CloudEvent"
+                      $ref: "#/components/schemas/WebrtcEventNotification"
                     examples:
                       NEW_SESSION_INCOMING (session-invitation):
                         $ref: "#/components/examples/NEW_SESSION_INCOMING"
@@ -841,7 +841,7 @@ components:
       description: The unique identifier of the WebRTC registration.
       example: ln3C-ttOSk-ObcQ7A0-tYO1LXqy
 
-    CloudEvent:
+    WebrtcEventNotification:
       description: The notification callback
       allOf:
         - $ref: "../common/CAMARA_event_common.yaml#/components/schemas/CloudEvent"
@@ -870,7 +870,7 @@ components:
         contextualize (call subject, branding info, etc). It MUST include a mediaSessionId, to allow the
         endpoint to subscribe to this new call session.
       allOf:
-        - $ref: "#/components/schemas/CloudEvent"
+        - $ref: "#/components/schemas/WebrtcEventNotification"
         - type: object
           required:
             - data
@@ -892,7 +892,7 @@ components:
 
         Most common use is for SDP updates and signaling updates regarding call status.
       allOf:
-        - $ref: "#/components/schemas/CloudEvent"
+        - $ref: "#/components/schemas/WebrtcEventNotification"
         - type: object
           required:
             - data
@@ -1015,7 +1015,7 @@ components:
     EventSubscriptionEnded:
       description: event structure for event subscription ends
       allOf:
-        - $ref: "#/components/schemas/CloudEvent"
+        - $ref: "#/components/schemas/WebrtcEventNotification"
         - type: object
           properties:
             data:
@@ -1059,7 +1059,7 @@ components:
     EventRegistrationEnds:
       description: event structure for event subscription ends
       allOf:
-        - $ref: "#/components/schemas/CloudEvent"
+        - $ref: "#/components/schemas/WebrtcEventNotification"
         - type: object
           required:
             - data
