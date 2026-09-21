@@ -234,13 +234,13 @@ servers:
         description: API root
         default: 'http://localhost:9091'
 tags:
-  - name: Call handling
+  - name: Call Handling
     description: Operations to manage voice video sessions (calls)
 paths:
   /sessions:
     post:
       tags:
-        - Call handling
+        - Call Handling
       summary: Creates voice and/or video session
       description: Creates a voice and/or video session
       operationId: createSession
@@ -310,7 +310,7 @@ paths:
   /sessions/{mediaSessionId}:
     get:
       tags:
-        - Call handling
+        - Call Handling
       summary: Get the media session information
       description: |
         Get the media Session description based on `mediaSessionId`.
@@ -345,7 +345,7 @@ paths:
           $ref: '#/components/responses/Generic404'
     delete:
       tags:
-        - Call handling
+        - Call Handling
       summary: Cancel or Terminate the media session
       description: >
         Cancel a 1-1 media session (as originator),
@@ -379,7 +379,7 @@ paths:
   /sessions/{mediaSessionId}/status:
     put:
       tags:
-        - Call handling
+        - Call Handling
       summary: Update the status of the media session
       description: |
         Update the status of the media session, this may include updating SDP media

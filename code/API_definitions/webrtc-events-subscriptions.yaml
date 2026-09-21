@@ -210,7 +210,7 @@ servers:
         default: http://localhost:9091
         description: API root
 tags:
-  - name: Webrtc-events Subscription
+  - name: Webrtc Events Subscription
     description: |-
       Operations to manage event subscriptions for WebRTC Event APIs.
       Directly related with webrtc-call-handling and webrtc-registration.
@@ -218,7 +218,7 @@ paths:
   /subscriptions:
     post:
       tags:
-        - Webrtc-events Subscription
+        - Webrtc Events Subscription
       summary: "Create a webrtc-events event subscription"
       description: |-
         Create a webrtc-events event subscription. For the corresponding type:
@@ -339,7 +339,7 @@ paths:
           $ref: "#/components/responses/Generic429"
     get:
       tags:
-        - Webrtc-events Subscription
+        - Webrtc Events Subscription
       summary: "Retrieve a list of webrtc-events event subscription"
       description:
         Retrieve **a list** of webrtc-events subscription(s) with detailed
@@ -373,7 +373,7 @@ paths:
   /subscriptions/{subscriptionId}:
     get:
       tags:
-        - Webrtc-events Subscription
+        - Webrtc Events Subscription
       summary: "Retrieve a webrtc-events event subscription"
       description: |
         Retrieve webrtc-events subscription detailed information for a given
@@ -405,7 +405,7 @@ paths:
           $ref: "#/components/responses/Generic404"
     put:
       tags:
-        - Webrtc-events Subscription
+        - Webrtc Events Subscription
       summary: "Update a webrtc-events event subscription"
       description: |-
         Update a given webrtc-events subscription without changing its identity.
@@ -462,7 +462,7 @@ paths:
           $ref: "#/components/responses/Generic429"
     delete:
       tags:
-        - Webrtc-events Subscription
+        - Webrtc Events Subscription
       summary: "Delete a webrtc-events event subscription"
       operationId: deleteNotificationChannelSubscription
       description: |
