@@ -231,7 +231,7 @@ servers:
   - url: '{apiRoot}/webrtc-call-handling/vwip'
     variables:
       apiRoot:
-        description: API root
+        description: API root, defined by the service provider, e.g. `api.example.com` or `api.example.com/somepath`
         default: 'http://localhost:9091'
 tags:
   - name: Call handling

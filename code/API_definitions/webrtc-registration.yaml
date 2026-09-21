@@ -127,7 +127,7 @@ servers:
     description: APIs to manage device registration and connection
     variables:
       apiRoot:
-        description: API Root
+        description: API root, defined by the service provider, e.g. `api.example.com` or `api.example.com/somepath`
         default: http://localhost:9091
 tags:
   - name: Registration
