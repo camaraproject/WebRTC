@@ -712,10 +712,11 @@ components:
           type: string
           format: date-time
           maxLength: 64
-          description: The timestamp (in ISO 8601 format) indicating when the location
-            information was Calculated. \nThis is crucial for emergency services to
-            assess the timeliness of the data. if not provided current timestamp will
-            be used by default"
+          description: |-
+            The timestamp indicating when the location information was calculated.
+            This is crucial for emergency services to assess the timeliness of the data.
+            If not provided, current timestamp will be used by default.
+            It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
     CircleCoordinates:
       description: Geographic coordinates defining a circular area by center point and radius
       type: object
