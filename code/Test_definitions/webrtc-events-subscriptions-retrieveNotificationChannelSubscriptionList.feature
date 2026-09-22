@@ -1,8 +1,8 @@
-Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation retrieveNotificationChannelSubscriptionList
+Feature: CAMARA WebRTC Events Subscriptions, v0.3.0-rc.1 - Operation retrieveNotificationChannelSubscriptionList
 
   Background: Common retrieveNotificationChannelSubscriptionList setup
     Given an environment at "apiRoot"
-    And the resource "/webrtc-events-subscriptions/vwip/subscriptions"                                                              |
+    And the resource "/webrtc-events-subscriptions/v0.3rc1/subscriptions"                                                              |
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
