@@ -413,6 +413,9 @@ paths:
           description: |
             Updated the session status (with SDP data).
             It will confirm the status defined on the PUT operation.
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
           content:
             application/json:
               schema:
@@ -434,6 +437,9 @@ paths:
                   $ref: '#/components/examples/exampleSessionStatusLocationUpdate'
         '204':
           description: Updated the session status (no content)
+          headers:
+            x-correlator:
+              $ref: "#/components/headers/x-correlator"
         '400':
           $ref: '#/components/responses/Generic400'
         '401':
