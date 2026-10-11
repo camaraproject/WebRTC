@@ -4,22 +4,22 @@ info:
   description: |-
     # Introduction
 
-    This API provide REST API for a client, browser or native application, to
-    receive events about updates of an active session or new sessions requests
-    (incoming calls) or registration termination.
+    The WebRTC Events Subscriptions API lets a client, browser or native
+    application, receive events about active session updates, new session
+    requests (incoming calls) and registration termination.
 
-    This API allows a WebRTC client to subscribe to events associated with a specific device,
-    identified by its `deviceId`. The deviceId uniquely represents a physical device on which
-    registrations and sessions may occur.
+    Subscriptions are bound to a specific device, identified by its `deviceId`,
+    which represents a unique physical device on which registrations and
+    sessions may occur.
 
     Instead of requiring separate subscriptions per registration (`registrationId`) or per session
-    (`mediaSessionId`), event delivery is consolidated under the deviceId. This enables the client to
-    receive all relevant notifications — such as new call invitations or session status updates —
+    (`mediaSessionId`), event delivery is consolidated under the `deviceId`, so the client
+    receives all relevant notifications — such as new call invitations or session status updates —
     for any registration or session belonging to the same device.
 
-    This allows the device applications to update the UI while media sessions
-    are progressing and also, allows the device to receive new session request,
-    generating incoming call scenarios for non-SIM devices.
+    As a result, device applications can update the UI while media sessions
+    progress, and receive new session requests, enabling incoming calls on
+    non-SIM devices.
 
     A classic use case is the negotiation of a live media session (call), that
     requires multiple asynchronous events from server side. Other classic
@@ -62,7 +62,7 @@ info:
     The CAMARA subscription model is detailed in the CAMARA API design guideline
     document and follows CloudEvents specification.
 
-    This API allows to create an explicit notification channel for two types of
+    This API allows to create an explicit notification channel for three types of
     events. It is mandatory in the subscription to provide the event type for
     which the client would like to subscribe.
 
@@ -103,7 +103,7 @@ info:
     A `org.camaraproject.webrtc-events-subscriptions.v0.session-status` event includes
     session information updates. With the same schema that is used with the
     WebRTC Call Handling API, when retrieving information from the
-    `GET /webrtc-call-handling/session/{mediaSessionId}` endpoint.
+    `GET /webrtc-call-handling/sessions/{mediaSessionId}` endpoint.
 
     In general lines, it is emitted each time that an event happens within the
     subscribed session. This might happen when SDP updates are included for any
@@ -1263,10 +1263,11 @@ components:
     # Subscription examples
     REGISTRATION_ENDS_SUBSCRIPTION:
       description: |-
-        A sample of `registration-ends` subscription for registrationId
-        `+xsmcaum3z4zw4l0cu4w115m0` at `acme.opentelco.com`.
+        A sample of `registration-ends` subscription for a `deviceId` at
+        `acme.opentelco.com`.
 
         This will be used to receive WebRTC registration termination events
+        for any registration of the device.
       value:
         protocol: HTTP
         sink: https://notificationServer.opentelco.com
@@ -1282,20 +1283,16 @@ components:
             deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
     INVITE_SUBSCRIPTION:
       description: |-
-        A sample of media `session-invitation` subscription for phone number
-        `+1234567890` at `acme.opentelco.com`.
+        A sample of media `session-invitation` subscription for a `deviceId`
+        at `acme.opentelco.com`.
 
-        This will be used to receive incoming sessions (incoming
-        calls). The implicit subscription to `subscription-ended` will make
-        the client aware of registration status updates from the server.
-        (i.e. when a REGISTRATION expires).
+        This will be used to receive incoming sessions (incoming calls) for
+        any registration of the device. Registration termination is notified
+        through the `registration-ends` event type, which requires its own
+        subscription.
 
         The example uses `sinkCredential` for authenticated event delivery and
-        a `subscriptionExpireTime` to control the subscription lifetime. Check
-        callback examples to check some possible events received:
-
-        - New incoming call
-        - Registration revoked
+        a `subscriptionExpireTime` to control the subscription lifetime.
       value:
         protocol: HTTP
         sink: https://notificationServer.opentelco.com
@@ -1312,11 +1309,11 @@ components:
           subscriptionExpireTime: "2024-11-17T13:18:23.682Z"
     SESSION_SUBSCRIPTION:
       description: |-
-        A sample of media `session-status` subscription for a specific
-        `mediaSessionId` at `acme.opentelco.com`.
+        A sample of media `session-status` subscription for a `deviceId` at
+        `acme.opentelco.com`.
 
-        Identified by for `mediaSessionId`, and validated via a `registrationId`
-        the endpoint is able to interact with its own media session.
+        This will be used to receive status updates of any media session of the
+        device, identified in each event by its `mediaSessionId`.
         This could be used to remotely control the call or to handle the async
         session establishment. For instance, updating the user interface for
         different statuses: InProgress, Ringing, Cancel, etc.
@@ -1442,8 +1439,8 @@ components:
         When a re-registration is requested from server, maybe due to expire or
         administrative token revocation or due any other technical reason. It
         is expected from the endpoint to re-register. No new sessions will be
-        delivered to the user endpoint, as the subscription is not valid
-        anymore.
+        delivered to the user endpoint until it re-registers. Event
+        subscriptions are bound to the `deviceId` and remain active.
 
         Here, an example of how the network will communicate to the client that
         the registration is not valid anymore, detailing on

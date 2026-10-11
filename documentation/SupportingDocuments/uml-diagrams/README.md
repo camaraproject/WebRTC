@@ -1,15 +1,15 @@
 # UML diagrams
 
-This folder includes UML files and PNG rederizations of the three main use cases.
+This folder includes UML files and PNG renderings of the three main use cases.
 
 - [UML diagrams](#uml-diagrams)
-  - [WebRTC Events sucription](#webrtc-events-sucription)
+  - [WebRTC Events subscription](#webrtc-events-subscription)
   - [WebRTC Registration process](#webrtc-registration-process)
   - [WebRTC Call handling](#webrtc-call-handling)
     - [Originating use case (create a call)](#originating-use-case-create-a-call)
     - [Terminating use case (receive a call)](#terminating-use-case-receive-a-call)
 
-## WebRTC Events sucription
+## WebRTC Events subscription
 
 ![WebRTC EventsSubscription](<WebRTC-EventsSusbcription-0.2.png>)
 

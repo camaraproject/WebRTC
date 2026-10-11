@@ -1,3 +1,5 @@
+> **Note:** This document may be outdated. The API definitions in [code/API_definitions](../../code/API_definitions/) and their inline documentation are the source of truth.
+
 # Overview
 
 Bring your own number (BYON) service aims to provide consumers with the ability to use their phone number (MSISDN) for outgoing and incoming calls from non-SIM card devices. To access the service, users are required to authenticate using their digital credentials associated with their MNO account, in example their operator app credentials. As registration from a web endpoint is necessary to enable the service on non-SIM card devices.

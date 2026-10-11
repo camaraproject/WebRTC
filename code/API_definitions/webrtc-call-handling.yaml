@@ -84,39 +84,20 @@ info:
     You must check the webrtc-registration API to retrieve a valid registration
     on the network that allows you to send calls (IMS registration).
 
-    Once this is completed, you can consume the POST /sessions/ endpoint to call
-    a remote destination.
+    Once this is completed, you can consume the `POST /sessions` endpoint to call
+    a remote destination. The request MUST include the local SDP `offer`.
 
-    ```
-    POST /webrtc-call-handling/v0.2/sessions
-    {
-      "originatorAddress": "tel:+17085852753",
-      "receiverAddress": "tel:+17085854000",
-    }
-    ```
-
-    This will create a call, but without local media you will have a problem, or
-    maybe the network will reject your call. You need to add a local SDP offer.
-
-    > **The WebRTC SDP local candidate**
+    > **The WebRTC SDP local offer**
     >
-    > What is usually done, before attempt to create a call, is to solve the SDP local
-    description. This is, how you are going to send the media. To explain it briefly,
-    browsers offer the
-    [WebRTC API](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API) that
-    include `getUserMedia()` and `RTCPeerConnection` interfaces that will simplify
-    the process.
-    >
-    > In summary, we need to obtain the media, create the `RTCPeerConnection`
-    and use it's SDP on our CAMARA webrtc-call-handling API as the offer. There
-    is extra information about this concept on the SupportingDocuments folder.
-
-    Once you retrieve you local SDP offer, you modify your session including it,
-    or maybe you prefer to solve the local candidate before attempt the call, in
-    that case, you will include your local offer on the audio/video session creation.
+    > Before creating a call, the client obtains its local SDP description, which
+    > describes how it is going to send the media. Browsers offer the
+    > [WebRTC API](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API),
+    > including the `getUserMedia()` and `RTCPeerConnection` interfaces, to obtain
+    > the media and create the SDP offer. Extra information about this concept is
+    > available in the SupportingDocuments folder.
 
     ```
-    POST /webrtc-call-handling/v0.2/sessions
+    POST /sessions
     {
         "originatorAddress": "tel:+17085852753",
         "receiverAddress": "tel:+17085854000",
@@ -127,10 +108,10 @@ info:
     ```
 
     Following this point, your call is progressing and the network will inform
-    about extra information required and connection status via de the
+    about extra information required and connection status via the
     webrtc-events-subscriptions API.
 
-    Check webrtc-events-subscriptions API inline documentation and supporting documents
+    Check webrtc-events-subscriptions API inline documentation and Supporting Documents
     for further information.
 
     ## 2. Hanging up a call
@@ -152,15 +133,14 @@ info:
     using the GET request, afterwards, you can present to the user some
     confirmation option to accept the call.
 
-    Final step is to include a local offer. We already seen at 3.1 that a local
-    SDP is required, in this case, we will use the PUT request to modify the
-    audio/video session and include the information about the responding device.
+    Final step is to accept the call with the local SDP `answer`, using the PUT
+    request with status `Connected`.
 
     Let's say that we are responding this session `0AEE1B58BAEEDA3EABA42B32EBB3DFE0DEAD`:
     ```
-    PUT /webrtc-call-handling/v0.2/sessions/0AEE1B58BAEEDA3EABA42B32EBB3DFE0DEAD/status
+    PUT /sessions/0AEE1B58BAEEDA3EABA42B32EBB3DFE0DEAD/status
     {
-        "status": "InProgress",
+        "status": "Connected",
         "answer": {
             "sdp": "v=0\r\no=- 4808447918291752114 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=extmap-allow-mixed\r\nm=audio 13765 UDP/TLS/RTP/SAVPF 111 63 9 0 8 13 110 126\r\nc=IN IP4 123.123.123.123\r\na=ice-ufrag:YoUo\r\na=ice-pwd:kK5J6IAgiKFDFU+2rC+FyZal\r\n...\r\n"
             }
