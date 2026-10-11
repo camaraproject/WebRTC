@@ -88,6 +88,7 @@ info:
     - Event subscriptions created via webrtc-events-subscriptions API are not affected.
 
     <!-- CAMARA:MANDATORY:authorization-and-authentication:BEGIN -->
+
     # Authorization and authentication
 
     The "Camara Security and Interoperability Profile" provides details of how an API consumer requests an access token. Please refer to Identity and Consent Management (https://github.com/camaraproject/IdentityAndConsentManagement/) for the released version of the profile.
@@ -98,6 +99,7 @@ info:
     <!-- CAMARA:MANDATORY:authorization-and-authentication:END -->
 
     <!-- CAMARA:MANDATORY:additional-error-responses:BEGIN -->
+
     # Additional CAMARA error responses
 
     The list of error codes in this API specification is not exhaustive. Therefore the API specification MAY not document some non-mandatory error statuses as indicated in `CAMARA API Design Guide`.
@@ -108,6 +110,7 @@ info:
     <!-- CAMARA:MANDATORY:additional-error-responses:END -->
 
     <!-- CAMARA:MANDATORY:request-body-strictness:BEGIN -->
+
     # Request body strictness
 
     This API rejects requests with JSON request bodies that contain properties not declared in this specification, at any nesting level. Unknown properties result in a `400 INVALID_ARGUMENT` response.
@@ -163,8 +166,8 @@ paths:
           in: query
           required: true
           description: |-
-            The deviceId of the client in UUID format. Only registrations
-            associated with this deviceId will be returned.
+            The `deviceId` of the client in UUID format. Only registrations
+            associated with this `deviceId` will be returned.
           schema:
             type: string
             format: uuid
@@ -175,7 +178,7 @@ paths:
       responses:
         '200':
           description: |-
-            List of active registrations for the given deviceId.
+            List of active registrations for the given `deviceId`.
             Returns an empty array if no active registrations exist.
           headers:
             x-correlator:
@@ -365,8 +368,11 @@ paths:
               remaining = t_prev - t_req
            (values ≤ 0 indicate the client is late; operators MAY reject or
            treat it as a new registration).
-        3. Apply the operator's configured TTL (`TTL_cfg`, e.g. 3600 s) **from
-           `t_req`, not from `t_prev`**:
+        3. Compute the new expiry **from `t_req`, not from `t_prev`**:
+           - if the request includes `registrationExpireTime`, apply it as
+             described in that field (capped at the operator's maximum, or
+             rejected below the operator's minimum);
+           - otherwise apply the operator's configured TTL (`TTL_cfg`, e.g. 3600 s):
               newExpire = t_req + TTL_cfg
         4. Persist `newExpire` and return it in `expiresAt` inside the
            response body.
@@ -485,7 +491,7 @@ components:
           format: uuid
           maxLength: 36
           description: |-
-            The deviceId of the client in UUID format. A unique identifier for
+            The `deviceId` of the client in UUID format. A unique identifier for
             the physical device where a registration is initiated. Generated
             by the WebRTC application, and consistent within the same device.
         phoneNumber:
@@ -532,6 +538,9 @@ components:
 
               and initiate a refresh *before* `ttl` elapses (a safety margin
               of ~120 s is recommended).
+
+            ▸ The operator's allowed minimum and maximum are durations relative
+              to the server-side receipt time of the request.
 
             ▸ If the client includes a value exceeding the operator's allowed maximum,
               the server caps the value and returns the authoritative expiry in `expiresAt`.
@@ -583,6 +592,9 @@ components:
             Optional **absolute** UTC timestamp that *requests* a new expiry.
             It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must include a time offset.
 
+            The operator's allowed minimum and maximum are durations relative
+            to the server-side receipt time of the request.
+
             If the client includes a value exceeding the operator's allowed maximum,
             the server caps the value and returns the authoritative expiry in `expiresAt`.
 
@@ -595,8 +607,6 @@ components:
             If the client omits this field, the server extends the expiry
             according to its own TTL policy and returns the authoritative
             expiry in `expiresAt`.
-
-            It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
     RegistrationStatus:
       description: Current registration status of the WebRTC device
       type: string

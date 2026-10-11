@@ -1,12 +1,18 @@
 # Supporting documents
 
-This folder include documentation to support the API definition, API overview description, how to use guides, and other documentation related with the OpenAPI v3 specs of the `API_definitions` folder.
+The API definitions in [`code/API_definitions`](../../code/API_definitions/) are the authoritative source of truth, and their inline documentation is the closest description of them. The documents in this folder are supporting material, with longer explanations and developer guidance.
 
 * [UML diagrams](uml-diagrams/)
-  * Check the UML diagrams included for the documented use cases. They include UML activity diagrams that depict a detailed interaction between apps, WebRTC GW and IMS network.
+  * UML activity diagrams of the main use cases, depicting the interaction between apps, WebRTC GW and IMS network.
+
+* [WebRTC API call flows](uml-diagrams-APIprovider/)
+  * Example call flows and messages for implementers of a WebRTC Gateway exposing the WebRTC APIs.
+
+* [WebRTC API user story](WebRTC-API-User-Story_ASP-WebRTCGW.md)
+  * User story for an Application Service Provider using a WebRTC Gateway.
 
 * [WebRTC voice API](webrtc%20voice%20api.md)
-  * Check this document for introduction to the API, and brief expanation of the API itself, use cases and status descriptions.
+  * Introduction to the APIs, use cases and status descriptions.
 
 * [Obtaining a WebRTC SDP to create calls](webrtc-call-handling-sdp-gathering.md)
-  * CAMARA `webrtc-call-handling` API requires basic usage of the WebRTC API to create calls. You need to obtain and create an `SDP`(Session Description Protocol) body to use in the call creation. This document review that process.
+  * How to obtain the `SDP` (Session Description Protocol) body required to create calls with the `webrtc-call-handling` API.

@@ -61,7 +61,6 @@ _The above section is automatically synchronized by CAMARA project-administratio
 
 * Find API reference documentation at folder: [code/API_definitions](code/API_definitions/)
 * Find API testing documentation at folder: [code/Test_definitions](code/Test_definitions/)
-* Find release status documentation at folder: [documentation/API_documentation](documentation/API_documentation)
 * Find UML and complementary documentation at folder: [documentation/SupportingDocuments](documentation/SupportingDocuments)
 * For other information refer to [Confluence CAMARA project wiki](https://lf-camaraproject.atlassian.net/wiki/spaces/CAM/pages/14560817/WebRTC)
 
