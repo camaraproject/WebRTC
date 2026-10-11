@@ -10,3 +10,6 @@ This folder include documentation to support the API definition, API overview de
 
 * [Obtaining a WebRTC SDP to create calls](webrtc-call-handling-sdp-gathering.md)
   * CAMARA `webrtc-call-handling` API requires basic usage of the WebRTC API to create calls. You need to obtain and create an `SDP`(Session Description Protocol) body to use in the call creation. This document review that process.
+
+* [Releasing guide](releasing-guide.md)
+  * Simplified summary of the CAMARA release process applied to this repository: meta-release milestones, release types and the automated release steps.
