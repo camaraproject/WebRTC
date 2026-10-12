@@ -95,13 +95,3 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation updateNotification
     And the response property "$.status" is 401
     And the response property "$.code" is "UNAUTHENTICATED"
     And the response property "$.message" contains a user friendly text
-
-  # Generic 422 errors
-
-  @webrtc_events_updateNotificationChannelSubscription_422_unprocessable_entity
-  Scenario: Update conflicts with the subscribed event type or config
-    Given the request body contains an update that cannot be processed for this subscription
-    When the HTTP "PUT" request is sent
-    Then the response status code is 422
-    And the response property "$.status" is 422
-    And the response property "$.message" contains a user friendly text

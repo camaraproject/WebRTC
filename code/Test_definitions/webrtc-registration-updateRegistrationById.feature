@@ -13,8 +13,10 @@ Feature: CAMARA WebRTC Registration, vwip - Operation updateRegistrationById
     Given an existing registration session with "registrationId" as "existing-session-id"
     And the path parameter "registrationId" is set to the value for that register session
     When the client sends a PUT request to "/sessions/existing-session-id"
-    Then the response status code should be 204
+    Then the response status code is 200
     And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response body complies with the OAS schema at "#/components/schemas/RegSessionResponse"
+    And the response property "$.expiresAt" exists
 
   # Error scenarios
 

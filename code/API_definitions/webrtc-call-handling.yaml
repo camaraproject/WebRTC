@@ -153,7 +153,7 @@ info:
 
     The list of error codes in this API specification is not exhaustive. Therefore the API specification MAY not document some non-mandatory error statuses as indicated in `CAMARA API Design Guide`.
 
-    Please refer to the `CAMARA_common.yaml` of the Commonalities Release associated to this API version for a complete list of error responses. The applicable Commonalities Release can be identified in the `API Readiness Checklist` document associated to this API version.
+    Please refer to the `CAMARA_common.yaml` of the Commonalities Release associated to this API version for a complete list of error responses. The applicable Commonalities Release can be identified from the `x-camara-commonalities` field, the changelog and the metadata of the released API version.
 
     As a specific rule, error `501 - NOT_IMPLEMENTED` can be only a possible error response if it is explicitly documented in the API.
     <!-- CAMARA:MANDATORY:additional-error-responses:END -->
@@ -189,6 +189,8 @@ info:
     - The `locationDetails` schema follows PIDF-LO concepts (3GPP TS 24.229,
     RFC 4119, RFC 5139, RFC 5491) with either a circle or ellipsoid shape.
     - If `callType` is omitted, it defaults to `REGULAR`.
+    - If the API provider does not support `EMERGENCY`, the request is rejected
+    with `422 WEBRTC_CALL_HANDLING.CALLTYPE_EMERGENCY_NOT_SUPPORTED`.
 
     <!-- CAMARA:MANDATORY:authorization-and-authentication:BEGIN -->
 
@@ -205,7 +207,7 @@ info:
     name: Apache 2.0
     url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
   version: wip
-  x-camara-commonalities: 0.6
+  x-camara-commonalities: 0.9.0
 
 externalDocs:
   description: Product documentation at CAMARA
@@ -260,13 +262,13 @@ paths:
                 SessionCreated:
                   $ref: '#/components/examples/exampleMediaSessionResponse'
         '400':
-          $ref: '#/components/responses/Generic400'
+          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
         '401':
-          $ref: "#/components/responses/Generic401"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
         '403':
-          $ref: '#/components/responses/Generic403'
-        '501':
-          description: Not Implemented
+          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
+        '422':
+          description: Unprocessable Content
           headers:
             x-correlator:
               $ref: '#/components/headers/x-correlator'
@@ -274,22 +276,22 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ErrorInfo'
+                  - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
                   - type: object
                     properties:
                       status:
                         enum:
-                          - 501
+                          - 422
                       code:
                         enum:
-                          - CALLTYPE_EMERGENCY_NOT_SUPPORTED
+                          - WEBRTC_CALL_HANDLING.CALLTYPE_EMERGENCY_NOT_SUPPORTED
               examples:
-                501_CALLTYPE_EMERGENCY_NOT_SUPPORTED:
-                  description: The implementation of API provider does not support the `callType` of `EMERGENCY`.
+                WEBRTC_CALL_HANDLING_422_CALLTYPE_EMERGENCY_NOT_SUPPORTED:
+                  description: The API provider does not support the `callType` of `EMERGENCY`.
                   value:
-                    status: 501
-                    code: CALLTYPE_EMERGENCY_NOT_SUPPORTED
-                    message: Server does not support call type EMERGENCY.
+                    status: 422
+                    code: WEBRTC_CALL_HANDLING.CALLTYPE_EMERGENCY_NOT_SUPPORTED
+                    message: Call type EMERGENCY is not supported.
   /sessions/{mediaSessionId}:
     get:
       tags:
@@ -319,13 +321,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/MediaSessionResponse'
         '400':
-          $ref: '#/components/responses/Generic400'
+          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
         '401':
-          $ref: '#/components/responses/Generic401'
+          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
         '403':
-          $ref: '#/components/responses/Generic403'
+          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
         '404':
-          $ref: '#/components/responses/Generic404'
+          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
     delete:
       tags:
         - Call Handling
@@ -352,13 +354,13 @@ paths:
             x-correlator:
               $ref: "#/components/headers/x-correlator"
         '400':
-          $ref: '#/components/responses/Generic400'
+          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
         '401':
-          $ref: '#/components/responses/Generic401'
+          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
         '403':
-          $ref: '#/components/responses/Generic403'
+          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
         '404':
-          $ref: '#/components/responses/Generic404'
+          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
   /sessions/{mediaSessionId}/status:
     put:
       tags:
@@ -396,6 +398,7 @@ paths:
           description: |
             Updated the session status (with SDP data).
             It will confirm the status defined on the PUT operation.
+            A request that doesn't change the status or SDP returns `200` with the current session.
           headers:
             x-correlator:
               $ref: "#/components/headers/x-correlator"
@@ -418,19 +421,14 @@ paths:
                   $ref: '#/components/examples/exampleSessionStatusConnectedWithLocation'
                 Location update (post-setup location sharing):
                   $ref: '#/components/examples/exampleSessionStatusLocationUpdate'
-        '204':
-          description: Updated the session status (no content)
-          headers:
-            x-correlator:
-              $ref: "#/components/headers/x-correlator"
         '400':
-          $ref: '#/components/responses/Generic400'
+          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
         '401':
-          $ref: '#/components/responses/Generic401'
+          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
         '403':
-          $ref: '#/components/responses/Generic403'
+          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
         '404':
-          $ref: '#/components/responses/Generic404'
+          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
 components:
   securitySchemes:
     openId:
@@ -594,28 +592,6 @@ components:
         - NotReachable
         - Busy
       example: Ringing
-    ErrorInfo:
-      description: A structured error response providing details about a failed request, including the HTTP status code, an error code, and a human-readable message
-      type: object
-      required:
-        - status
-        - code
-        - message
-      properties:
-        status:
-          type: integer
-          format: int32
-          minimum: 100
-          maximum: 599
-          description: HTTP response status code
-        code:
-          type: string
-          maxLength: 96
-          description: Friendly Code to describe the error
-        message:
-          type: string
-          maxLength: 512
-          description: A human readable description of what the event represent
     Address:
       type: string
       description: >-
@@ -944,125 +920,3 @@ components:
             pdf: normal
             value: 97
           timestamp: '2025-10-06T19:31:25Z'
-  responses:
-    Generic400:
-      description: Bad Request
-      headers:
-        x-correlator:
-          $ref: "#/components/headers/x-correlator"
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: "#/components/schemas/ErrorInfo"
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 400
-                  code:
-                    enum:
-                      - INVALID_ARGUMENT
-                      - OUT_OF_RANGE
-          examples:
-            GENERIC_400_INVALID_ARGUMENT:
-              description: Invalid Argument. Generic Syntax Exception
-              value:
-                status: 400
-                code: INVALID_ARGUMENT
-                message: Client specified an invalid argument, request body or query param.
-            GENERIC_400_OUT_OF_RANGE:
-              description: Out of Range. Specific Syntax Exception used when a given field has a pre-defined range or a invalid filter criteria combination is requested
-              value:
-                status: 400
-                code: OUT_OF_RANGE
-                message: Client specified an invalid range.
-    Generic401:
-      description: Unauthorized
-      headers:
-        x-correlator:
-          $ref: "#/components/headers/x-correlator"
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: "#/components/schemas/ErrorInfo"
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 401
-                  code:
-                    enum:
-                      - UNAUTHENTICATED
-          examples:
-            GENERIC_401_UNAUTHENTICATED:
-              description: Request cannot be authenticated and a new authentication is required
-              value:
-                status: 401
-                code: UNAUTHENTICATED
-                message: Request not authenticated due to missing, invalid, or expired credentials. A new authentication is required.
-    Generic403:
-      description: Forbidden
-      headers:
-        x-correlator:
-          $ref: "#/components/headers/x-correlator"
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: "#/components/schemas/ErrorInfo"
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 403
-                  code:
-                    enum:
-                      - PERMISSION_DENIED
-                      - INVALID_TOKEN_CONTEXT
-          examples:
-            GENERIC_403_PERMISSION_DENIED:
-              description: Permission denied. OAuth2 token access does not have the required scope or when the user fails operational security
-              value:
-                status: 403
-                code: PERMISSION_DENIED
-                message: Client does not have sufficient permissions to perform this action.
-            GENERIC_403_INVALID_TOKEN_CONTEXT:
-              description: Reflect some inconsistency between information in some field of the API and the related OAuth2 Token
-              value:
-                status: 403
-                code: INVALID_TOKEN_CONTEXT
-                message: "originator info is not consistent with access token."
-    Generic404:
-      description: Not found
-      headers:
-        x-correlator:
-          $ref: "#/components/headers/x-correlator"
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: "#/components/schemas/ErrorInfo"
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 404
-                  code:
-                    enum:
-                      - NOT_FOUND
-                      - IDENTIFIER_NOT_FOUND
-          examples:
-            GENERIC_404_NOT_FOUND:
-              description: Resource is not found
-              value:
-                status: 404
-                code: NOT_FOUND
-                message: The specified resource is not found.
-            GENERIC_404_IDENTIFIER_NOT_FOUND:
-              description: Some identifier cannot be matched to a device
-              value:
-                status: 404
-                code: IDENTIFIER_NOT_FOUND
-                message: Device identifier not found.
