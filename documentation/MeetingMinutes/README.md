@@ -1,5 +1,3 @@
 # Meeting notes
 
-These meetings notes are stored her for archive purposes, find updated Meeting notes at CAMARA main Wiki website
-
-* https://wiki.camaraproject.org/display/CAM/WebRTC+Meeting+Minutes
+These meeting notes are stored here for archive purposes. Find the current meeting notes at the [CAMARA wiki](https://lf-camaraproject.atlassian.net/wiki/spaces/CAM/pages/14564608/Minutes+-+WebRTC).

@@ -1,13 +1,9 @@
 # Documentation
 
-This folder include extra documentation about the API beyond the technical OpenAPI v3 API description of the `code` folder
-
-* [MeetingMinutes](MeetingMinutes/)
-  * Check this folder for the original meeting minutes.
-  * Newer meeting minutes can be found at [CAMARA Wiki](https://lf-camaraproject.atlassian.net/wiki/spaces/CAM/pages/14564608/WebRTC+Meeting+Minutes)
-  
-* [API_documentation](API_documentation/)
-  * Check this folder for release status documentation.
+This folder includes documentation about the APIs beyond the inline documentation of the OpenAPI definitions in the `code` folder.
 
 * [SupportingDocuments](SupportingDocuments/)
-  * Check this folder for extra documentation to support the API definition, UML activity diagrams, API overview description, how to use guides, and other documentation related..
+  * UML diagrams, call flows, user stories and other documentation supporting the API definitions.
+
+* [MeetingMinutes](MeetingMinutes/)
+  * Archive of the original meeting minutes. Newer meeting minutes are available at the [CAMARA wiki](https://lf-camaraproject.atlassian.net/wiki/spaces/CAM/pages/14564608/Minutes+-+WebRTC).
