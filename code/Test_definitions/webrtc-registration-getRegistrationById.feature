@@ -1,83 +1,135 @@
 Feature: CAMARA WebRTC Registration, vwip - Operation getRegistrationById
 
-  Background: Common getRegistrationById setup
+  # Input to be provided by the implementation to the tester
+  #
+  # Implementation indications:
+  # * apiRoot: API root of the server URL
+  # * Access token type: the API accepts 3-legged access tokens, identifying a single phone number, and 2-legged access tokens, which do not identify a single phone number. The Background access token is any of them, granted access to the registration under test.
+  #
+  # Testing assets:
+  # * An existing registration created by operation "createRegistration".
+  # * An expired registration, if it can be produced in the test environment.
+  #
+  # References to OAS spec schemas refer to schemas specified in webrtc-registration.yaml
+
+  Background: Common "getRegistrationById" setup
     Given an environment at "apiRoot"
-    And the resource "/webrtc-registration/vwip/sessions/{registrationId}"                                                              |
-    And the header "Content-Type" is set to "application/json"
+    And the resource "/webrtc-registration/vwip/sessions/{registrationId}"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
-    And the path parameter "registrationId" is set by default to a existing register session
+    And the path parameter "registrationId" is set by default to the identifier of an existing registration
+
+############################ Happy Path Scenarios #############################################
 
   @webrtc_registration_getRegistrationById_01_generic_success_scenario
-  Scenario: Get the registration information
-    Given an existing registration session with "registrationId" as "a1b2c3d4-1234-5678-abcd-ef0123456789"
-    And the path parameter "registrationId" is set to the value for that register session
-    When the client sends a GET request to "/sessions/a1b2c3d4-1234-5678-abcd-ef0123456789"
-    Then the response status code should be 200
+  Scenario: Retrieve an existing registration
+    Given an existing registration created by operation "createRegistration"
+    And the path parameter "registrationId" is set to the value of the identifier for that registration
+    When the request "getRegistrationById" is sent
+    Then the response status code is 200
+    And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/schemas/RegSessionResponse"
+    And the response body complies with the OAS schema at "#/components/schemas/RegSessionResponse"
+    And the response property "$.registrationId" is equal to the path parameter "registrationId"
+    And the response property "$.regInfo.phoneNumber" is equal to the phone number bound to that registration
+    And the response property "$.regInfo.regStatus" is "Registered"
 
-  # Error scenarios
+############################ Error Scenarios #################################################
 
-  @webrtc_registration_getRegistrationById_404_session_not_found
-  Scenario: Registration identifier cannot be matched to an existing registration
-    Given the path parameter "registrationId" is compliant with the parameter schema but does not identify a valid session
-    When the HTTP "GET" request is sent
+  @webrtc_registration_getRegistrationById_400.01_registration_id_not_schema_compliant
+  Scenario: Path parameter "registrationId" not compliant with the schema
+    Given the path parameter "registrationId" is set to a value not compliant with the schema (longer than 256 characters)
+    When the request "getRegistrationById" is sent
+    Then the response status code is 400
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_registration_getRegistrationById_400.02_invalid_x-correlator
+  Scenario: Invalid x-correlator header
+    Given the header "x-correlator" does not comply with the schema at "#/components/schemas/XCorrelator"
+    When the request "getRegistrationById" is sent
+    Then the response status code is 400
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_registration_getRegistrationById_401.01_no_authorization_header
+  Scenario: Error response for no header "Authorization"
+    Given the header "Authorization" is not sent
+    When the request "getRegistrationById" is sent
+    Then the response status code is 401
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 401
+    And the response property "$.code" is "UNAUTHENTICATED"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_registration_getRegistrationById_401.02_expired_access_token
+  Scenario: Error response for expired access token
+    Given the header "Authorization" is set to an expired access token
+    When the request "getRegistrationById" is sent
+    Then the response status code is 401
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 401
+    And the response property "$.code" is "UNAUTHENTICATED"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_registration_getRegistrationById_401.03_invalid_access_token
+  Scenario: Error response for invalid access token
+    Given the header "Authorization" is set to an invalid access token
+    When the request "getRegistrationById" is sent
+    Then the response status code is 401
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 401
+    And the response property "$.code" is "UNAUTHENTICATED"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_registration_getRegistrationById_403.01_missing_access_token_scope
+  Scenario: Missing access token scope
+    Given the header "Authorization" is set to an access token that does not include scope "webrtc-registration:sessions:read"
+    When the request "getRegistrationById" is sent
+    Then the response status code is 403
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 403
+    And the response property "$.code" is "PERMISSION_DENIED"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_registration_getRegistrationById_403.02_api_client_token_mismatch
+  Scenario: Registration not accessible with the given access token
+    Given the header "Authorization" is set to a valid access token emitted to an API client which did not have rights to access/manage the registration
+    And the path parameter "registrationId" is set to the identifier of an existing registration
+    When the request "getRegistrationById" is sent
+    Then the response status code is 403
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 403
+    And the response property "$.code" is "PERMISSION_DENIED"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_registration_getRegistrationById_404.01_not_found
+  Scenario: Non-existing "registrationId"
+    Given the path parameter "registrationId" is set to a schema compliant value that does not identify any registration
+    When the request "getRegistrationById" is sent
     Then the response status code is 404
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
     And the response property "$.status" is 404
     And the response property "$.code" is "NOT_FOUND"
     And the response property "$.message" contains a user friendly text
 
-  # Generic 400 errors
-
-  @webrtc_registration_getRegistrationById_400.1_no_request
-  Scenario: Missing request path
-    Given the path parameter "registrationId" not included
-    When the HTTP "GET" request is sent
-    Then the response status code is 400
-    And the response property "$.status" is 400
-    And the response property "$.code" is "INVALID_ARGUMENT"
-    And the response property "$.message" contains a user friendly text
-
-  @webrtc_registration_getRegistrationById_400.2_empty_request
-  Scenario: Empty object as request path
-    Given the request body is set to "{}"
-    And the path parameter "registrationId" is set to ""
-    When the HTTP "GET" request is sent
-    Then the response status code is 400
-    And the response property "$.status" is 400
-    And the response property "$.code" is "INVALID_ARGUMENT"
-    And the response property "$.message" contains a user friendly text
-
-  # Generic 401 errors
-
-  @webrtc_registration_getRegistrationById_401.1_no_authorization_header
-  Scenario: No Authorization header
-    Given the header "Authorization" is removed
-    And the path parameter "registrationId" is valid
-    When the HTTP "GET" request is sent
-    Then the response status code is 401
-    And the response property "$.status" is 401
-    And the response property "$.code" is "UNAUTHENTICATED"
-    And the response property "$.message" contains a user friendly text
-
-  @webrtc_registration_getRegistrationById_401.2_expired_access_token
-  Scenario: Expired access token
-    Given the header "Authorization" is set to an expired access token
-    And the path parameter "registrationId" is valid
-    When the HTTP "GET" request is sent
-    Then the response status code is 401
-    And the response property "$.status" is 401
-    And the response property "$.code" is "UNAUTHENTICATED"
-    And the response property "$.message" contains a user friendly text
-
-  @webrtc_registration_getRegistrationById_401.3_invalid_access_token
-  Scenario: Invalid access token
-    Given the header "Authorization" is set to an invalid access token
-    And the path parameter "registrationId" is valid
-    When the HTTP "GET" request is sent
-    Then the response status code is 401
+  @webrtc_registration_getRegistrationById_404.02_expired_registration
+  Scenario: Expired registration
+    Given the path parameter "registrationId" is set to the identifier of an expired registration
+    When the request "getRegistrationById" is sent
+    Then the response status code is 404
+    And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response header "Content-Type" is "application/json"
-    And the response property "$.status" is 401
-    And the response property "$.code" is "UNAUTHENTICATED"
+    And the response property "$.status" is 404
+    And the response property "$.code" is "NOT_FOUND"
     And the response property "$.message" contains a user friendly text

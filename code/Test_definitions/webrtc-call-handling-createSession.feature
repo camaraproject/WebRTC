@@ -1,82 +1,196 @@
 Feature: CAMARA WebRTC Call Handling, vwip - Operation createSession
 
+  # Input to be provided by the implementation to the tester
+  #
+  # Implementation indications:
+  # * apiRoot: API root of the server URL
+  # * Whether callType "EMERGENCY" is supported. Support for EMERGENCY is implementation-declared:
+  #   if supported, the EMERGENCY success scenario applies; if not, the 422 CALLTYPE_EMERGENCY_NOT_SUPPORTED scenario applies.
+  #
+  # Testing assets:
+  # * A valid registrationId of an active registration created by operation "createRegistration" of webrtc-registration API.
+  # * An originatorAddress belonging to that registration and a reachable receiverAddress.
+  # * A valid WebRTC SDP offer.
+  # * If EMERGENCY is supported, an emergency test environment where calls to an emergency service URN can be placed safely.
+  #
+  # References to OAS spec schemas refer to schemas specified in webrtc-call-handling.yaml
+
   Background: Common createSession setup
     Given an environment at "apiRoot"
-    And the resource "/webrtc-call-handling/vwip/sessions"                                                              |
+    And the resource "/webrtc-call-handling/vwip/sessions"
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
-    And the header "registrationId" is set to a UUID value
+    And the header "registrationId" is set by default to the identifier of an existing active registration
+    And the request body is set by default to a request body compliant with the schema at "#/components/schemas/MediaSessionCreate"
 
-  @webrtc_call_handling_createSession_01_generic_success_scenario
-  Scenario: Create a new call session
-    When the client sends a POST request to "/sessions" with the following payload:
-      """
-      {
-        "originatorAddress": "tel:+17085852753",
-        "receiverAddress": "tel:+17085854000",
-        "offer": {
-          "sdp": "v=0\r\no=- 8066321617929821805 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 42988 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:2448:7a05:9b11:66f2:c9e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:1645903805 1 udp 2122262783 2001:e0:410:2448:7a05:9b11:66f2:c9e 42988 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:4eKp\r\na=ice-pwd:D4sF5Pv9vx9ggaqxBlHbAFMx\r\na=ice-options:trickle renomination\r\na=mid:audio\r\na=extmap:2 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=sendrecv\r\na=rtcp-mux\r\na=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:Xm3YciqVIWFNSwy19e9MvfZ2YOdAZil7oT/tHjdf\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\n"
-        },
-        "clientCorrelator": "fda6e26d-e7c8-4596-870c-c083c0d39b2c"
-      }
-      """
-    Then the response status code should be 201
+############################ Happy Path Scenarios #############################################
+
+  @webrtc_call_handling_createSession_01_regular_call_success
+  Scenario: Create a regular voice-video session
+    Given the request body property "$.originatorAddress" is set to the address associated with the registration
+    And the request body property "$.receiverAddress" is set to a valid reachable address
+    And the request body property "$.offer.sdp" is set to a valid SDP offer
+    And the request body property "$.callType" is set to "REGULAR"
+    When the request "createSession" is sent
+    Then the response status code is 201
+    And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/schemas/MediaSessionInformation"
-    And the response body should contain a "mediaSessionId"
+    And the response body complies with the OAS schema at "#/components/schemas/MediaSessionResponse"
+    And the response property "$.originatorAddress" has the same value as the request body property "$.originatorAddress"
+    And the response property "$.receiverAddress" has the same value as the request body property "$.receiverAddress"
+    And a subsequent request "getSessionDetailsById" with the path parameter "mediaSessionId" set to the response property "$.mediaSessionId" returns response status code 200
 
-  # Error scenarios
+  @webrtc_call_handling_createSession_02_emergency_call_with_location_success
+  Scenario: Create an emergency voice-video session with location details
+    Given the implementation supports callType "EMERGENCY"
+    And the request body property "$.originatorAddress" is set to the address associated with the registration
+    And the request body property "$.receiverAddress" is set to "urn:service:sos"
+    And the request body property "$.offer.sdp" is set to a valid SDP offer
+    And the request body property "$.callType" is set to "EMERGENCY"
+    And the request body property "$.locationDetails" is set to a valid value compliant with the schema at "#/components/schemas/LocationDetails"
+    When the request "createSession" is sent
+    Then the response status code is 201
+    And the response header "Content-Type" is "application/json"
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response body complies with the OAS schema at "#/components/schemas/MediaSessionResponse"
+    And the response property "$.receiverAddress" is "urn:service:sos"
 
-  # Generic 400 errors
+############################ Error Scenarios #############################################
 
-  @webrtc_call_handling_createSession_400.1_no_request_body
+  @webrtc_call_handling_createSession_400.01_schema_not_compliant
+  Scenario: Invalid Argument. Generic Syntax Exception
+    Given the request body is included but is not compliant with the schema at "#/components/schemas/MediaSessionCreate"
+    When the request "createSession" is sent
+    Then the response status code is 400
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_call_handling_createSession_400.02_no_request_body
   Scenario: Missing request body
     Given the request body is not included
-    When the HTTP "POST" request is sent
+    When the request "createSession" is sent
     Then the response status code is 400
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
     And the response property "$.status" is 400
     And the response property "$.code" is "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
 
-  @webrtc_call_handling_createSession_400.2_empty_request_body
+  @webrtc_call_handling_createSession_400.03_empty_request_body
   Scenario: Empty object as request body
-    Given the request body is set to "{}"
-    When the HTTP "POST" request is sent
+    Given the request body is set to {}
+    When the request "createSession" is sent
+    Then the response status code is 400
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_call_handling_createSession_400.04_missing_required_property
+  Scenario Outline: Error response for missing required property in request body
+    Given the request body property "<required_property>" is not included
+    When the request "createSession" is sent
+    Then the response status code is 400
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+    Examples:
+      | required_property    |
+      | $.originatorAddress  |
+      | $.receiverAddress    |
+      | $.offer              |
+
+  @webrtc_call_handling_createSession_400.05_missing_registrationId_header
+  Scenario: Missing registrationId header
+    Given the header "registrationId" is not sent
+    When the request "createSession" is sent
+    Then the response status code is 400
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_call_handling_createSession_400.06_invalid_registrationId_header
+  Scenario: registrationId header not compliant with the schema
+    Given the header "registrationId" is set to a value not compliant with the schema of parameter "registrationId"
+    When the request "createSession" is sent
+    Then the response status code is 400
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_call_handling_createSession_400.07_invalid_x-correlator
+  Scenario: Invalid x-correlator header
+    Given the header "x-correlator" does not comply with the schema at "#/components/schemas/XCorrelator"
+    When the request "createSession" is sent
     Then the response status code is 400
     And the response property "$.status" is 400
     And the response property "$.code" is "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
 
-  # Generic 401 errors
-
-  @webrtc_call_handling_createSession_401.1_no_authorization_header
-  Scenario: No Authorization header
-    Given the header "Authorization" is removed
-    And the request body is set to a valid request body
-    When the HTTP "POST" request is sent
+  @webrtc_call_handling_createSession_401.01_no_authorization_header
+  Scenario: Error response for no header "Authorization"
+    Given the header "Authorization" is not sent
+    When the request "createSession" is sent
     Then the response status code is 401
-    And the response property "$.status" is 401
-    And the response property "$.code" is "UNAUTHENTICATED"
-    And the response property "$.message" contains a user friendly text
-
-  @webrtc_call_handling_createSession_401.2_expired_access_token
-  Scenario: Expired access token
-    Given the header "Authorization" is set to an expired access token
-    And the request body is set to a valid request body
-    When the HTTP "POST" request is sent
-    Then the response status code is 401
-    And the response property "$.status" is 401
-    And the response property "$.code" is "UNAUTHENTICATED"
-    And the response property "$.message" contains a user friendly text
-
-  @webrtc_call_handling_createSession_401.3_invalid_access_token
-  Scenario: Invalid access token
-    Given the header "Authorization" is set to an invalid access token
-    And the request body is set to a valid request body
-    When the HTTP "POST" request is sent
-    Then the response status code is 401
+    And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response header "Content-Type" is "application/json"
     And the response property "$.status" is 401
     And the response property "$.code" is "UNAUTHENTICATED"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_call_handling_createSession_401.02_expired_access_token
+  Scenario: Error response for expired access token
+    Given the header "Authorization" is set to an expired access token
+    When the request "createSession" is sent
+    Then the response status code is 401
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 401
+    And the response property "$.code" is "UNAUTHENTICATED"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_call_handling_createSession_401.03_invalid_access_token
+  Scenario: Error response for invalid access token
+    Given the header "Authorization" is set to an invalid access token
+    When the request "createSession" is sent
+    Then the response status code is 401
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 401
+    And the response property "$.code" is "UNAUTHENTICATED"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_call_handling_createSession_403.01_missing_access_token_scope
+  Scenario: Missing access token scope
+    Given the header "Authorization" is set to an access token that does not include scope "webrtc-call-handling:sessions:create"
+    When the request "createSession" is sent
+    Then the response status code is 403
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 403
+    And the response property "$.code" is "PERMISSION_DENIED"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_call_handling_createSession_422.01_calltype_emergency_not_supported
+  Scenario: Error response for callType EMERGENCY not supported
+    Given the implementation does not support callType "EMERGENCY"
+    And the request body property "$.callType" is set to "EMERGENCY"
+    When the request "createSession" is sent
+    Then the response status code is 422
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 422
+    And the response property "$.code" is "WEBRTC_CALL_HANDLING.CALLTYPE_EMERGENCY_NOT_SUPPORTED"
     And the response property "$.message" contains a user friendly text
