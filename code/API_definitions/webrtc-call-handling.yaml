@@ -451,6 +451,7 @@ components:
       schema:
         type: string
         maxLength: 256
+        pattern: '^[^\x00-\x1F\x7F]+$'
     pathParamMediaSessionId:
       name: mediaSessionId
       in: path
@@ -461,6 +462,7 @@ components:
       schema:
         type: string
         maxLength: 256
+        pattern: '^[^\x00-\x1F\x7F]+$'
     x-correlator:
       name: x-correlator
       in: header
@@ -483,6 +485,7 @@ components:
         originatorName:
           type: string
           maxLength: 256
+          pattern: '^[^\x00-\x1F\x7F]+$'
           description: Friendly name of the call originator
           example: 'Alice'
         receiverAddress:
@@ -490,6 +493,7 @@ components:
         receiverName:
           type: string
           maxLength: 256
+          pattern: '^[^\x00-\x1F\x7F]+$'
           description: Friendly name of the call terminator
           example: 'Bob'
         offer:
@@ -537,6 +541,7 @@ components:
             mediaSessionId:
               type: string
               maxLength: 256
+              pattern: '^[^\x00-\x1F\x7F]+$'
               description: >-
                 The media session ID created by the network.
               example: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
@@ -568,6 +573,7 @@ components:
         sdp:
           type: string
           maxLength: 65536
+          pattern: '^[^\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+$'
           description: |-
             An inlined session description in SDP format [RFC4566].If XML syntax is used, the content of this element SHALL be embedded in a CDATA section
     SessionStatus:
