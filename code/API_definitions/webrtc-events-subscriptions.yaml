@@ -233,11 +233,6 @@ paths:
         To subscribe and receive notifications about new calls, a
         `session-invitation` subscription is required using the `deviceId` related to a valid registration.
 
-        For WebRTC calling subscription scenarios, developers should not use
-        `initialEvent` or `subscriptionMaxEvents`. These attributes remain in
-        the schema for CAMARA compatibility, but they are not used by this API
-        for WebRTC calling subscriptions.
-
       operationId: createNotificationChannelSubscription
       parameters:
         - $ref: "#/components/parameters/x-correlator"
@@ -269,7 +264,7 @@ paths:
                 consumer. The webrtc-events server will call this endpoint
                 whenever a webrtc-events event occurs. `operationId` value will
                 have to be replaced accordingly with WG API specific semantic.
-              operationId: createNotificationChannelSubscription
+              operationId: postNotification
               parameters:
                 - $ref: "#/components/parameters/x-correlator"
               requestBody:
@@ -406,61 +401,6 @@ paths:
           $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
         "404":
           $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
-    put:
-      tags:
-        - Webrtc Events Subscription
-      summary: "Update a webrtc-events event subscription"
-      description: |-
-        Update a given webrtc-events subscription without changing its identity.
-
-        This operation is idempotent. Repeating the same update request results
-        in the same final subscription state.
-
-        Either or both of the following attributes may be updated:
-        - `sinkCredential`
-        - `config.subscriptionExpireTime`
-
-        The subscription `sink`, event types, and `config.subscriptionDetail`
-        are not modified by this operation.
-      operationId: updateNotificationChannelSubscription
-      security:
-        - openId:
-            - webrtc-events-subscriptions:update
-      parameters:
-        - $ref: "#/components/parameters/SubscriptionId"
-        - $ref: "#/components/parameters/x-correlator"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SubscriptionUpdateRequest"
-            examples:
-              UPDATE_SUBSCRIPTION:
-                $ref: "#/components/examples/UPDATE_SUBSCRIPTION"
-      responses:
-        "200":
-          description: Updated
-          headers:
-            x-correlator:
-              $ref: "#/components/headers/x-correlator"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Subscription"
-              examples:
-                UPDATED_SUBSCRIPTION:
-                  $ref: "#/components/examples/UPDATED_SUBSCRIPTION"
-        "400":
-          $ref: "#/components/responses/UpdateSubscriptionBadRequest400"
-        "401":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
-        "403":
-          $ref: "../common/CAMARA_event_common.yaml#/components/responses/SubscriptionPermissionDenied403"
-        "404":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
-        "429":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/TooManyRequests429"
     delete:
       tags:
         - Webrtc Events Subscription
@@ -570,32 +510,12 @@ components:
         config:
           $ref: "#/components/schemas/Config"
 
-    SubscriptionUpdateRequest:
-      description: |-
-        The request for updating an existing event subscription.
-
-        Either or both of `sinkCredential` and `config.subscriptionExpireTime`
-        may be updated.
-      type: object
-      properties:
-        sinkCredential:
-          $ref: "#/components/schemas/SinkCredential"
-        config:
-          $ref: "#/components/schemas/SubscriptionUpdateConfig"
-      additionalProperties: false
-
     Config:
       description: |-
         Implementation-specific configuration parameters needed by the subscription manager for acquiring
-        events. `subscriptionExpireTime`, `subscriptionMaxEvents`, `initialEvent` are predefined for CAMARA
-        specifications.
+        events. `subscriptionExpireTime` is predefined for CAMARA specifications.
 
         WebRTC specific event type attributes are included into `WebrtcSubscriptionDetail` schema.
-
-        For WebRTC calling subscriptions in this API, developers should use `subscriptionDetail`
-        and, optionally, `subscriptionExpireTime`. The predefined CAMARA attributes
-        `subscriptionMaxEvents` and `initialEvent` are kept for schema alignment and compatibility,
-        but they are not used for WebRTC calling subscription scenarios.
 
         Note: if a request is performed for several event type, all subscribed event will use same `config`
         parameters.
@@ -613,38 +533,6 @@ components:
           description: |-
             The subscription expiration time (in date-time format) requested by the API consumer.
             It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-        subscriptionMaxEvents:
-          type: integer
-          format: int32
-          description: Identifies the maximum number of event reports to be generated (>=1) requested by the API consumer - Once this number is reached, the subscription ends. Up to API project decision to keep it.
-          minimum: 1
-          maximum: 1000000
-          example: 5
-        initialEvent:
-          type: boolean
-          description: |-
-            Set to `true` by API consumer if consumer wants to get an event as soon as the subscription is created and current situation reflects event request.
-            Example: Consumer request Roaming event. If consumer sets initialEvent to true and device is in roaming situation, an event is triggered
-            Up to API project decision to keep it.
-
-    SubscriptionUpdateConfig:
-      description: |-
-        Configuration parameters that may be updated for an existing subscription.
-
-        For this API, only `subscriptionExpireTime` may be updated through
-        `PUT /subscriptions/{subscriptionId}`.
-      type: object
-      properties:
-        subscriptionExpireTime:
-          type: string
-          format: date-time
-          maxLength: 64
-          example: "2023-01-17T13:18:23.682Z"
-          description: |-
-            The updated subscription expiration time requested by the API consumer.
-            It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
-            and must have time zone.
-      additionalProperties: false
 
     Protocol:
       type: string
@@ -763,7 +651,7 @@ components:
             Camara Event types eligible to be delivered by this subscription.
           type: array
           minItems: 1
-          maxItems: 1
+          maxItems: 3
           items:
             $ref: "#/components/schemas/SubscriptionEventType"
         config:
@@ -889,6 +777,7 @@ components:
         A prototype for media session infomration on Webrtc events. Used as event data schemas for session updates.
       type: object
       required:
+        - subscriptionId
         - mediaSessionId
       properties:
         subscriptionId:
@@ -896,7 +785,7 @@ components:
         originatorAddress:
           type: string
           description: Sender (originator) address
-          pattern: '^(tel:\+[0-9]{5,15}|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})$'
+          pattern: '^(tel:\+[1-9][0-9]{4,14}|tel:[0-9*#]{1,15};phone-context=(?:\+[1-9][0-9]{0,14}|[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+)|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|sip:[0-9*#]{1,15};phone-context=(?:\+[1-9][0-9]{0,14}|[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+)@[A-Za-z0-9.-]+\.[A-Za-z]{2,};user=phone|urn:service:sos(?:\.[a-z0-9](?:[a-z0-9\-]{0,30}[a-z0-9])?)*|sip:anonymous@anonymous\.invalid)$'
           maxLength: 256
           example: 'tel:+11234567899'
         originatorName:
@@ -907,7 +796,7 @@ components:
         receiverAddress:
           type: string
           description: Receiver (terminator) address
-          pattern: '^(tel:\+[0-9]{5,15}|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})$'
+          pattern: '^(tel:\+[1-9][0-9]{4,14}|tel:[0-9*#]{1,15};phone-context=(?:\+[1-9][0-9]{0,14}|[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+)|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|sip:[0-9*#]{1,15};phone-context=(?:\+[1-9][0-9]{0,14}|[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+)@[A-Za-z0-9.-]+\.[A-Za-z]{2,};user=phone|urn:service:sos(?:\.[a-z0-9](?:[a-z0-9\-]{0,30}[a-z0-9])?)*|sip:anonymous@anonymous\.invalid)$'
           maxLength: 256
           example: 'tel:+11234567899'
         receiverName:
@@ -1025,11 +914,9 @@ components:
       description: |-
         - NETWORK_TERMINATED - API server stopped sending notification
         - SUBSCRIPTION_EXPIRED - Subscription expire time (optionally set by the requester) has been reached
-        - MAX_EVENTS_REACHED - Maximum number of events (optionally set by the requester) has been reached
         - ACCESS_TOKEN_EXPIRED - Access Token sinkCredential (optionally set by the requester) expiration time has been reached
         - SUBSCRIPTION_DELETED - Subscription was deleted by the requester
       enum:
-        - MAX_EVENTS_REACHED
         - NETWORK_TERMINATED
         - SUBSCRIPTION_EXPIRED
         - ACCESS_TOKEN_EXPIRED
@@ -1054,9 +941,12 @@ components:
       description: Event detail structure for REGISTRATION_ENDS event. registrationExpireTime is absolute UTC. Clients SHOULD refresh in advance; otherwise a REGISTRATION_EXPIRED terminationReason will be emitted.
       type: object
       required:
+        - subscriptionId
         - registrationId
         - terminationReason
       properties:
+        subscriptionId:
+          $ref: "#/components/schemas/SubscriptionId"
         registrationId:
           $ref: "#/components/schemas/RegistrationId"
         terminationDescription:
@@ -1193,36 +1083,6 @@ components:
           description: Orientation of the ellipsoid in degrees.
 
   responses:
-    UpdateSubscriptionBadRequest400:
-      description: Problem with the client request
-      headers:
-        x-correlator:
-          $ref: "#/components/headers/x-correlator"
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 400
-                  code:
-                    enum:
-                      - INVALID_ARGUMENT
-                      - OUT_OF_RANGE
-                      - INVALID_CREDENTIAL
-                      - INVALID_TOKEN
-          examples:
-            GENERIC_400_INVALID_ARGUMENT:
-              $ref: "../common/CAMARA_common.yaml#/components/examples/GENERIC_400_INVALID_ARGUMENT"
-            GENERIC_400_OUT_OF_RANGE:
-              $ref: "../common/CAMARA_common.yaml#/components/examples/GENERIC_400_OUT_OF_RANGE"
-            GENERIC_400_INVALID_CREDENTIAL:
-              $ref: "../common/CAMARA_event_common.yaml#/components/examples/GENERIC_400_INVALID_CREDENTIAL"
-            GENERIC_400_INVALID_TOKEN:
-              $ref: "../common/CAMARA_event_common.yaml#/components/examples/GENERIC_400_INVALID_TOKEN"
     CreateSubscriptionUnprocessableEntity422:
       description: Unprocessable Content
       headers:
@@ -1334,35 +1194,6 @@ components:
           subscriptionDetail:
             deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
           subscriptionExpireTime: "2024-11-17T13:18:23.682Z"
-    UPDATE_SUBSCRIPTION:
-      description: |-
-        Example of updating an existing subscription. Either `sinkCredential`,
-        `config.subscriptionExpireTime`, or both may be updated.
-      value:
-        sinkCredential:
-          credentialType: "ACCESSTOKEN"
-          accessToken: "eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJKV1QiL..updated"
-          accessTokenExpiresUtc: "2025-05-01T14:37:56.147Z"
-          accessTokenType: "bearer"
-        config:
-          subscriptionExpireTime: "2025-05-01T13:18:23.682Z"
-    UPDATED_SUBSCRIPTION:
-      description: |-
-        Example of the updated subscription returned after a successful
-        subscription update operation.
-      value:
-        protocol: HTTP
-        sink: https://endpoint.example.com/sink
-        types:
-          - org.camaraproject.webrtc-events-subscriptions.v0.session-status
-        config:
-          subscriptionDetail:
-            deviceId: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-          subscriptionExpireTime: "2023-01-17T13:18:23.682Z"
-        id: "qs15-h556-rt89-1298"
-        startsAt: "2023-07-03T12:27:08.312Z"
-        expiresAt: "2023-07-03T12:27:08.312Z"
-        status: "ACTIVE"
     # Event examples
     NEW_SESSION_INCOMING:
       description: |-
