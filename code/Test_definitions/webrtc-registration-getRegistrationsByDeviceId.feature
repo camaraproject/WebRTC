@@ -1,4 +1,4 @@
-Feature: CAMARA WebRTC Registration, vwip - Operation getRegistrationsByDeviceId
+Feature: CAMARA WebRTC Registration, v0.4.0-rc.2 - Operation getRegistrationsByDeviceId
 
   # Input to be provided by the implementation to the tester
   #
@@ -15,7 +15,7 @@ Feature: CAMARA WebRTC Registration, vwip - Operation getRegistrationsByDeviceId
 
   Background: Common "getRegistrationsByDeviceId" setup
     Given an environment at "apiRoot"
-    And the resource "/webrtc-registration/vwip/sessions"
+    And the resource "/webrtc-registration/v0.4rc2/sessions"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
     And the query parameter "deviceId" is set by default to the deviceId of an existing registration

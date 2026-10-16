@@ -1,4 +1,4 @@
-Feature: CAMARA WebRTC Registration, vwip - Operation createRegistration
+Feature: CAMARA WebRTC Registration, v0.4.0-rc.2 - Operation createRegistration
 
   # Input to be provided by the implementation to the tester
   #
@@ -20,7 +20,7 @@ Feature: CAMARA WebRTC Registration, vwip - Operation createRegistration
 
   Background: Common "createRegistration" setup
     Given an environment at "apiRoot"
-    And the resource "/webrtc-registration/vwip/sessions"
+    And the resource "/webrtc-registration/v0.4rc2/sessions"
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"

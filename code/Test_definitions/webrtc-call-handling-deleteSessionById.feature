@@ -1,4 +1,4 @@
-Feature: CAMARA WebRTC Call Handling, vwip - Operation deleteSessionById
+Feature: CAMARA WebRTC Call Handling, v0.4.0-rc.2 - Operation deleteSessionById
 
   # Input to be provided by the implementation to the tester
   #
@@ -13,7 +13,7 @@ Feature: CAMARA WebRTC Call Handling, vwip - Operation deleteSessionById
 
   Background: Common deleteSessionById setup
     Given an environment at "apiRoot"
-    And the resource "/webrtc-call-handling/vwip/sessions/{mediaSessionId}"
+    And the resource "/webrtc-call-handling/v0.4rc2/sessions/{mediaSessionId}"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
     And the path parameter "mediaSessionId" is set by default to the identifier of an existing session

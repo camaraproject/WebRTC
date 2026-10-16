@@ -1,4 +1,4 @@
-Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation createNotificationChannelSubscription
+Feature: CAMARA WebRTC Events Subscriptions, v0.3.0-rc.2 - Operation createNotificationChannelSubscription
   # Input to be provided by the implementation to the tester
   #
   # Implementation indications:
@@ -15,7 +15,7 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation createNotification
 
   Background: Common createNotificationChannelSubscription setup
     Given an environment at "apiRoot"
-    And the resource "/webrtc-events-subscriptions/vwip/subscriptions"
+    And the resource "/webrtc-events-subscriptions/v0.3rc2/subscriptions"
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"

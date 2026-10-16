@@ -202,25 +202,23 @@ info:
 
     In cases where personal data is processed by the API and users can exercise their rights through mechanisms such as opt-in and/or opt-out, the use of three-legged access tokens is mandatory. This ensures that the API remains in compliance with privacy regulations, upholding the principles of transparency and user-centric privacy-by-design.
     <!-- CAMARA:MANDATORY:authorization-and-authentication:END -->
-
   license:
     name: Apache 2.0
-    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
-  version: wip
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.4.0-rc.2
   x-camara-commonalities: 0.9.0
-
-externalDocs:
-  description: Product documentation at CAMARA
-  url: https://github.com/camaraproject/WebRTC
 servers:
-  - url: '{apiRoot}/webrtc-call-handling/vwip'
+  - url: '{apiRoot}/webrtc-call-handling/v0.4rc2'
     variables:
       apiRoot:
         description: API root, defined by the service provider, e.g. `api.example.com` or `api.example.com/somepath`
-        default: 'http://localhost:9091'
+        default: http://localhost:9091
 tags:
   - name: Call Handling
     description: Operations to manage voice video sessions (calls)
+externalDocs:
+  description: Product documentation at CAMARA
+  url: https://github.com/camaraproject/WebRTC
 paths:
   /sessions:
     post:
@@ -230,7 +228,7 @@ paths:
       description: Creates a voice and/or video session
       operationId: createSession
       parameters:
-        - $ref: "#/components/parameters/x-correlator"
+        - $ref: '#/components/parameters/x-correlator'
         - $ref: '#/components/parameters/hdrRegistrationId'
       security:
         - openId:
@@ -253,7 +251,7 @@ paths:
           description: Created
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
           content:
             application/json:
               schema:
@@ -262,11 +260,11 @@ paths:
                 SessionCreated:
                   $ref: '#/components/examples/exampleMediaSessionResponse'
         '400':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
+          $ref: '#/components/responses/BadRequest400'
         '401':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
+          $ref: '#/components/responses/Unauthenticated401'
         '403':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
+          $ref: '#/components/responses/PermissionDenied403'
         '422':
           description: Unprocessable Content
           headers:
@@ -276,7 +274,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+                  - $ref: '#/components/schemas/ErrorInfo'
                   - type: object
                     properties:
                       status:
@@ -315,30 +313,27 @@ paths:
           description: A session information
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MediaSessionResponse'
         '400':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
+          $ref: '#/components/responses/BadRequest400'
         '401':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
+          $ref: '#/components/responses/Unauthenticated401'
         '403':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
+          $ref: '#/components/responses/PermissionDenied403'
         '404':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
+          $ref: '#/components/responses/NotFound404'
     delete:
       tags:
         - Call Handling
       summary: Cancel or Terminate the media session
-      description: >
+      description: |
         Cancel a 1-1 media session (as originator),
-
         Decline a 1-1 media session (as receiver),
-
         Terminate a 1-1 an ongoing media session
-
         ** The client shall construct the API path using the mediaSessionId supplied in the session creation response (origination) or in the invitation notification (termination). **'
       operationId: deleteSessionById
       parameters:
@@ -352,15 +347,15 @@ paths:
           description: Session deleted
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
         '400':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
+          $ref: '#/components/responses/BadRequest400'
         '401':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
+          $ref: '#/components/responses/Unauthenticated401'
         '403':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
+          $ref: '#/components/responses/PermissionDenied403'
         '404':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
+          $ref: '#/components/responses/NotFound404'
   /sessions/{mediaSessionId}/status:
     put:
       tags:
@@ -401,7 +396,7 @@ paths:
             A request that doesn't change the status or SDP returns `200` with the current session.
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
           content:
             application/json:
               schema:
@@ -422,13 +417,13 @@ paths:
                 Location update (post-setup location sharing):
                   $ref: '#/components/examples/exampleSessionStatusLocationUpdate'
         '400':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
+          $ref: '#/components/responses/BadRequest400'
         '401':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
+          $ref: '#/components/responses/Unauthenticated401'
         '403':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
+          $ref: '#/components/responses/PermissionDenied403'
         '404':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
+          $ref: '#/components/responses/NotFound404'
 components:
   securitySchemes:
     openId:
@@ -439,7 +434,7 @@ components:
     x-correlator:
       description: Correlation id for the different services
       schema:
-        $ref: "#/components/schemas/XCorrelator"
+        $ref: '#/components/schemas/XCorrelator'
   parameters:
     hdrRegistrationId:
       name: registrationId
@@ -451,7 +446,7 @@ components:
       schema:
         type: string
         maxLength: 256
-        pattern: '^[^\x00-\x1F\x7F]+$'
+        pattern: ^[^\x00-\x1F\x7F]+$
     pathParamMediaSessionId:
       name: mediaSessionId
       in: path
@@ -462,20 +457,20 @@ components:
       schema:
         type: string
         maxLength: 256
-        pattern: '^[^\x00-\x1F\x7F]+$'
+        pattern: ^[^\x00-\x1F\x7F]+$
     x-correlator:
       name: x-correlator
       in: header
       description: Correlation id for the different services
       schema:
-        $ref: "#/components/schemas/XCorrelator"
+        $ref: '#/components/schemas/XCorrelator'
   schemas:
     XCorrelator:
-      description: Correlator string, UUID format recommended but any string matching the pattern can be used
       type: string
+      description: Correlator string, UUID format recommended but any string matching the pattern can be used
       pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
       maxLength: 256
-      example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
+      example: b4333c46-49c0-4f62-80d7-f0ef930f1c46
     MediaSessionInformation:
       description: Information about a WebRTC media session including originator and receiver identities, SDP offer, call type and location
       type: object
@@ -485,17 +480,17 @@ components:
         originatorName:
           type: string
           maxLength: 256
-          pattern: '^[^\x00-\x1F\x7F]+$'
+          pattern: ^[^\x00-\x1F\x7F]+$
           description: Friendly name of the call originator
-          example: 'Alice'
+          example: Alice
         receiverAddress:
           $ref: '#/components/schemas/Address'
         receiverName:
           type: string
           maxLength: 256
-          pattern: '^[^\x00-\x1F\x7F]+$'
+          pattern: ^[^\x00-\x1F\x7F]+$
           description: Friendly name of the call terminator
-          example: 'Bob'
+          example: Bob
         offer:
           $ref: '#/components/schemas/WrtcSdpDescriptor'
         callType:
@@ -505,11 +500,7 @@ components:
             - REGULAR
             - EMERGENCY
         locationDetails:
-          description: >-
-            Location of the party making this request. When provided in `POST /sessions`, it represents the originator's device location.
-            When provided in `PUT /sessions/{mediaSessionId}/status`, it represents the location of the party making the update
-            (either originator or answering party). Providing this information is specific to certain use cases and does not imply a
-            guarantee of any particular server-side action or behavior.
+          description: Location of the party making this request. When provided in `POST /sessions`, it represents the originator's device location. When provided in `PUT /sessions/{mediaSessionId}/status`, it represents the location of the party making the update (either originator or answering party). Providing this information is specific to certain use cases and does not imply a guarantee of any particular server-side action or behavior.
           allOf:
             - $ref: '#/components/schemas/LocationDetails'
     MediaSessionCreate:
@@ -541,9 +532,8 @@ components:
             mediaSessionId:
               type: string
               maxLength: 256
-              pattern: '^[^\x00-\x1F\x7F]+$'
-              description: >-
-                The media session ID created by the network.
+              pattern: ^[^\x00-\x1F\x7F]+$
+              description: The media session ID created by the network.
               example: 0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF
     MediaSessionStatusChange:
       description: Request body for updating the status of a media session (PUT request)
@@ -573,9 +563,8 @@ components:
         sdp:
           type: string
           maxLength: 65536
-          pattern: '^[^\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+$'
-          description: |-
-            An inlined session description in SDP format [RFC4566].If XML syntax is used, the content of this element SHALL be embedded in a CDATA section
+          pattern: ^[^\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+$
+          description: An inlined session description in SDP format [RFC4566].If XML syntax is used, the content of this element SHALL be embedded in a CDATA section
     SessionStatus:
       type: string
       description: Provides the status of the media session.
@@ -598,10 +587,8 @@ components:
       example: Ringing
     Address:
       type: string
-      description: >-
-        Subscriber address (Sender or Receiver).
-        The following formats are supported:
-        - A TEL URI :
+      description: |-
+        Subscriber address (Sender or Receiver). The following formats are supported: - A TEL URI :
           - an international format; or
           - a home local number (as defined in 3GPP TS 24.229 subclause 5.1.2A.1.5) qualified by a `phone-context`
             parameter identifying the home network numbering plan.
@@ -612,21 +599,13 @@ components:
           - an emergency service URN; or
           - anonymous SIP URI
 
-        The reserved value `sip:anonymous@anonymous.invalid` (as defined in RFC 3323) MAY be used to indicate
-        that the calling party identity is withheld within the trust domain. When `sip:anonymous@anonymous.invalid` is set
-        as the `originatorAddress`, the session SHALL be handled as an anonymous call origination.
-        This value SHALL NOT be used as the `receiverAddress`.
-
-      pattern: '^(tel:\+[1-9][0-9]{4,14}|tel:[0-9*#]{1,15};phone-context=(?:\+[1-9][0-9]{0,14}|[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+)|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|sip:[0-9*#]{1,15};phone-context=(?:\+[1-9][0-9]{0,14}|[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+)@[A-Za-z0-9.-]+\.[A-Za-z]{2,};user=phone|urn:service:sos(?:\.[a-z0-9](?:[a-z0-9\-]{0,30}[a-z0-9])?)*|sip:anonymous@anonymous\.invalid)$'
-      example: 'tel:+11234567899'
+        The reserved value `sip:anonymous@anonymous.invalid` (as defined in RFC 3323) MAY be used to indicate that the calling party identity is withheld within the trust domain. When `sip:anonymous@anonymous.invalid` is set as the `originatorAddress`, the session SHALL be handled as an anonymous call origination. This value SHALL NOT be used as the `receiverAddress`.
+      pattern: ^(tel:\+[1-9][0-9]{4,14}|tel:[0-9*#]{1,15};phone-context=(?:\+[1-9][0-9]{0,14}|[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+)|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|sip:[0-9*#]{1,15};phone-context=(?:\+[1-9][0-9]{0,14}|[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+)@[A-Za-z0-9.-]+\.[A-Za-z]{2,};user=phone|urn:service:sos(?:\.[a-z0-9](?:[a-z0-9\-]{0,30}[a-z0-9])?)*|sip:anonymous@anonymous\.invalid)$
+      example: tel:+11234567899
       maxLength: 256
     LocationDetails:
       type: object
-      description: >-
-        Details about a party's location and related information. This object adheres to
-        3GPP TS 24.229, RFC 4119, RFC 5139, and RFC 5491 for PIDF-LO compatibility.
-        Providing this information is specific to certain use cases and does not imply a
-        guarantee of any particular server-side action or behavior.
+      description: Details about a party's location and related information. This object adheres to 3GPP TS 24.229, RFC 4119, RFC 5139, and RFC 5491 for PIDF-LO compatibility. Providing this information is specific to certain use cases and does not imply a guarantee of any particular server-side action or behavior.
       properties:
         shape:
           type: string
@@ -638,8 +617,7 @@ components:
           oneOf:
             - $ref: '#/components/schemas/CircleCoordinates'
             - $ref: '#/components/schemas/EllipsoidCoordinates'
-          description: The coordinates of the caller's location, specific to the chosen
-            shape.
+          description: The coordinates of the caller's location, specific to the chosen shape.
         method:
           type: string
           enum:
@@ -647,14 +625,9 @@ components:
             - DBH
             - DBH_HELO
             - Other
-          description: 'The method used to obtain the location information.
-
-            * **GPS:** Global Positioning System (highly accurate)
-            * **DBH:** Device-Based Hybrid
-            * **DBH_HELO:** Device-Based Hybrid using Apple Hybridized Emergency Location
-            * **Other:** Other methods (e.g., landmarks, IP Based etc.)
-
-            '
+          description: |
+            The method used to obtain the location information.
+            * **GPS:** Global Positioning System (highly accurate) * **DBH:** Device-Based Hybrid * **DBH_HELO:** Device-Based Hybrid using Apple Hybridized Emergency Location * **Other:** Other methods (e.g., landmarks, IP Based etc.)
         confidence:
           type: object
           description: The confidence level of the location information.
@@ -664,8 +637,7 @@ components:
               enum:
                 - normal
                 - uniform
-              description: The probability density function (PDF) associated with the
-                confidence value.
+              description: The probability density function (PDF) associated with the confidence value.
             value:
               type: number
               minimum: 0
@@ -736,23 +708,45 @@ components:
         orientation:
           type: number
           description: Orientation of the ellipsoid in degrees.
+    ErrorInfo:
+      type: object
+      description: A structured error response providing details about a failed request, including the HTTP status code, an error code, and a human-readable message
+      required:
+        - status
+        - code
+        - message
+      properties:
+        status:
+          type: integer
+          format: int32
+          minimum: 100
+          maximum: 599
+          description: HTTP response status code
+        code:
+          type: string
+          maxLength: 96
+          description: A human-readable code to describe the error
+        message:
+          type: string
+          maxLength: 512
+          description: A human-readable description of what the event represents
   examples:
     exampleRegularMediaSessionRequest:
       summary: Regular call initiation with media information
       description: Example of a standard outbound call request body with SDP offer
       value:
-        originatorAddress: 'tel:+17085852753'
+        originatorAddress: tel:+17085852753
         originatorName: Alice
-        receiverAddress: 'tel:+17085854000'
+        receiverAddress: tel:+17085854000
         receiverName: Bob
         offer:
           sdp: "v=0\r\no=- 8066321617929821805 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 42988 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:2448:7a05:9b11:66f2:c9e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:1645903805 1 udp 2122262783 2001:e0:410:2448:7a05:9b11:66f2:c9e 42988 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:4eKp\r\na=ice-pwd:D4sF5Pv9vx9ggaqxBlHbAFMx\r\na=ice-options:trickle renomination\r\na=mid:audio\r\n [...]"
     exampleMediaSessionResponse:
       description: Example response body returned after successfully creating a media session
       value:
-        originatorAddress: 'tel:+17085852753'
+        originatorAddress: tel:+17085852753
         originatorName: Alice
-        receiverAddress: 'tel:+17085854000'
+        receiverAddress: tel:+17085854000
         receiverName: Bob
         offer:
           sdp: "v=0\r\no=- 8066321617929821805 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 42988 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:2448:7a05:9b11:66f2:c9e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:1645903805 1 udp 2122262783 2001:e0:410:2448:7a05:9b11:66f2:c9e 42988 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:4eKp\r\na=ice-pwd:D4sF5Pv9vx9ggaqxBlHbAFMx\r\na=ice-options:trickle renomination\r\na=mid:audio\r\n [...]"
@@ -781,7 +775,7 @@ components:
           shape: Circle
           coordinates:
             latitude: 40.7128
-            longitude: -74.0060
+            longitude: -74.006
             radius: 50
           method: GPS
           confidence:
@@ -807,9 +801,9 @@ components:
     exampleSessionStatus183InProgress:
       description: Session status update indicating the call is in progress (183 Session Progress)
       value:
-        originatorAddress: 'tel:+17085852753'
+        originatorAddress: tel:+17085852753
         originatorName: Alice
-        receiverAddress: 'tel:+17085854000'
+        receiverAddress: tel:+17085854000
         receiverName: Bob
         status: InProgress
         offer:
@@ -820,9 +814,9 @@ components:
     exampleSessionStatus180Ringing:
       description: Session status update indicating the remote end is ringing (180 Ringing)
       value:
-        originatorAddress: 'tel:+17085852753'
+        originatorAddress: tel:+17085852753
         originatorName: Alice
-        receiverAddress: 'tel:+17085854000'
+        receiverAddress: tel:+17085854000
         receiverName: Bob
         status: Ringing
         offer:
@@ -831,9 +825,9 @@ components:
     exampleSessionStatus200Connected:
       description: Session status update indicating the call has been answered and connected (200 OK)
       value:
-        originatorAddress: 'tel:+17085852753'
+        originatorAddress: tel:+17085852753
         originatorName: Alice
-        receiverAddress: 'tel:+17085854000'
+        receiverAddress: tel:+17085854000
         receiverName: Bob
         status: Connected
         offer:
@@ -844,9 +838,9 @@ components:
     exampleSessionStatusHold:
       description: Session status update indicating the call has been placed on hold
       value:
-        originatorAddress: 'tel:+17085852753'
+        originatorAddress: tel:+17085852753
         originatorName: Alice
-        receiverAddress: 'tel:+17085854000'
+        receiverAddress: tel:+17085854000
         receiverName: Bob
         status: Hold
         offer:
@@ -857,9 +851,9 @@ components:
     exampleSessionStatusResume:
       description: Session status update indicating a held call has been resumed
       value:
-        originatorAddress: 'tel:+17085852753'
+        originatorAddress: tel:+17085852753
         originatorName: Alice
-        receiverAddress: 'tel:+17085854000'
+        receiverAddress: tel:+17085854000
         receiverName: Bob
         status: Resume
         offer:
@@ -871,9 +865,9 @@ components:
       summary: Answering party accepts the call and shares their device location
       description: Session status update for a connected call where the answering party shares device location
       value:
-        originatorAddress: 'tel:+17085852753'
+        originatorAddress: tel:+17085852753
         originatorName: Alice
-        receiverAddress: 'tel:+17085854000'
+        receiverAddress: tel:+17085854000
         receiverName: Bob
         status: Connected
         offer:
@@ -885,7 +879,7 @@ components:
           shape: Circle
           coordinates:
             latitude: 40.7128
-            longitude: -74.0060
+            longitude: -74.006
             radius: 50
           method: GPS
           confidence:
@@ -896,9 +890,9 @@ components:
       summary: Post-setup location update by either party
       description: Session status update carrying a location update from either call party after the session is established
       value:
-        originatorAddress: 'tel:+17085852753'
+        originatorAddress: tel:+17085852753
         originatorName: Alice
-        receiverAddress: 'tel:+17085854000'
+        receiverAddress: tel:+17085854000
         receiverName: Bob
         status: Connected
         offer:
@@ -919,9 +913,9 @@ components:
       summary: Emergency call initiation with location details
       description: Example request body for initiating an emergency call with caller location details
       value:
-        originatorAddress: 'tel:+17085852753'
+        originatorAddress: tel:+17085852753
         originatorName: Alice
-        receiverAddress: 'urn:service:sos'
+        receiverAddress: urn:service:sos
         receiverName: PSAP
         offer:
           sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\n [...]"
@@ -941,7 +935,7 @@ components:
       summary: Regular call initiation with location details
       description: Example request body for a regular call that includes caller location details
       value:
-        originatorAddress: 'tel:+17085852753'
+        originatorAddress: tel:+17085852753
         originatorName: Alice
         receiverAddress: tel:+17085854000
         receiverName: Bob
@@ -958,3 +952,112 @@ components:
             pdf: normal
             value: 97
           timestamp: '2025-10-06T19:31:25Z'
+    GENERIC_400_INVALID_ARGUMENT:
+      description: Invalid Argument. Generic Syntax Exception
+      value:
+        status: 400
+        code: INVALID_ARGUMENT
+        message: Client specified an invalid argument, request body or query param.
+    GENERIC_401_UNAUTHENTICATED:
+      description: Request cannot be authenticated and a new authentication is required
+      value:
+        status: 401
+        code: UNAUTHENTICATED
+        message: Request not authenticated due to missing, invalid, or expired credentials. A new authentication is required.
+    GENERIC_403_PERMISSION_DENIED:
+      description: Permission denied. OAuth2 token access does not have the required scope or when the user fails operational security
+      value:
+        status: 403
+        code: PERMISSION_DENIED
+        message: Client does not have sufficient permissions to perform this action.
+    GENERIC_404_NOT_FOUND:
+      description: Resource is not found
+      value:
+        status: 404
+        code: NOT_FOUND
+        message: The specified resource is not found.
+  responses:
+    BadRequest400:
+      description: Bad Request
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 400
+                  code:
+                    enum:
+                      - INVALID_ARGUMENT
+          examples:
+            GENERIC_400_INVALID_ARGUMENT:
+              $ref: '#/components/examples/GENERIC_400_INVALID_ARGUMENT'
+    Unauthenticated401:
+      description: Unauthorized
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 401
+                  code:
+                    enum:
+                      - UNAUTHENTICATED
+          examples:
+            GENERIC_401_UNAUTHENTICATED:
+              $ref: '#/components/examples/GENERIC_401_UNAUTHENTICATED'
+    PermissionDenied403:
+      description: Forbidden
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 403
+                  code:
+                    enum:
+                      - PERMISSION_DENIED
+          examples:
+            GENERIC_403_PERMISSION_DENIED:
+              $ref: '#/components/examples/GENERIC_403_PERMISSION_DENIED'
+    NotFound404:
+      description: Not found
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 404
+                  code:
+                    enum:
+                      - NOT_FOUND
+          examples:
+            GENERIC_404_NOT_FOUND:
+              $ref: '#/components/examples/GENERIC_404_NOT_FOUND'
