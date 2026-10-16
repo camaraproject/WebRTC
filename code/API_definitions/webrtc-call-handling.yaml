@@ -390,9 +390,9 @@ paths:
               Update ringing (status update without SDP):
                 $ref: '#/components/examples/exampleStatusChangeRinging'
               Answer with location (callee accepts and shares location):
-                $ref: '#/components/examples/exampleSessionStatusConnectedWithLocation'
+                $ref: '#/components/examples/exampleStatusChangeConnectedWithLocation'
               Location update (post-setup location sharing):
-                $ref: '#/components/examples/exampleSessionStatusLocationUpdate'
+                $ref: '#/components/examples/exampleStatusChangeLocationUpdate'
       responses:
         '200':
           description: |
@@ -475,7 +475,7 @@ components:
       maxLength: 256
       example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
     MediaSessionInformation:
-      description: Information about a WebRTC media session including originator and receiver identities, SDP offer/answer, and call status
+      description: Information about a WebRTC media session including originator and receiver identities, SDP offer, call type and location
       type: object
       properties:
         originatorAddress:
@@ -492,11 +492,7 @@ components:
           maxLength: 256
           description: Friendly name of the call terminator
           example: 'Bob'
-        status:
-          $ref: '#/components/schemas/SessionStatus'
         offer:
-          $ref: '#/components/schemas/WrtcSdpDescriptor'
-        answer:
           $ref: '#/components/schemas/WrtcSdpDescriptor'
         callType:
           type: string
@@ -534,6 +530,10 @@ components:
         - $ref: '#/components/schemas/MediaSessionInformation'
         - type: object
           properties:
+            status:
+              $ref: '#/components/schemas/SessionStatus'
+            answer:
+              $ref: '#/components/schemas/WrtcSdpDescriptor'
             mediaSessionId:
               type: string
               maxLength: 256
@@ -563,9 +563,7 @@ components:
 
         **ANSWER**: This type represents an answer in WebRTC Signaling. This element is not
         present in case there is no answer yet, or the session invitation has
-        been declined by the Terminating Participant.This element MUST NOT be
-        present in a request from the application to the server to create a
-        session.
+        been declined by the Terminating Participant.
       properties:
         sdp:
           type: string
@@ -574,7 +572,7 @@ components:
             An inlined session description in SDP format [RFC4566].If XML syntax is used, the content of this element SHALL be embedded in a CDATA section
     SessionStatus:
       type: string
-      description: Provides the status of the media session. During the session creation, this attribute SHALL NOT be included in the request.
+      description: Provides the status of the media session.
       enum:
         - Initial
         - InProgress
@@ -766,6 +764,40 @@ components:
       description: Example request body used to notify that the receiver endpoint is ringing
       value:
         status: Ringing
+    exampleStatusChangeConnectedWithLocation:
+      summary: Answering party accepts the call and shares their device location
+      description: Example request body used to answer the call with the SDP answer and the answering party's device location
+      value:
+        status: Connected
+        answer:
+          sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
+        locationDetails:
+          shape: Circle
+          coordinates:
+            latitude: 40.7128
+            longitude: -74.0060
+            radius: 50
+          method: GPS
+          confidence:
+            pdf: normal
+            value: 88
+          timestamp: '2025-10-06T19:32:10Z'
+    exampleStatusChangeLocationUpdate:
+      summary: Post-setup location update by either party
+      description: Example request body used by either call party to share an updated device location after the session is established
+      value:
+        status: Connected
+        locationDetails:
+          shape: Circle
+          coordinates:
+            latitude: 40.7148
+            longitude: -74.0075
+            radius: 30
+          method: GPS
+          confidence:
+            pdf: normal
+            value: 95
+          timestamp: '2025-10-06T19:45:00Z'
     exampleSessionStatus183InProgress:
       description: Session status update indicating the call is in progress (183 Session Progress)
       value:
