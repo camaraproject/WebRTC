@@ -63,7 +63,8 @@ Changes documented below are compared to version 0.4.0-rc.1.
 
 ### Breaking changes
 
-* N/A
+* fix: unsupported EMERGENCY `callType` returns `422 WEBRTC_CALL_HANDLING.CALLTYPE_EMERGENCY_NOT_SUPPORTED` instead of `501` at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
+* fix: `PUT /sessions/{mediaSessionId}/status` returns `200` with the current session only, `204` removed at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
 
 ### Added
 
@@ -71,15 +72,19 @@ Changes documented below are compared to version 0.4.0-rc.1.
 
 ### Changed
 
-* N/A
+* fix: unsupported EMERGENCY `callType` returns `422 WEBRTC_CALL_HANDLING.CALLTYPE_EMERGENCY_NOT_SUPPORTED` instead of `501` at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
+* fix: `PUT /sessions/{mediaSessionId}/status` returns `200` with the current session only, `204` removed at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
+* task: align with Commonalities r4.4 (0.9.0): common error responses referenced from `CAMARA_common.yaml`, mandatory `info.description` templates updated at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
 
 ### Fixed
 
-* N/A
+* fix: align inline documentation and examples with the API definition (`POST /sessions` example with required `offer`, pick-up example with `Connected` and `answer`) at PR [#237](https://github.com/camaraproject/WebRTC/pull/237)
+* fix: `MediaSessionCreate` no longer inherits `status` and `answer`; status update examples match `MediaSessionStatusChange` at PR [#244](https://github.com/camaraproject/WebRTC/pull/244)
+* fix: add `pattern` to unrestricted string fields at PR [#245](https://github.com/camaraproject/WebRTC/pull/245)
 
 ### Removed
 
-* N/A
+* fix: remove unused error codes `INVALID_TOKEN_CONTEXT` and `IDENTIFIER_NOT_FOUND` at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
 
 ## webrtc-events-subscriptions 0.3.0-rc.2
 
@@ -94,7 +99,9 @@ Changes documented below are compared to version 0.3.0-rc.1.
 
 ### Breaking changes
 
-* N/A
+* fix: `subscriptionId` is required in `MediaSession` and `RegistrationEnds` event data at PR [#244](https://github.com/camaraproject/WebRTC/pull/244)
+* fix: remove unused `initialEvent` and `subscriptionMaxEvents` from `Config`, and `MAX_EVENTS_REACHED` from `TerminationReason` at PR [#244](https://github.com/camaraproject/WebRTC/pull/244)
+* fix: remove `PUT /subscriptions/{subscriptionId}` and the `webrtc-events-subscriptions:update` scope; to change a subscription, delete and create it again at PR [#244](https://github.com/camaraproject/WebRTC/pull/244)
 
 ### Added
 
@@ -102,15 +109,22 @@ Changes documented below are compared to version 0.3.0-rc.1.
 
 ### Changed
 
-* N/A
+* fix: `subscriptionId` is required in `MediaSession` and `RegistrationEnds` event data at PR [#244](https://github.com/camaraproject/WebRTC/pull/244)
+* fix: `registration-ends` event no longer ends the subscription, aligned with webrtc-registration at PR [#237](https://github.com/camaraproject/WebRTC/pull/237)
+* fix: rename callback operationId to `postNotification` (no change on the wire) at PR [#244](https://github.com/camaraproject/WebRTC/pull/244)
+* task: align with Commonalities r4.4 (0.9.0): common error responses referenced from `CAMARA_common.yaml` and `CAMARA_event_common.yaml`, mandatory `info.description` templates updated at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
 
 ### Fixed
 
-* N/A
+* fix: align inline documentation with the API definition (three event types, subscription examples per `deviceId`, `/sessions/{mediaSessionId}` path) at PR [#237](https://github.com/camaraproject/WebRTC/pull/237)
+* fix: `Subscription.types` accepts up to 3 items, matching the request at PR [#244](https://github.com/camaraproject/WebRTC/pull/244)
+* fix: `MediaSession` address pattern matches `Address` in webrtc-call-handling at PR [#244](https://github.com/camaraproject/WebRTC/pull/244)
+* fix: add `pattern` to unrestricted string fields at PR [#245](https://github.com/camaraproject/WebRTC/pull/245)
 
 ### Removed
 
-* N/A
+* fix: remove unused `initialEvent` and `subscriptionMaxEvents` from `Config`, and `MAX_EVENTS_REACHED` from `TerminationReason` at PR [#244](https://github.com/camaraproject/WebRTC/pull/244)
+* fix: remove `PUT /subscriptions/{subscriptionId}` and the `webrtc-events-subscriptions:update` scope at PR [#244](https://github.com/camaraproject/WebRTC/pull/244)
 
 ## webrtc-registration 0.4.0-rc.2
 
@@ -125,7 +139,8 @@ Changes documented below are compared to version 0.4.0-rc.1.
 
 ### Breaking changes
 
-* N/A
+* fix: rename API-specific error codes with the `WEBRTC_REGISTRATION.` prefix (`MAX_DEVICES_PER_USER`, `MAX_REGISTRATION_PER_MSISDN`, `MAX_REGISTRATION_PER_USER`) at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
+* fix: `PUT /sessions/{registrationId}` returns `200` with `expiresAt` only, `204` removed at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
 
 ### Added
 
@@ -133,15 +148,18 @@ Changes documented below are compared to version 0.4.0-rc.1.
 
 ### Changed
 
-* N/A
+* fix: rename API-specific error codes with the `WEBRTC_REGISTRATION.` prefix (`MAX_DEVICES_PER_USER`, `MAX_REGISTRATION_PER_MSISDN`, `MAX_REGISTRATION_PER_USER`) at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
+* fix: `PUT /sessions/{registrationId}` returns `200` with `expiresAt` only, `204` removed at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
+* fix: registration refresh honours the requested `registrationExpireTime` within the allowed range at PR [#237](https://github.com/camaraproject/WebRTC/pull/237)
+* task: align with Commonalities r4.4 (0.9.0): common error responses referenced from `CAMARA_common.yaml`, mandatory `info.description` templates updated at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
 
 ### Fixed
 
-* N/A
+* fix: add `pattern` to unrestricted string fields at PR [#245](https://github.com/camaraproject/WebRTC/pull/245)
 
 ### Removed
 
-* N/A
+* fix: remove unused error codes `EMERGENCY_ADDRESS_MISSING`, `INVALID_TOKEN_CONTEXT` and `IDENTIFIER_NOT_FOUND` at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
 
 **Full Changelog**: https://github.com/camaraproject/WebRTC/compare/r3.1...r3.2
 
