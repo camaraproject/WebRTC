@@ -468,6 +468,7 @@ components:
       schema:
         type: string
         maxLength: 256
+        pattern: '^[^\x00-\x1F\x7F]+$'
   schemas:
     XCorrelator:
       description: Correlator string, UUID format recommended but any string matching the pattern can be used
@@ -561,6 +562,7 @@ components:
         registrationId:
           type: string
           maxLength: 256
+          pattern: '^[^\x00-\x1F\x7F]+$'
           description: The registration session ID is returned when registering a device with the network . Clients must utilize this ID to as a parameter in the call-handling and subscription APIs.
         expiresAt:
           type: string
