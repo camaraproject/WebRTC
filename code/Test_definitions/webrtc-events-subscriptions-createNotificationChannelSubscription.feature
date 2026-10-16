@@ -22,7 +22,6 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation createNotification
     And the request body is set by default to a request body compliant with the schema at "#/components/schemas/SubscriptionRequest"
     And the request body property "$.sink" is set to "callbackUrl"
     And the request body property "$.config.subscriptionDetail.deviceId" is set to the testing asset deviceId
-    And the request body properties "$.config.initialEvent" and "$.config.subscriptionMaxEvents" are not included
 
 ############################ Happy Path Scenarios #############################################
 
