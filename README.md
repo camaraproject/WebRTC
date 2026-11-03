@@ -45,13 +45,13 @@ Sandbox API Repository to describe, develop, document, and test the WebRTC Servi
 
 ### Upcoming Release Preview
 
-* Pre-release: [r3.1](https://github.com/camaraproject/WebRTC/releases/tag/r3.1) (release candidate)
-  * **webrtc-call-handling 0.4.0-rc.1**
-  [[YAML]](https://github.com/camaraproject/WebRTC/blob/r3.1/code/API_definitions/webrtc-call-handling.yaml)  [[ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r3.1/code/API_definitions/webrtc-call-handling.yaml&nocors)  [[Swagger]](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r3.1/code/API_definitions/webrtc-call-handling.yaml)
-  * **webrtc-events-subscriptions 0.3.0-rc.1**
-  [[YAML]](https://github.com/camaraproject/WebRTC/blob/r3.1/code/API_definitions/webrtc-events-subscriptions.yaml)  [[ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r3.1/code/API_definitions/webrtc-events-subscriptions.yaml&nocors)  [[Swagger]](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r3.1/code/API_definitions/webrtc-events-subscriptions.yaml)
-  * **webrtc-registration 0.4.0-rc.1**
-  [[YAML]](https://github.com/camaraproject/WebRTC/blob/r3.1/code/API_definitions/webrtc-registration.yaml)  [[ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r3.1/code/API_definitions/webrtc-registration.yaml&nocors)  [[Swagger]](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r3.1/code/API_definitions/webrtc-registration.yaml)
+* Pre-release: [r3.2](https://github.com/camaraproject/WebRTC/releases/tag/r3.2) (release candidate)
+  * **webrtc-call-handling 0.4.0-rc.2**
+  [[YAML]](https://github.com/camaraproject/WebRTC/blob/r3.2/code/API_definitions/webrtc-call-handling.yaml)  [[ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r3.2/code/API_definitions/webrtc-call-handling.yaml&nocors)  [[Swagger]](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r3.2/code/API_definitions/webrtc-call-handling.yaml)
+  * **webrtc-events-subscriptions 0.3.0-rc.2**
+  [[YAML]](https://github.com/camaraproject/WebRTC/blob/r3.2/code/API_definitions/webrtc-events-subscriptions.yaml)  [[ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r3.2/code/API_definitions/webrtc-events-subscriptions.yaml&nocors)  [[Swagger]](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r3.2/code/API_definitions/webrtc-events-subscriptions.yaml)
+  * **webrtc-registration 0.4.0-rc.2**
+  [[YAML]](https://github.com/camaraproject/WebRTC/blob/r3.2/code/API_definitions/webrtc-registration.yaml)  [[ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r3.2/code/API_definitions/webrtc-registration.yaml&nocors)  [[Swagger]](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r3.2/code/API_definitions/webrtc-registration.yaml)
 
 
 _The above section is automatically synchronized by CAMARA project-administration._
