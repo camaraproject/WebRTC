@@ -179,7 +179,7 @@ info:
     making the update (originator or answering party).
 
     The `locationDetails` schema follows PIDF-LO concepts (3GPP TS 24.229,
-    RFC 4119, RFC 5139, RFC 5491) with either a circle or ellipsoid shape.
+    RFC 4119, RFC 5139, RFC 5491) with the location area expressed as a CAMARA common `Area` (circle or polygon).
 
     # Emergency Calling
 
@@ -187,7 +187,7 @@ info:
     - When `callType` is `EMERGENCY`, the client **MAY** include
     `locationDetails` describing the caller's device location.
     - The `locationDetails` schema follows PIDF-LO concepts (3GPP TS 24.229,
-    RFC 4119, RFC 5139, RFC 5491) with either a circle or ellipsoid shape.
+    RFC 4119, RFC 5139, RFC 5491) with the location area expressed as a CAMARA common `Area` (circle or polygon).
     - If `callType` is omitted, it defaults to `REGULAR`.
     - If the API provider does not support `EMERGENCY`, the request is rejected
     with `422 WEBRTC_CALL_HANDLING.CALLTYPE_EMERGENCY_NOT_SUPPORTED`.
@@ -230,7 +230,7 @@ paths:
       description: Creates a voice and/or video session
       operationId: createSession
       parameters:
-        - $ref: "#/components/parameters/x-correlator"
+        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
         - $ref: '#/components/parameters/hdrRegistrationId'
       security:
         - openId:
@@ -253,7 +253,7 @@ paths:
           description: Created
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
           content:
             application/json:
               schema:
@@ -271,7 +271,7 @@ paths:
           description: Unprocessable Content
           headers:
             x-correlator:
-              $ref: '#/components/headers/x-correlator'
+              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
           content:
             application/json:
               schema:
@@ -305,7 +305,7 @@ paths:
         (termination). **
       operationId: getSessionDetailsById
       parameters:
-        - $ref: '#/components/parameters/x-correlator'
+        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
         - $ref: '#/components/parameters/pathParamMediaSessionId'
       security:
         - openId:
@@ -315,7 +315,7 @@ paths:
           description: A session information
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
           content:
             application/json:
               schema:
@@ -342,7 +342,7 @@ paths:
         ** The client shall construct the API path using the mediaSessionId supplied in the session creation response (origination) or in the invitation notification (termination). **'
       operationId: deleteSessionById
       parameters:
-        - $ref: '#/components/parameters/x-correlator'
+        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
         - $ref: '#/components/parameters/pathParamMediaSessionId'
       security:
         - openId:
@@ -352,7 +352,7 @@ paths:
           description: Session deleted
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
         '400':
           $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
         '401':
@@ -374,7 +374,7 @@ paths:
         The party making the update MAY include `locationDetails` to share their device location. When included in an answer/accept step (e.g., status `Connected` with an answer SDP), `locationDetails` describes the answering party's device location. After call establishment, either party MAY provide or update their location by including `locationDetails`; in that case, the provided location applies to the party making the update.
       operationId: updateSessionStatus
       parameters:
-        - $ref: '#/components/parameters/x-correlator'
+        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
         - $ref: '#/components/parameters/pathParamMediaSessionId'
       security:
         - openId:
@@ -401,7 +401,7 @@ paths:
             A request that doesn't change the status or SDP returns `200` with the current session.
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
           content:
             application/json:
               schema:
@@ -435,11 +435,6 @@ components:
       type: openIdConnect
       description: OpenID Connect authentication via discovery metadata.
       openIdConnectUrl: https://example.com/.well-known/openid-configuration
-  headers:
-    x-correlator:
-      description: Correlation id for the different services
-      schema:
-        $ref: "#/components/schemas/XCorrelator"
   parameters:
     hdrRegistrationId:
       name: registrationId
@@ -463,19 +458,7 @@ components:
         type: string
         maxLength: 256
         pattern: '^[^\x00-\x1F\x7F]+$'
-    x-correlator:
-      name: x-correlator
-      in: header
-      description: Correlation id for the different services
-      schema:
-        $ref: "#/components/schemas/XCorrelator"
   schemas:
-    XCorrelator:
-      description: Correlator string, UUID format recommended but any string matching the pattern can be used
-      type: string
-      pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
-      maxLength: 256
-      example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
     MediaSessionInformation:
       description: Information about a WebRTC media session including originator and receiver identities, SDP offer, call type and location
       type: object
@@ -623,23 +606,13 @@ components:
     LocationDetails:
       type: object
       description: >-
-        Details about a party's location and related information. This object adheres to
-        3GPP TS 24.229, RFC 4119, RFC 5139, and RFC 5491 for PIDF-LO compatibility.
+        Details about a party's location and related information, following PIDF-LO concepts
+        (3GPP TS 24.229, RFC 4119, RFC 5139, RFC 5491).
         Providing this information is specific to certain use cases and does not imply a
         guarantee of any particular server-side action or behavior.
       properties:
-        shape:
-          type: string
-          enum:
-            - Circle
-            - Ellipsoid
-          description: The shape representing the caller's location (Circle or Ellipsoid).
-        coordinates:
-          oneOf:
-            - $ref: '#/components/schemas/CircleCoordinates'
-            - $ref: '#/components/schemas/EllipsoidCoordinates'
-          description: The coordinates of the caller's location, specific to the chosen
-            shape.
+        area:
+          $ref: "../common/CAMARA_common.yaml#/components/schemas/Area"
         method:
           type: string
           enum:
@@ -672,70 +645,12 @@ components:
               maximum: 100
               description: The confidence value (percentage).
         timestamp:
-          type: string
-          format: date-time
-          maxLength: 64
           description: |-
             The timestamp indicating when the location information was calculated.
             This is crucial for emergency services to assess the timeliness of the data.
             If not provided, current timestamp will be used by default.
-            It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-    CircleCoordinates:
-      description: Geographic coordinates defining a circular area by center point and radius
-      type: object
-      required:
-        - latitude
-        - longitude
-        - radius
-      properties:
-        latitude:
-          type: number
-          format: float
-          description: Latitude of the center point in decimal degrees (WGS84).
-        longitude:
-          type: number
-          format: float
-          description: Longitude of the center point in decimal degrees (WGS84).
-        radius:
-          type: number
-          format: float
-          description: Radius of the circle in meters, indicating the uncertainty.
-    EllipsoidCoordinates:
-      description: Geographic coordinates defining an ellipsoidal uncertainty area in the WGS84 geocentric coordinate system
-      type: object
-      required:
-        - latitude
-        - longitude
-        - zAxis
-        - semiMajorAxis
-        - semiMinorAxis
-        - verticalAxis
-        - orientation
-      properties:
-        latitude:
-          type: number
-          format: float
-          description: Latitude in the WGS 84 geocentric coordinate system.
-        longitude:
-          type: number
-          format: float
-          description: Longitude in the WGS 84 geocentric coordinate system.
-        zAxis:
-          type: number
-          format: float
-          description: Altitude (optional) in the WGS 84 geocentric coordinate system.
-        semiMajorAxis:
-          type: number
-          description: Length of the semi-major axis of the ellipsoid in meters.
-        semiMinorAxis:
-          type: number
-          description: Length of the semi-minor axis of the ellipsoid in meters.
-        verticalAxis:
-          type: number
-          description: Length of the vertical axis of the ellipsoid in meters.
-        orientation:
-          type: number
-          description: Orientation of the ellipsoid in degrees.
+          allOf:
+            - $ref: "../common/CAMARA_common.yaml#/components/schemas/DateTime"
   examples:
     exampleRegularMediaSessionRequest:
       summary: Regular call initiation with media information
@@ -778,10 +693,11 @@ components:
         answer:
           sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=rtpmap:102 AMR-WB/16000\r\na=fmtp:102 octet-align=0; mode-set=0,1,2; mode-change-capability=2\r\na=rtpmap:113 telephone-event/16000\r\na=ptime:20\r\n"
         locationDetails:
-          shape: Circle
-          coordinates:
-            latitude: 40.7128
-            longitude: -74.0060
+          area:
+            areaType: CIRCLE
+            center:
+              latitude: 40.7128
+              longitude: -74.0060
             radius: 50
           method: GPS
           confidence:
@@ -794,10 +710,11 @@ components:
       value:
         status: Connected
         locationDetails:
-          shape: Circle
-          coordinates:
-            latitude: 40.7148
-            longitude: -74.0075
+          area:
+            areaType: CIRCLE
+            center:
+              latitude: 40.7148
+              longitude: -74.0075
             radius: 30
           method: GPS
           confidence:
@@ -882,10 +799,11 @@ components:
         answer:
           sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\n [...]"
         locationDetails:
-          shape: Circle
-          coordinates:
-            latitude: 40.7128
-            longitude: -74.0060
+          area:
+            areaType: CIRCLE
+            center:
+              latitude: 40.7128
+              longitude: -74.0060
             radius: 50
           method: GPS
           confidence:
@@ -905,10 +823,11 @@ components:
           sdp: "v=0\r\no=- 8066321617929821805 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 42988 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:2448:7a05:9b11:66f2:c9e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:1645903805 1 udp 2122262783 2001:e0:410:2448:7a05:9b11:66f2:c9e 42988 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:4eKp\r\na=ice-pwd:D4sF5Pv9vx9ggaqxBlHbAFMx\r\na=ice-options:trickle renomination\r\na=mid:audio\r\n [...]"
         mediaSessionId: 0AEE1B58BAEEDA3EABA42B32EBB3DFE0DEAD3F90AE0CEB9EEB0C0F703E199FC00E7C6E648F50EE885FF0CE6C7E1CEE795EDD
         locationDetails:
-          shape: Circle
-          coordinates:
-            latitude: 40.7148
-            longitude: -74.0075
+          area:
+            areaType: CIRCLE
+            center:
+              latitude: 40.7148
+              longitude: -74.0075
             radius: 30
           method: GPS
           confidence:
@@ -927,10 +846,11 @@ components:
           sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\n [...]"
         callType: EMERGENCY
         locationDetails:
-          shape: Circle
-          coordinates:
-            latitude: 47.6062
-            longitude: -122.3321
+          area:
+            areaType: CIRCLE
+            center:
+              latitude: 47.6062
+              longitude: -122.3321
             radius: 35
           method: GPS
           confidence:
@@ -948,10 +868,11 @@ components:
         offer:
           sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 47510 RTP/SAVPF 102 113\r\nc=IN IP6 2001:e0:410:243a:a344:cee7:7b39:bb1e\r\nb=AS:64\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=candidate:3108871805 1 udp 2122262783 2001:e0:410:243a:a344:cee7:7b39:bb1e 47510 typ host generation 0 network-id 3 network-cost 900\r\na=ice-ufrag:47Nx\r\na=ice-pwd:ln3CttOSkObcQ7A0tYO1LXqy\r\na=ice-options:trickle renomination\r\na=mid:audio\r\n [...]"
         locationDetails:
-          shape: Circle
-          coordinates:
-            latitude: 47.5124
-            longitude: -122.4176
+          area:
+            areaType: CIRCLE
+            center:
+              latitude: 47.5124
+              longitude: -122.4176
             radius: 27
           method: GPS
           confidence:

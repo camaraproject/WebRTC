@@ -161,7 +161,7 @@ paths:
         belonging to other devices.
       operationId: getRegistrationsByDeviceId
       parameters:
-        - $ref: '#/components/parameters/x-correlator'
+        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
         - name: deviceId
           in: query
           required: true
@@ -182,7 +182,7 @@ paths:
             Returns an empty array if no active registrations exist.
           headers:
             x-correlator:
-              $ref: '#/components/headers/x-correlator'
+              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
           content:
             application/json:
               schema:
@@ -273,7 +273,7 @@ paths:
         re-POSTing.
       operationId: createRegistration
       parameters:
-        - $ref: '#/components/parameters/x-correlator'
+        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
       security:
         - openId:
             - webrtc-registration:sessions:create
@@ -287,7 +287,7 @@ paths:
           description: Created
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
           content:
             application/json:
               schema:
@@ -320,7 +320,7 @@ paths:
         Returns `404` if the registration does not exist or has expired.
       operationId: getRegistrationById
       parameters:
-        - $ref: '#/components/parameters/x-correlator'
+        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
         - $ref: '#/components/parameters/pathParamRegistrationId'
       security:
         - openId:
@@ -330,7 +330,7 @@ paths:
           description: Registration details retrieved successfully
           headers:
             x-correlator:
-              $ref: '#/components/headers/x-correlator'
+              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
           content:
             application/json:
               schema:
@@ -381,7 +381,7 @@ paths:
         race conditions.
       operationId: updateRegistrationById
       parameters:
-        - $ref: '#/components/parameters/x-correlator'
+        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
         - $ref: '#/components/parameters/pathParamRegistrationId'
       security:
         - openId:
@@ -396,7 +396,7 @@ paths:
           description: Ok
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
           content:
             application/json:
               schema:
@@ -421,7 +421,7 @@ paths:
         Use the registrationId to identify the registration to delete.
       operationId: deleteRegistrationById
       parameters:
-        - $ref: '#/components/parameters/x-correlator'
+        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
         - $ref: '#/components/parameters/pathParamRegistrationId'
       security:
         - openId:
@@ -431,7 +431,7 @@ paths:
           description: No Content
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
         '400':
           $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
         '401':
@@ -446,18 +446,7 @@ components:
       type: openIdConnect
       description: OpenID Connect authentication via discovery metadata.
       openIdConnectUrl: https://example.com/.well-known/openid-configuration
-  headers:
-    x-correlator:
-      description: Correlation id for the different services
-      schema:
-        $ref: "#/components/schemas/XCorrelator"
   parameters:
-    x-correlator:
-      name: x-correlator
-      in: header
-      description: Correlation id for the different services
-      schema:
-        $ref: "#/components/schemas/XCorrelator"
     pathParamRegistrationId:
       name: registrationId
       in: path
@@ -470,12 +459,6 @@ components:
         maxLength: 256
         pattern: '^[^\x00-\x1F\x7F]+$'
   schemas:
-    XCorrelator:
-      description: Correlator string, UUID format recommended but any string matching the pattern can be used
-      type: string
-      pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
-      maxLength: 256
-      example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
     RegSessionRequest:
       description: Request body for creating a new WebRTC device registration
       type: object
@@ -517,14 +500,10 @@ components:
             The effective phone number bound to the registration is returned in
             `regInfo.phoneNumber` in the response.
           allOf:
-            - $ref: '#/components/schemas/PhoneNumber'
+            - $ref: "../common/CAMARA_common.yaml#/components/schemas/PhoneNumber"
         registrationExpireTime:
-          type: string
-          format: date-time
-          maxLength: 64
           description: |-
             Optional **absolute** expiry moment for this registration.
-            It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must include a time offset.
 
             ▸ **Devices without a trustworthy clock** (e.g. Wi-Fi-only tablets
               or other non-SIM hardware) SHOULD treat the value as an
@@ -550,6 +529,8 @@ components:
             ▸ If the client omits this field, the server will set the expiry
               according to its own TTL policy and return the authoritative expiry in
               `expiresAt` in the response.
+          allOf:
+            - $ref: "../common/CAMARA_common.yaml#/components/schemas/DateTime"
 
     RegSessionResponse:
       description: Response body returned after successfully creating or refreshing a WebRTC device registration
@@ -565,9 +546,6 @@ components:
           pattern: '^[^\x00-\x1F\x7F]+$'
           description: The registration session ID is returned when registering a device with the network . Clients must utilize this ID to as a parameter in the call-handling and subscription APIs.
         expiresAt:
-          type: string
-          format: date-time
-          maxLength: 64
           description: |-
             Authoritative expiry timestamp calculated **after** applying the
             refresh logic. Clients MUST treat this value as the new upper-bound
@@ -575,19 +553,15 @@ components:
 
             Client applications should compute the remaining time before expiry (expiresAt - currentTime)
             and plan to refresh well in advance to avoid race conditions. A suggested margin is 120 seconds before expiry.
-
-            It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
+          allOf:
+            - $ref: "../common/CAMARA_common.yaml#/components/schemas/DateTime"
     RegSessionUpdate:
       description: Request body for refreshing an existing WebRTC device registration
       type: object
       properties:
         registrationExpireTime:
-          type: string
-          format: date-time
-          maxLength: 64
           description: |-
             Optional **absolute** UTC timestamp that *requests* a new expiry.
-            It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must include a time offset.
 
             The operator's allowed minimum and maximum are durations relative
             to the server-side receipt time of the request.
@@ -604,6 +578,8 @@ components:
             If the client omits this field, the server extends the expiry
             according to its own TTL policy and returns the authoritative
             expiry in `expiresAt`.
+          allOf:
+            - $ref: "../common/CAMARA_common.yaml#/components/schemas/DateTime"
     RegistrationStatus:
       description: Current registration status of the WebRTC device
       type: string
@@ -614,22 +590,16 @@ components:
       type: object
       properties:
         phoneNumber:
-          $ref: '#/components/schemas/PhoneNumber'
+          $ref: "../common/CAMARA_common.yaml#/components/schemas/PhoneNumber"
         regStatus:
           $ref: '#/components/schemas/RegistrationStatus'
-    PhoneNumber:
-      description: A public identifier addressing a telephone subscription. In mobile networks it corresponds to the MSISDN (Mobile Station International Subscriber Directory Number). In order to be globally unique it has to be formatted in international format, according to E.164 standard, prefixed with '+'.
-      type: string
-      pattern: '^\+[1-9][0-9]{4,14}$'
-      maxLength: 128
-      example: "+123456789"
 
   responses:
     CreateSessionForbidden403:
       description: Forbidden
       headers:
         x-correlator:
-          $ref: "#/components/headers/x-correlator"
+          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
       content:
         application/json:
           schema:
@@ -643,8 +613,8 @@ components:
                   code:
                     enum:
                       - PERMISSION_DENIED
-                      - WEBRTC_REGISTRATION.MAX_REGISTRATION_PER_USER
-                      - WEBRTC_REGISTRATION.MAX_REGISTRATION_PER_MSISDN
+                      - WEBRTC_REGISTRATION.MAX_REGISTRATIONS_PER_USER
+                      - WEBRTC_REGISTRATION.MAX_REGISTRATIONS_PER_MSISDN
                       - WEBRTC_REGISTRATION.MAX_DEVICES_PER_USER
           examples:
             GENERIC_403_PERMISSION_DENIED:
@@ -655,17 +625,17 @@ components:
                 status: 403
                 code: PERMISSION_DENIED
                 message: The API consumer is not authorized to register the requested phoneNumber.
-            WEBRTC_REGISTRATION_403_MAX_REGISTRATION_PER_USER:
+            WEBRTC_REGISTRATION_403_MAX_REGISTRATIONS_PER_USER:
               description: The maximum number of registrations per user has been reached
               value:
                 status: 403
-                code: WEBRTC_REGISTRATION.MAX_REGISTRATION_PER_USER
+                code: WEBRTC_REGISTRATION.MAX_REGISTRATIONS_PER_USER
                 message: The maximum number of service registrations per user has been reached.
-            WEBRTC_REGISTRATION_403_MAX_REGISTRATION_PER_MSISDN:
+            WEBRTC_REGISTRATION_403_MAX_REGISTRATIONS_PER_MSISDN:
               description: The maximum number of registrations per MSISDN has been reached
               value:
                 status: 403
-                code: WEBRTC_REGISTRATION.MAX_REGISTRATION_PER_MSISDN
+                code: WEBRTC_REGISTRATION.MAX_REGISTRATIONS_PER_MSISDN
                 message: The maximum number of service registrations per MSISDN has been reached.
             WEBRTC_REGISTRATION_403_MAX_DEVICES_PER_USER:
               description: The maximum number of devices per user has been reached
@@ -677,7 +647,7 @@ components:
       description: Unprocessable Content
       headers:
         x-correlator:
-          $ref: "#/components/headers/x-correlator"
+          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
       content:
         application/json:
           schema:

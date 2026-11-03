@@ -78,13 +78,15 @@ info:
       - Events triggered when a new session is requested (e.g. incoming call
         received)
 
-    - `org.camaraproject.webrtc-events-subscriptions.v0.registration-ends`
+    - `org.camaraproject.webrtc-events-subscriptions.v0.registration-ended`
 
       - Events triggered when a webrtc registration is terminated (e.g. webrtc registration expired)
 
     Note: Additionally to these list, ``org.camaraproject.webrtc-events-subscriptions.v0.subscription-ended``
     notification `type` is sent when the subscription ends.
     This notification does not require dedicated subscription.
+    The other Commonalities subscription lifecycle events (`subscription-started`,
+    `subscription-updated`) MAY also be sent.
 
     It is used when:
     - the subscription expire time has been reached (optionally set by the
@@ -153,7 +155,7 @@ info:
     always refers to the sender's own device location.
 
     The `locationDetails` schema follows PIDF-LO concepts (3GPP TS 24.229,
-    RFC 4119, RFC 5139, RFC 5491) with either a circle or ellipsoid shape.
+    RFC 4119, RFC 5139, RFC 5491) with the location area expressed as a CAMARA common `Area` (circle or polygon).
 
     ## 3. Subscription ends (subscription-ended)
 
@@ -163,10 +165,10 @@ info:
     signal the need to check the event subscription status and attempt to refresh
     it in order to continue receiving new event notifications.
 
-    ## 4. Registration ends (`registration-ends`)
+    ## 4. Registration ended (`registration-ended`)
 
-    A `org.camaraproject.webrtc-events-subscriptions.v0.registration-ends` event indicates that a previously active registration has ended and is no longer valid.
-    From a developer's point of view, reception of the `registration-ends` event should be treated as a signal to renew the WebRTC registration in order to continue receiving or initiating calls for the registered phone number.
+    A `org.camaraproject.webrtc-events-subscriptions.v0.registration-ended` event indicates that a previously active registration has ended and is no longer valid.
+    From a developer's point of view, reception of the `registration-ended` event should be treated as a signal to renew the WebRTC registration in order to continue receiving or initiating calls for the registered phone number.
 
     <!-- CAMARA:MANDATORY:authorization-and-authentication:BEGIN -->
 
@@ -228,19 +230,19 @@ paths:
 
         - `org.camaraproject.webrtc-events-subscriptions.v0.session-invitation`: new calls event
         - `org.camaraproject.webrtc-events-subscriptions.v0.session-status`: updates on specific call
-        - `org.camaraproject.webrtc-events-subscriptions.v0.registration-ends`: registration termination event
+        - `org.camaraproject.webrtc-events-subscriptions.v0.registration-ended`: registration termination event
 
         To subscribe and receive notifications about new calls, a
         `session-invitation` subscription is required using the `deviceId` related to a valid registration.
 
       operationId: createNotificationChannelSubscription
       parameters:
-        - $ref: "#/components/parameters/x-correlator"
+        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
       security:
         - openId:
             - webrtc-events-subscriptions:org.camaraproject.webrtc-events-subscriptions.v0.session-status:create
             - webrtc-events-subscriptions:org.camaraproject.webrtc-events-subscriptions.v0.session-invitation:create
-            - webrtc-events-subscriptions:org.camaraproject.webrtc-events-subscriptions.v0.registration-ends:create
+            - webrtc-events-subscriptions:org.camaraproject.webrtc-events-subscriptions.v0.registration-ended:create
       requestBody:
         content:
           application/json:
@@ -251,8 +253,8 @@ paths:
                 $ref: "#/components/examples/INVITE_SUBSCRIPTION"
               SESSION_SUBSCRIPTION (session-status):
                 $ref: "#/components/examples/SESSION_SUBSCRIPTION"
-              REGISTRATION_ENDS_SUBSCRIPTION (registration-ends):
-                $ref: "#/components/examples/REGISTRATION_ENDS_SUBSCRIPTION"
+              REGISTRATION_ENDED_SUBSCRIPTION (registration-ended):
+                $ref: "#/components/examples/REGISTRATION_ENDED_SUBSCRIPTION"
         required: true
       callbacks:
         notifications:
@@ -266,13 +268,13 @@ paths:
                 have to be replaced accordingly with WG API specific semantic.
               operationId: postNotification
               parameters:
-                - $ref: "#/components/parameters/x-correlator"
+                - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
               requestBody:
                 required: true
                 content:
                   application/cloudevents+json:
                     schema:
-                      $ref: "#/components/schemas/WebrtcEventNotification"
+                      $ref: "#/components/schemas/NotificationEvent"
                     examples:
                       NEW_SESSION_INCOMING (session-invitation):
                         $ref: "#/components/examples/NEW_SESSION_INCOMING"
@@ -280,8 +282,8 @@ paths:
                         $ref: "#/components/examples/NEW_LOCATED_SESSION_INCOMING"
                       SESSION_UPDATE (session-status):
                         $ref: "#/components/examples/SESSION_UPDATE"
-                      REGISTRATION_EXPIRED (registration-ends):
-                        $ref: "#/components/examples/REGISTRATION_ENDS"
+                      REGISTRATION_EXPIRED (registration-ended):
+                        $ref: "#/components/examples/REGISTRATION_ENDED"
                       SUBSCRIPTION_ENDED (subscription-ended):
                         $ref: "#/components/examples/SUBSCRIPTION_ENDED"
               responses:
@@ -289,7 +291,7 @@ paths:
                   description: Successful notification
                   headers:
                     x-correlator:
-                      $ref: "#/components/headers/x-correlator"
+                      $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
                 "400":
                   $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
                 "401":
@@ -309,7 +311,7 @@ paths:
           description: Created
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
           content:
             application/json:
               schema:
@@ -318,7 +320,7 @@ paths:
           description: Request accepted to be processed. It applies for async creation process.
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
           content:
             application/json:
               schema:
@@ -344,7 +346,9 @@ paths:
         information. Including configuration data and current status.
       operationId: retrieveNotificationChannelSubscriptionList
       parameters:
-        - $ref: "#/components/parameters/x-correlator"
+        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+        - $ref: "../common/CAMARA_common.yaml#/components/parameters/page"
+        - $ref: "../common/CAMARA_common.yaml#/components/parameters/perPage"
       security:
         - openId:
             - webrtc-events-subscriptions:read
@@ -353,15 +357,17 @@ paths:
           description: List of event subscription details
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+            x-total-count:
+              $ref: "../common/CAMARA_common.yaml#/components/headers/x-total-count"
+            x-total-pages:
+              $ref: "../common/CAMARA_common.yaml#/components/headers/x-total-pages"
+            link:
+              $ref: "../common/CAMARA_common.yaml#/components/headers/link"
           content:
             application/json:
               schema:
-                type: array
-                minItems: 0
-                maxItems: 100
-                items:
-                  $ref: '#/components/schemas/Subscription'
+                $ref: "#/components/schemas/SubscriptionList"
         "400":
           $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
         "401":
@@ -382,13 +388,13 @@ paths:
             - webrtc-events-subscriptions:read
       parameters:
         - $ref: "#/components/parameters/SubscriptionId"
-        - $ref: "#/components/parameters/x-correlator"
+        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
       responses:
         "200":
           description: OK
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
           content:
             application/json:
               schema:
@@ -414,18 +420,18 @@ paths:
             - webrtc-events-subscriptions:delete
       parameters:
         - $ref: "#/components/parameters/SubscriptionId"
-        - $ref: "#/components/parameters/x-correlator"
+        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
       responses:
         "204":
           description: webrtc-events subscription deleted
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
         "202":
           description: Request accepted to be processed. It applies for async deletion process.
           headers:
             x-correlator:
-              $ref: "#/components/headers/x-correlator"
+              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
           content:
             application/json:
               schema:
@@ -445,12 +451,7 @@ components:
       description: OpenID Connect authentication via discovery metadata.
       openIdConnectUrl: https://example.com/.well-known/openid-configuration
     notificationsBearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: "{$request.body#/sinkCredential.credentialType}"
-      description: |-
-        Bearer token for notification delivery. Token format is determined
-        by `sinkCredential.credentialType` in the subscription request.
+      $ref: "../common/CAMARA_event_common.yaml#/components/securitySchemes/notificationsBearerAuth"
   parameters:
     SubscriptionId:
       name: subscriptionId
@@ -458,26 +459,8 @@ components:
       description: Subscription identifier that was obtained from the create event subscription operation
       required: true
       schema:
-        $ref: "#/components/schemas/SubscriptionId"
-    x-correlator:
-      name: x-correlator
-      in: header
-      description: Correlation id for the different services
-      schema:
-        $ref: "#/components/schemas/XCorrelator"
-  headers:
-    x-correlator:
-      description: Correlation id for the different services
-      schema:
-        $ref: "#/components/schemas/XCorrelator"
+        $ref: "../common/CAMARA_event_common.yaml#/components/schemas/SubscriptionId"
   schemas:
-    XCorrelator:
-      description: Correlator string, UUID format recommended but any string matching the pattern can be used
-      type: string
-      pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
-      maxLength: 256
-      example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
-
     SubscriptionRequest:
       description: The request for creating a event-type event subscription
       type: object
@@ -488,16 +471,13 @@ components:
         - types
       properties:
         protocol:
-          $ref: "#/components/schemas/Protocol"
+          $ref: "../common/CAMARA_event_common.yaml#/components/schemas/Protocol"
         sink:
-          type: string
-          format: uri
-          pattern: ^https:\/\/.+$
-          maxLength: 1024
           description: The address to which events shall be delivered using the selected protocol.
-          example: "https://endpoint.example.com/sink"
+          allOf:
+            - $ref: "../common/CAMARA_event_common.yaml#/components/schemas/Sink"
         sinkCredential:
-          $ref: "#/components/schemas/SinkCredential"
+          $ref: "../common/CAMARA_event_common.yaml#/components/schemas/SinkCredential"
         types:
           description: |-
             Camara Event types eligible to be delivered by this subscription.
@@ -506,91 +486,130 @@ components:
           minItems: 1
           maxItems: 3
           items:
-            $ref: "#/components/schemas/SubscriptionEventType"
+            $ref: "#/components/schemas/ApiEventType"
         config:
           $ref: "#/components/schemas/Config"
+      discriminator:
+        propertyName: protocol
+        mapping:
+          HTTP: "#/components/schemas/HTTPSubscriptionRequest"
+
+    Subscription:
+      description: Represents a event-type subscription.
+      type: object
+      required:
+        - sink
+        - protocol
+        - config
+        - types
+        - id
+      properties:
+        protocol:
+          $ref: "../common/CAMARA_event_common.yaml#/components/schemas/Protocol"
+        sink:
+          description: The address to which events shall be delivered using the selected protocol.
+          allOf:
+            - $ref: "../common/CAMARA_event_common.yaml#/components/schemas/Sink"
+        sinkCredential:
+          $ref: "../common/CAMARA_event_common.yaml#/components/schemas/SinkCredential"
+        types:
+          description: |-
+            Camara Event types eligible to be delivered by this subscription.
+          type: array
+          minItems: 1
+          maxItems: 3
+          items:
+            $ref: "#/components/schemas/ApiEventType"
+        config:
+          $ref: "#/components/schemas/Config"
+        id:
+          $ref: "../common/CAMARA_event_common.yaml#/components/schemas/SubscriptionId"
+        startsAt:
+          $ref: "../common/CAMARA_common.yaml#/components/schemas/DateTime"
+        expiresAt:
+          $ref: "../common/CAMARA_common.yaml#/components/schemas/DateTime"
+        status:
+          type: string
+          description: |-
+            Current status of the subscription - Management of Subscription State engine is not mandatory for now. Note not all statuses may be considered to be implemented. Details:
+              - `ACTIVATION_REQUESTED`: Subscription creation (POST) is triggered but subscription creation process is not finished yet.
+              - `ACTIVE`: Subscription creation process is completed. Subscription is fully operative.
+              - `INACTIVE`: Subscription is temporarily inactive, but its workflow logic is not deleted.
+              - `EXPIRED`: Subscription is ended (no longer active). This status applies when subscription is ended due to `SUBSCRIPTION_EXPIRED` or `ACCESS_TOKEN_EXPIRED` event.
+              - `DELETED`: Subscription is ended as deleted (no longer active). This status applies when subscription information is kept (i.e. subscription workflow is no longer active but its meta-information is kept).
+          enum:
+            - ACTIVATION_REQUESTED
+            - ACTIVE
+            - EXPIRED
+            - INACTIVE
+            - DELETED
+      discriminator:
+        propertyName: protocol
+        mapping:
+          HTTP: "#/components/schemas/HTTPSubscriptionResponse"
+
+    SubscriptionAsync:
+      description: Response for a event-type subscription request managed asynchronously (Creation or Deletion)
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          $ref: "../common/CAMARA_event_common.yaml#/components/schemas/SubscriptionId"
+
+    SubscriptionList:
+      description: Response with subscriptions list
+      type: object
+      required:
+        - subscriptions
+        - pagination
+      properties:
+        subscriptions:
+          description: Subscriptions list
+          type: array
+          minItems: 0
+          maxItems: 100
+          items:
+            $ref: "#/components/schemas/Subscription"
+        pagination:
+          $ref: "../common/CAMARA_common.yaml#/components/schemas/Pagination"
+
+    HTTPSubscriptionRequest:
+      description: Subscription request for HTTP-based event delivery.
+      allOf:
+        - $ref: "#/components/schemas/SubscriptionRequest"
+        - type: object
+          properties:
+            protocolSettings:
+              $ref: "../common/CAMARA_event_common.yaml#/components/schemas/HTTPSettings"
+
+    HTTPSubscriptionResponse:
+      description: Subscription resource returned for HTTP-based event delivery.
+      allOf:
+        - $ref: "#/components/schemas/Subscription"
+        - type: object
+          properties:
+            protocolSettings:
+              $ref: "../common/CAMARA_event_common.yaml#/components/schemas/HTTPSettings"
 
     Config:
       description: |-
         Implementation-specific configuration parameters needed by the subscription manager for acquiring
-        events. `subscriptionExpireTime` is predefined for CAMARA specifications.
+        events. Extends `ConfigBase` from `CAMARA_event_common.yaml` with the required, API-specific
+        `subscriptionDetail` property.
 
-        WebRTC specific event type attributes are included into `WebrtcSubscriptionDetail` schema.
-
-        Note: if a request is performed for several event type, all subscribed event will use same `config`
-        parameters.
-      type: object
-      required:
-        - subscriptionDetail
-      properties:
-        subscriptionDetail:
-          $ref: "#/components/schemas/WebrtcSubscriptionDetail"
-        subscriptionExpireTime:
-          type: string
-          format: date-time
-          maxLength: 64
-          example: 2023-01-17T13:18:23.682Z
-          description: |-
-            The subscription expiration time (in date-time format) requested by the API consumer.
-            It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-
-    Protocol:
-      type: string
-      enum: ["HTTP"]
-      description: Identifier of a delivery protocol. Only HTTP is allowed for now
-      example: "HTTP"
-
-    SinkCredential:
-      description: A sink credential provides authentication or authorization information necessary to enable delivery of events to a target.
-      type: object
-      properties:
-        credentialType:
-          type: string
-          enum:
-            - ACCESSTOKEN
-          description: |
-            The type of the credential.
-            Note: Type of the credential - MUST be set to ACCESSTOKEN for now
-      discriminator:
-        propertyName: credentialType
-        mapping:
-          ACCESSTOKEN: "#/components/schemas/AccessTokenCredential"
-      required:
-        - credentialType
-    AccessTokenCredential:
-      type: object
-      description: An access token credential.
+        Note: if a request is performed for several event types, all subscribed events will use the same
+        `config` parameters.
       allOf:
-        - $ref: "#/components/schemas/SinkCredential"
+        - $ref: "../common/CAMARA_event_common.yaml#/components/schemas/ConfigBase"
         - type: object
-          properties:
-            accessToken:
-              description: REQUIRED. An access token is a previously acquired token granting access to the target resource.
-              type: string
-              maxLength: 8192
-              writeOnly: true
-            accessTokenExpiresUtc:
-              type: string
-              format: date-time
-              maxLength: 64
-              description: |
-                REQUIRED. An absolute (UTC) timestamp at which the token shall be considered expired.
-                In the case of an ACCESS_TOKEN_EXPIRED termination reason, implementation should notify the client before the expiration date.
-                If the access token is a JWT and registered "exp" (Expiration Time) claim is present, the two expiry times should match.
-                It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-              example: "2023-07-03T12:27:08.312Z"
-            accessTokenType:
-              description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)).
-              type: string
-              writeOnly: true
-              enum:
-                - bearer
           required:
-            - accessToken
-            - accessTokenExpiresUtc
-            - accessTokenType
+            - subscriptionDetail
+          properties:
+            subscriptionDetail:
+              $ref: "#/components/schemas/CreateSubscriptionDetail"
 
-    WebrtcSubscriptionDetail:
+    CreateSubscriptionDetail:
       description: |-
         The detail of the requested event subscription.
         - org.camaraproject.webrtc-events-subscriptions.v0.session-invitation requires a
@@ -610,7 +629,7 @@ components:
             the physical device where a registration is initiated. Generated
             by the WebRTC application, and consistent within the same device.
 
-    SubscriptionEventType:
+    ApiEventType:
       type: string
       description: |-
         event-type - Event triggered when an event-type event occurred
@@ -618,90 +637,14 @@ components:
           - Events triggered for any media session related event (e.g. far end new media endpoints)
         - `org.camaraproject.webrtc-events-subscriptions.v0.session-invitation`
           - Events triggered for any media endpoint registration event (e.g. incoming session)
-        - `org.camaraproject.webrtc-events-subscriptions.v0.registration-ends`
+        - `org.camaraproject.webrtc-events-subscriptions.v0.registration-ended`
           - Events triggered for registration termination (e.g. incoming session)
 
-        `subscription-ended` is not supported for subscription. It is sent by default
+        Subscription lifecycle events are not subscribable. They are sent by default.
       enum:
         - org.camaraproject.webrtc-events-subscriptions.v0.session-status
         - org.camaraproject.webrtc-events-subscriptions.v0.session-invitation
-        - org.camaraproject.webrtc-events-subscriptions.v0.registration-ends
-
-    Subscription:
-      description: Represents a event-type subscription.
-      type: object
-      required:
-        - sink
-        - protocol
-        - config
-        - types
-        - id
-      properties:
-        protocol:
-          $ref: "#/components/schemas/Protocol"
-        sink:
-          type: string
-          format: uri
-          pattern: ^https:\/\/.+$
-          maxLength: 1024
-          description: The address to which events shall be delivered using the selected protocol.
-          example: "https://endpoint.example.com/sink"
-        types:
-          description: |-
-            Camara Event types eligible to be delivered by this subscription.
-          type: array
-          minItems: 1
-          maxItems: 3
-          items:
-            $ref: "#/components/schemas/SubscriptionEventType"
-        config:
-          $ref: '#/components/schemas/Config'
-        id:
-          $ref: '#/components/schemas/SubscriptionId'
-        startsAt:
-          type: string
-          format: date-time
-          maxLength: 64
-          description: |
-            Date when the event subscription will begin/began
-            It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-          example: "2023-07-03T12:27:08.312Z"
-        expiresAt:
-          type: string
-          format: date-time
-          maxLength: 64
-          description: |
-            Date when the event subscription will expire. Only provided when `subscriptionExpireTime` is indicated by API client or Telco Operator has specific policy about that.
-            It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-          example: "2023-07-03T12:27:08.312Z"
-        status:
-          type: string
-          description: |-
-            Current status of the subscription - Management of Subscription State engine is not mandatory for now. Note not all statuses may be considered to be implemented. Details:
-              - `ACTIVATION_REQUESTED`: Subscription creation (POST) is triggered but subscription creation process is not finished yet.
-              - `ACTIVE`: Subscription creation process is completed. Subscription is fully operative.
-              - `INACTIVE`: Subscription is temporarily inactive, but its workflow logic is not deleted.
-              - `EXPIRED`: Subscription is ended (no longer active). This status applies when subscription is ended due to `SUBSCRIPTION_EXPIRED` or `ACCESS_TOKEN_EXPIRED` event.
-              - `DELETED`: Subscription is ended as deleted (no longer active). This status applies when subscription information is kept (i.e. subscription workflow is no longer active but its meta-information is kept).
-          enum:
-            - ACTIVATION_REQUESTED
-            - ACTIVE
-            - EXPIRED
-            - INACTIVE
-            - DELETED
-
-    SubscriptionAsync:
-      description: Response for a event-type subscription request managed asynchronously (Creation or Deletion)
-      type: object
-      properties:
-        id:
-          $ref: "#/components/schemas/SubscriptionId"
-
-    SubscriptionId:
-      type: string
-      maxLength: 256
-      description: The unique identifier of the subscription in the scope of the subscription manager. When this information is contained within an event notification, this concept SHALL be referred as `subscriptionId` as per [Commonalities Event Notification Model](https://github.com/camaraproject/Commonalities/blob/main/documentation/API-design-guidelines.md#122-event-notification).
-      example: qs15-h556-rt89-1298
+        - org.camaraproject.webrtc-events-subscriptions.v0.registration-ended
 
     RegistrationId:
       type: string
@@ -710,24 +653,53 @@ components:
       description: The unique identifier of the WebRTC registration.
       example: ln3C-ttOSk-ObcQ7A0-tYO1LXqy
 
-    WebrtcEventNotification:
-      description: The notification callback
+    SubscriptionLifecycleEvent:
+      description: |-
+        Subscription lifecycle event group, common to all CAMARA APIs that
+        support explicit subscriptions.
       allOf:
         - $ref: "../common/CAMARA_event_common.yaml#/components/schemas/CloudEvent"
         - type: object
           properties:
             type:
-              type: string
-              maxLength: 512
-              pattern: '^[^\x00-\x1F\x7F]+$'
-              description: event-type that describes type of notification
-          discriminator:
-            propertyName: "type"
-            mapping:
-              org.camaraproject.webrtc-events-subscriptions.v0.session-invitation: "#/components/schemas/EventSessionInvitation"
-              org.camaraproject.webrtc-events-subscriptions.v0.session-status: "#/components/schemas/EventSessionStatus"
-              org.camaraproject.webrtc-events-subscriptions.v0.subscription-ended: "#/components/schemas/EventSubscriptionEnded"
-              org.camaraproject.webrtc-events-subscriptions.v0.registration-ends: "#/components/schemas/EventRegistrationEnds"
+              $ref: "#/components/schemas/SubscriptionLifecycleEventType"
+      discriminator:
+        propertyName: type
+        mapping:
+          org.camaraproject.webrtc-events-subscriptions.v0.subscription-started: "#/components/schemas/EventSubscriptionStarted"
+          org.camaraproject.webrtc-events-subscriptions.v0.subscription-updated: "#/components/schemas/EventSubscriptionUpdated"
+          org.camaraproject.webrtc-events-subscriptions.v0.subscription-ended: "#/components/schemas/EventSubscriptionEnded"
+
+    SubscriptionLifecycleEventType:
+      type: string
+      description: Subscription lifecycle event types, managed by Commonalities.
+      enum:
+        - org.camaraproject.webrtc-events-subscriptions.v0.subscription-started
+        - org.camaraproject.webrtc-events-subscriptions.v0.subscription-updated
+        - org.camaraproject.webrtc-events-subscriptions.v0.subscription-ended
+
+    ApiNotificationEvent:
+      description: |-
+        WebRTC notification event group. Extends the CloudEvent envelope and
+        constrains `type` to the event types defined by this API.
+      allOf:
+        - $ref: "../common/CAMARA_event_common.yaml#/components/schemas/CloudEvent"
+        - type: object
+          properties:
+            type:
+              $ref: "#/components/schemas/ApiEventType"
+      discriminator:
+        propertyName: "type"
+        mapping:
+          org.camaraproject.webrtc-events-subscriptions.v0.session-invitation: "#/components/schemas/EventSessionInvitation"
+          org.camaraproject.webrtc-events-subscriptions.v0.session-status: "#/components/schemas/EventSessionStatus"
+          org.camaraproject.webrtc-events-subscriptions.v0.registration-ended: "#/components/schemas/EventRegistrationEnded"
+
+    NotificationEvent:
+      description: Union of all valid notification event groups at the callback endpoint.
+      oneOf:
+        - $ref: "#/components/schemas/ApiNotificationEvent"
+        - $ref: "#/components/schemas/SubscriptionLifecycleEvent"
 
     ############################################
     EventSessionInvitation:
@@ -740,7 +712,7 @@ components:
         contextualize (call subject, branding info, etc). It MUST include a mediaSessionId, to allow the
         endpoint to subscribe to this new call session.
       allOf:
-        - $ref: "#/components/schemas/WebrtcEventNotification"
+        - $ref: "#/components/schemas/ApiNotificationEvent"
         - type: object
           required:
             - data
@@ -762,7 +734,7 @@ components:
 
         Most common use is for SDP updates and signaling updates regarding call status.
       allOf:
-        - $ref: "#/components/schemas/WebrtcEventNotification"
+        - $ref: "#/components/schemas/ApiNotificationEvent"
         - type: object
           required:
             - data
@@ -783,7 +755,7 @@ components:
         - mediaSessionId
       properties:
         subscriptionId:
-          $ref: "#/components/schemas/SubscriptionId"
+          $ref: "../common/CAMARA_event_common.yaml#/components/schemas/SubscriptionId"
         originatorAddress:
           type: string
           description: Sender (originator) address
@@ -887,65 +859,50 @@ components:
           description: |-
             An inlined session description in SDP format [RFC4566].If XML syntax is used, the content of this element SHALL be embedded in a CDATA section
 
-    # CloudEvent and CAMARA standard
-    EventSubscriptionEnded:
-      description: event structure for event subscription ends
+    EventSubscriptionStarted:
+      description: event structure for event subscription started
       allOf:
-        - $ref: "#/components/schemas/WebrtcEventNotification"
+        - $ref: "#/components/schemas/SubscriptionLifecycleEvent"
         - type: object
           properties:
             data:
-              $ref: "#/components/schemas/SubscriptionEnded"
-            type:
-              enum:
-                - org.camaraproject.webrtc-events-subscriptions.v0.subscription-ended
+              $ref: "../common/CAMARA_event_common.yaml#/components/schemas/SubscriptionStarted"
 
-    SubscriptionEnded:
-      description: Event detail structure for SUBSCRIPTION_ENDED event
-      type: object
-      required:
-        - subscriptionId
-        - terminationReason
-      properties:
-        subscriptionId:
-          $ref: "#/components/schemas/SubscriptionId"
-        terminationReason:
-          $ref: "#/components/schemas/TerminationReason"
-        terminationDescription:
-          type: string
-          maxLength: 2048
-          description: Human-readable explanation of why the subscription was terminated
+    EventSubscriptionUpdated:
+      description: event structure for event subscription updated
+      allOf:
+        - $ref: "#/components/schemas/SubscriptionLifecycleEvent"
+        - type: object
+          properties:
+            data:
+              $ref: "../common/CAMARA_event_common.yaml#/components/schemas/SubscriptionUpdated"
 
-    TerminationReason:
-      type: string
-      description: |-
-        - NETWORK_TERMINATED - API server stopped sending notification
-        - SUBSCRIPTION_EXPIRED - Subscription expire time (optionally set by the requester) has been reached
-        - ACCESS_TOKEN_EXPIRED - Access Token sinkCredential (optionally set by the requester) expiration time has been reached
-        - SUBSCRIPTION_DELETED - Subscription was deleted by the requester
-      enum:
-        - NETWORK_TERMINATED
-        - SUBSCRIPTION_EXPIRED
-        - ACCESS_TOKEN_EXPIRED
-        - SUBSCRIPTION_DELETED
+    EventSubscriptionEnded:
+      description: event structure for event subscription ended
+      allOf:
+        - $ref: "#/components/schemas/SubscriptionLifecycleEvent"
+        - type: object
+          properties:
+            data:
+              $ref: "../common/CAMARA_event_common.yaml#/components/schemas/SubscriptionEnded"
 
-    # WebRTC Registration Ends event
-    EventRegistrationEnds:
+    # WebRTC Registration Ended event
+    EventRegistrationEnded:
       description: event structure for event subscription ends
       allOf:
-        - $ref: "#/components/schemas/WebrtcEventNotification"
+        - $ref: "#/components/schemas/ApiNotificationEvent"
         - type: object
           required:
             - data
           properties:
             data:
-              $ref: "#/components/schemas/RegistrationEnds"
+              $ref: "#/components/schemas/RegistrationEnded"
             type:
               enum:
-                - org.camaraproject.webrtc-events-subscriptions.v0.registration-ends
+                - org.camaraproject.webrtc-events-subscriptions.v0.registration-ended
 
-    RegistrationEnds:
-      description: Event detail structure for REGISTRATION_ENDS event. registrationExpireTime is absolute UTC. Clients SHOULD refresh in advance; otherwise a REGISTRATION_EXPIRED terminationReason will be emitted.
+    RegistrationEnded:
+      description: Event detail structure for REGISTRATION_ENDED event. registrationExpireTime is absolute UTC. Clients SHOULD refresh in advance; otherwise a REGISTRATION_EXPIRED terminationReason will be emitted.
       type: object
       required:
         - subscriptionId
@@ -953,7 +910,7 @@ components:
         - terminationReason
       properties:
         subscriptionId:
-          $ref: "#/components/schemas/SubscriptionId"
+          $ref: "../common/CAMARA_event_common.yaml#/components/schemas/SubscriptionId"
         registrationId:
           $ref: "#/components/schemas/RegistrationId"
         terminationDescription:
@@ -976,23 +933,13 @@ components:
     LocationDetails:
       type: object
       description: >-
-        Details about a party's location and related information. This object adheres to
-        3GPP TS 24.229, RFC 4119, RFC 5139, and RFC 5491 for PIDF-LO compatibility.
+        Details about a party's location and related information, following PIDF-LO concepts
+        (3GPP TS 24.229, RFC 4119, RFC 5139, RFC 5491).
         Providing this information is specific to certain use cases and does not imply a
         guarantee of any particular server-side action or behavior.
       properties:
-        shape:
-          type: string
-          enum:
-            - Circle
-            - Ellipsoid
-          description: The shape representing the caller's location (Circle or Ellipsoid).
-        coordinates:
-          oneOf:
-            - $ref: '#/components/schemas/CircleCoordinates'
-            - $ref: '#/components/schemas/EllipsoidCoordinates'
-          description: The coordinates of the caller's location, specific to the chosen
-            shape.
+        area:
+          $ref: "../common/CAMARA_common.yaml#/components/schemas/Area"
         method:
           type: string
           enum:
@@ -1025,77 +972,19 @@ components:
               maximum: 100
               description: The confidence value (percentage).
         timestamp:
-          type: string
-          format: date-time
-          maxLength: 64
           description: |-
             The timestamp indicating when the location information was calculated.
             This is crucial for emergency services to assess the timeliness of the data.
             If not provided, current timestamp will be used by default.
-            It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-    CircleCoordinates:
-      description: Geographic coordinates defining a circular area by center point and radius
-      type: object
-      required:
-        - latitude
-        - longitude
-        - radius
-      properties:
-        latitude:
-          type: number
-          format: float
-          description: Latitude of the center point in decimal degrees (WGS84).
-        longitude:
-          type: number
-          format: float
-          description: Longitude of the center point in decimal degrees (WGS84).
-        radius:
-          type: number
-          format: float
-          description: Radius of the circle in meters, indicating the uncertainty.
-    EllipsoidCoordinates:
-      description: Geographic coordinates defining an ellipsoidal uncertainty area in the WGS84 geocentric coordinate system
-      type: object
-      required:
-        - latitude
-        - longitude
-        - zAxis
-        - semiMajorAxis
-        - semiMinorAxis
-        - verticalAxis
-        - orientation
-      properties:
-        latitude:
-          type: number
-          format: float
-          description: Latitude in the WGS 84 geocentric coordinate system.
-        longitude:
-          type: number
-          format: float
-          description: Longitude in the WGS 84 geocentric coordinate system.
-        zAxis:
-          type: number
-          format: float
-          description: Altitude (optional) in the WGS 84 geocentric coordinate system.
-        semiMajorAxis:
-          type: number
-          description: Length of the semi-major axis of the ellipsoid in meters.
-        semiMinorAxis:
-          type: number
-          description: Length of the semi-minor axis of the ellipsoid in meters.
-        verticalAxis:
-          type: number
-          description: Length of the vertical axis of the ellipsoid in meters.
-        orientation:
-          type: number
-          description: Orientation of the ellipsoid in degrees.
+          allOf:
+            - $ref: "../common/CAMARA_common.yaml#/components/schemas/DateTime"
 
   responses:
     CreateSubscriptionUnprocessableEntity422:
       description: Unprocessable Content
       headers:
         x-correlator:
-          $ref: "#/components/headers/x-correlator"
+          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
       content:
         application/json:
           schema:
@@ -1114,6 +1003,7 @@ components:
                       - UNNECESSARY_IDENTIFIER
                       - MULTIEVENT_SUBSCRIPTION_NOT_SUPPORTED
                       - MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED
+                      - PRIVATE_KEY_JWT_NOT_CONFIGURED
           examples:
             GENERIC_422_SERVICE_NOT_APPLICABLE:
               $ref: "../common/CAMARA_common.yaml#/components/examples/GENERIC_422_SERVICE_NOT_APPLICABLE"
@@ -1127,11 +1017,13 @@ components:
               $ref: "../common/CAMARA_event_common.yaml#/components/examples/GENERIC_422_MULTIEVENT_SUBSCRIPTION_NOT_SUPPORTED"
             GENERIC_422_MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED:
               $ref: "../common/CAMARA_event_common.yaml#/components/examples/GENERIC_422_MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED"
+            GENERIC_422_PRIVATE_KEY_JWT_NOT_CONFIGURED:
+              $ref: "../common/CAMARA_event_common.yaml#/components/examples/GENERIC_422_PRIVATE_KEY_JWT_NOT_CONFIGURED"
   examples:
     # Subscription examples
-    REGISTRATION_ENDS_SUBSCRIPTION:
+    REGISTRATION_ENDED_SUBSCRIPTION:
       description: |-
-        A sample of `registration-ends` subscription for a `deviceId` at
+        A sample of `registration-ended` subscription for a `deviceId` at
         `acme.opentelco.com`.
 
         This will be used to receive WebRTC registration termination events
@@ -1145,7 +1037,7 @@ components:
           accessTokenExpiresUtc: "2024-12-06T14:37:56.147Z"
           accessTokenType: "bearer"
         types:
-          - org.camaraproject.webrtc-events-subscriptions.v0.registration-ends
+          - org.camaraproject.webrtc-events-subscriptions.v0.registration-ended
         config:
           subscriptionDetail:
             deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
@@ -1156,7 +1048,7 @@ components:
 
         This will be used to receive incoming sessions (incoming calls) for
         any registration of the device. Registration termination is notified
-        through the `registration-ends` event type, which requires its own
+        through the `registration-ended` event type, which requires its own
         subscription.
 
         The example uses `sinkCredential` for authenticated event delivery and
@@ -1260,19 +1152,20 @@ components:
           reason: "New subscriber incoming call"
           sequenceNumber: 1
           locationDetails:
-            shape: Circle
-            coordinates:
-              latitude: 47.6062
-              longitude: -122.3321
+            area:
+              areaType: CIRCLE
+              center:
+                latitude: 47.6062
+                longitude: -122.3321
               radius: 35
             method: GPS
             confidence:
               pdf: normal
               value: 92
             timestamp: '2024-11-05T05:35:12.254Z'
-    REGISTRATION_ENDS:
+    REGISTRATION_ENDED:
       description: |-
-        Example of `registration-ends` events.
+        Example of `registration-ended` events.
 
         This scenario occurs when the device did not refresh before the registration expiry time (registrationExpireTime).
         When a re-registration is requested from server, maybe due to expire or
@@ -1287,7 +1180,7 @@ components:
       value:
         id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
         source: https://notificationServer.opentelco.com
-        type: org.camaraproject.webrtc-events-subscriptions.v0.registration-ends
+        type: org.camaraproject.webrtc-events-subscriptions.v0.registration-ended
         specversion: "1.0"
         datacontenttype: application/json
         time: 2024-11-05T05:40:23.682Z

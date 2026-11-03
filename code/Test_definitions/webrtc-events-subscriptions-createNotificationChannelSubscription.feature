@@ -42,7 +42,7 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation createNotification
       | event_type                                                          |
       | org.camaraproject.webrtc-events-subscriptions.v0.session-invitation |
       | org.camaraproject.webrtc-events-subscriptions.v0.session-status     |
-      | org.camaraproject.webrtc-events-subscriptions.v0.registration-ends  |
+      | org.camaraproject.webrtc-events-subscriptions.v0.registration-ended  |
 
   @webrtc_events_subscriptions_createNotificationChannelSubscription_02_async_creation
   Scenario: Create a subscription asynchronously
@@ -74,6 +74,50 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation createNotification
     Then the event notification "org.camaraproject.webrtc-events-subscriptions.v0.subscription-ended" is received on "callbackUrl"
     And the notification body complies with the OAS schema at "#/components/schemas/EventSubscriptionEnded"
     And the notification property "$.data.terminationReason" is "SUBSCRIPTION_EXPIRED"
+
+  @webrtc_events_subscriptions_createNotificationChannelSubscription_05_subscription_started_on_creation
+  Scenario: Receive subscription-started notification on creation
+    # Only applicable if the implementation sends subscription-started notifications
+    When the request "createNotificationChannelSubscription" is sent
+    Then the response status code is 201 or 202
+    And the event notification "org.camaraproject.webrtc-events-subscriptions.v0.subscription-started" is received on "callbackUrl"
+    And the notification body complies with the OAS schema at "#/components/schemas/EventSubscriptionStarted"
+    And the notification property "$.data.initiationReason" is "SUBSCRIPTION_CREATED"
+
+  @webrtc_events_subscriptions_createNotificationChannelSubscription_06_subscription_ended_on_max_events
+  Scenario: Receive subscription-ended notification on max events reached
+    Given an existing subscription created by operation "createNotificationChannelSubscription" with "$.config.subscriptionMaxEvents" set to 1
+    When the subscribed event occurs
+    Then the subscribed event notification is received on "callbackUrl"
+    And the event notification "org.camaraproject.webrtc-events-subscriptions.v0.subscription-ended" is received on "callbackUrl"
+    And the notification body complies with the OAS schema at "#/components/schemas/EventSubscriptionEnded"
+    And the notification property "$.data.terminationReason" is "MAX_EVENTS_REACHED"
+
+  @webrtc_events_subscriptions_createNotificationChannelSubscription_07_private_key_jwt_out_of_band
+  Scenario: Create a subscription synchronously with PRIVATE_KEY_JWT sinkCredential, out-of-band provisioning
+    # Some implementations may only support out-of-band provisioning
+    Given that subscriptions are created synchronously
+    And the request body property "$.sinkCredential.credentialType" is set to "PRIVATE_KEY_JWT"
+    When the request "createNotificationChannelSubscription" is sent
+    Then the response status code is 201
+    And the response header "Content-Type" is "application/json"
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response body complies with the OAS schema at "#/components/schemas/Subscription"
+
+  @webrtc_events_subscriptions_createNotificationChannelSubscription_08_private_key_jwt_in_band
+  Scenario: Create a subscription synchronously with PRIVATE_KEY_JWT sinkCredential, in-band provisioning
+    # Some implementations may additionally support in-band provisioning
+    Given that subscriptions are created synchronously
+    And the request body property "$.sinkCredential.credentialType" is set to "PRIVATE_KEY_JWT"
+    And the request body property "$.sinkCredential.clientId" is set to a valid value
+    And the request body property "$.sinkCredential.tokenUri" is set to a valid value
+    When the request "createNotificationChannelSubscription" is sent
+    Then the response status code is 201
+    And the response header "Content-Type" is "application/json"
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response body complies with the OAS schema at "#/components/schemas/Subscription"
+    And the response property "$.sinkCredential.credentialType" is "PRIVATE_KEY_JWT"
+    And the response property "$.sinkCredential.jwksUri" is set to a valid value
 
 ############################ Error Scenarios #############################################
 
@@ -132,7 +176,7 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation createNotification
 
   @webrtc_events_subscriptions_createNotificationChannelSubscription_400.05_invalid_event_type
   Scenario: Subscription creation with invalid event type
-    Given the request body property "$.types" is set to ["org.camaraproject.webrtc-events-subscriptions.v0.unknown-event"]
+    Given the request body property "$.types" is set to an event type not defined in the schema at "#/components/schemas/ApiEventType"
     When the request "createNotificationChannelSubscription" is sent
     Then the response status code is 400
     And the response header "x-correlator" has same value as the request header "x-correlator"
@@ -268,7 +312,7 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation createNotification
       | event_type         |
       | session-invitation |
       | session-status     |
-      | registration-ends  |
+      | registration-ended  |
 
   @webrtc_events_subscriptions_createNotificationChannelSubscription_409.01_already_exists
   Scenario: Conflict due to an existing subscription
@@ -325,6 +369,18 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation createNotification
     And the response header "Content-Type" is "application/json"
     And the response property "$.status" is 422
     And the response property "$.code" is "MULTIEVENT_COMBINATION_TEMPORARILY_NOT_SUPPORTED"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_events_subscriptions_createNotificationChannelSubscription_422.04_private_key_jwt_not_configured
+  Scenario: PRIVATE_KEY_JWT not configured for subscription creation
+    Given the PRIVATE_KEY_JWT mechanism is not pre-configured for the API client
+    And the request body property "$.sinkCredential.credentialType" is set to "PRIVATE_KEY_JWT"
+    When the request "createNotificationChannelSubscription" is sent
+    Then the response status code is 422
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 422
+    And the response property "$.code" is "PRIVATE_KEY_JWT_NOT_CONFIGURED"
     And the response property "$.message" contains a user friendly text
 
   @webrtc_events_subscriptions_createNotificationChannelSubscription_429.01_too_many_requests

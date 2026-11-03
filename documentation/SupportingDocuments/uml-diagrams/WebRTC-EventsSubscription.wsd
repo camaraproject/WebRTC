@@ -88,7 +88,7 @@ NC <- NS --: **POST SINK_URL** \n\
 
 DA -> API++: **POST /webrtc-events-suscription/{apiVersion}/subscriptions** \n\
   "sink": "https://notificationServer.opentelco.com",\n\
-  "types": [ "org.camaraproject.webrtc-events.v0.registration-ends" ]\n\
+  "types": [ "org.camaraproject.webrtc-events.v0.registration-ended" ]\n\
   "config": { ... }
 
 API -> NS
@@ -99,7 +99,7 @@ DA <-- API--: 201 Created
 API <-o NET++: Subcriptor REGISTER expiration
 API -> NS --++
 NC <- NS --: **POST SINK_URL** \n\
-  "type": "org.camaraproject.webrtc-events.v0.registration-ends",\n\
+  "type": "org.camaraproject.webrtc-events.v0.registration-ended",\n\
   "data": sessionId
 
 @enduml

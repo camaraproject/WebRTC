@@ -62,7 +62,7 @@ sequenceDiagram
 GET /authorize?response_type=code
     &client_id=asp-webrtc-app-001
     &redirect_uri=https%3A%2F%2Fasp.example.com%2Fcallback
-    &scope=openid%20webrtc-events-subscriptions%3Aorg.camaraproject.webrtc-events-subscriptions.v0.session-invitation%3Acreate%20webrtc-events-subscriptions%3Aorg.camaraproject.webrtc-events-subscriptions.v0.session-status%3Acreate%20webrtc-events-subscriptions%3Aorg.camaraproject.webrtc-events-subscriptions.v0.registration-ends%3Acreate
+    &scope=openid%20webrtc-events-subscriptions%3Aorg.camaraproject.webrtc-events-subscriptions.v0.session-invitation%3Acreate%20webrtc-events-subscriptions%3Aorg.camaraproject.webrtc-events-subscriptions.v0.session-status%3Acreate%20webrtc-events-subscriptions%3Aorg.camaraproject.webrtc-events-subscriptions.v0.registration-ended%3Acreate
     &state=af0ifjsldkj
     &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
     &code_challenge_method=S256 HTTP/1.1
@@ -126,7 +126,7 @@ x-correlator: b4333c46-49c0-4f62-80d7-f0ef930f1c46
   "types": [
     "org.camaraproject.webrtc-events-subscriptions.v0.session-invitation",
     "org.camaraproject.webrtc-events-subscriptions.v0.session-status",
-    "org.camaraproject.webrtc-events-subscriptions.v0.registration-ends"
+    "org.camaraproject.webrtc-events-subscriptions.v0.registration-ended"
   ],
   "config": {
     "subscriptionDetail": {
@@ -150,7 +150,7 @@ x-correlator: b4333c46-49c0-4f62-80d7-f0ef930f1c46
   "types": [
     "org.camaraproject.webrtc-events-subscriptions.v0.session-invitation",
     "org.camaraproject.webrtc-events-subscriptions.v0.session-status",
-    "org.camaraproject.webrtc-events-subscriptions.v0.registration-ends"
+    "org.camaraproject.webrtc-events-subscriptions.v0.registration-ended"
   ],
   "config": {
     "subscriptionDetail": {
@@ -259,7 +259,7 @@ x-correlator: f8e7d6c5-b4a3-2190-fedc-ba0987654321
   "types": [
     "org.camaraproject.webrtc-events-subscriptions.v0.session-invitation",
     "org.camaraproject.webrtc-events-subscriptions.v0.session-status",
-    "org.camaraproject.webrtc-events-subscriptions.v0.registration-ends"
+    "org.camaraproject.webrtc-events-subscriptions.v0.registration-ended"
   ],
   "config": {
     "subscriptionDetail": {
