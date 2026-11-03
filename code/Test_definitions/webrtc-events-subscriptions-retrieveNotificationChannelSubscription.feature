@@ -31,6 +31,33 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation retrieveNotificati
     And the response property "$.id" is the value of the path parameter "subscriptionId"
     And the response properties "$.types", "$.sink" and "$.config.subscriptionDetail" have the values of the subscription creation request
 
+  @webrtc_events_subscriptions_retrieveNotificationChannelSubscription_02_accesstoken_sink_credential_returned
+  Scenario: Retrieve a subscription with ACCESSTOKEN sinkCredential returned
+    # Some implementations may not return the sinkCredential in the response (data minimization principle)
+    Given an existing subscription created by operation "createNotificationChannelSubscription" with "$.sinkCredential.credentialType" set to "ACCESSTOKEN"
+    And the path parameter "subscriptionId" is set to the value of "$.id" for that subscription
+    When the request "retrieveNotificationChannelSubscription" is sent
+    Then the response status code is 200
+    And the response header "Content-Type" is "application/json"
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response body complies with the OAS schema at "#/components/schemas/Subscription"
+    And the response property "$.sinkCredential.credentialType", if present, is "ACCESSTOKEN"
+    And the response property "$.sinkCredential.accessTokenExpiresUtc", if present, has the value of the subscription creation request
+
+  @webrtc_events_subscriptions_retrieveNotificationChannelSubscription_03_private_key_jwt_sink_credential_returned
+  Scenario: Retrieve a subscription with PRIVATE_KEY_JWT sinkCredential returned
+    # Some implementations may not return the sinkCredential in the response (data minimization principle)
+    # Mainly applicable for in-band provisioning of PRIVATE_KEY_JWT
+    Given an existing subscription created by operation "createNotificationChannelSubscription" with "$.sinkCredential.credentialType" set to "PRIVATE_KEY_JWT"
+    And the path parameter "subscriptionId" is set to the value of "$.id" for that subscription
+    When the request "retrieveNotificationChannelSubscription" is sent
+    Then the response status code is 200
+    And the response header "Content-Type" is "application/json"
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response body complies with the OAS schema at "#/components/schemas/Subscription"
+    And the response property "$.sinkCredential.credentialType" is "PRIVATE_KEY_JWT"
+    And the response property "$.sinkCredential.jwksUri" is set to a valid value
+
 ############################ Error Scenarios #############################################
 
   @webrtc_events_subscriptions_retrieveNotificationChannelSubscription_400.01_invalid_path_parameter

@@ -27,6 +27,7 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation retrieveNotificati
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response body complies with the OAS schema at "#/components/schemas/SubscriptionList"
     And the response property "$.subscriptions" includes an item whose property "$.id" is the identifier of that subscription
+    And the response property "$.pagination" complies with the OAS schema at "#/components/schemas/Pagination"
 
   @webrtc_events_subscriptions_retrieveNotificationChannelSubscriptionList_02_empty_response
   Scenario: No existing subscriptions
@@ -35,7 +36,52 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation retrieveNotificati
     Then the response status code is 200
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response body complies with the OAS schema at "#/components/schemas/SubscriptionList"
     And the response property "$.subscriptions" is an empty array "[]"
+    And the response property "$.pagination" complies with the OAS schema at "#/components/schemas/Pagination"
+
+  # Pagination scenarios. Page size 20 is used as an example; adapt to the implementation default.
+
+  @webrtc_events_subscriptions_retrieveNotificationChannelSubscriptionList_03_pagination_default_values
+  Scenario: Pagination with default values for page and perPage
+    Given more than 20 subscriptions created by operation "createNotificationChannelSubscription" for the API client
+    When the request "retrieveNotificationChannelSubscriptionList" is sent without query parameters "page" and "perPage"
+    Then the response status code is 200
+    And the response header "Content-Type" is "application/json"
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "link" contains a link to the next page with rel="next"
+    And the response body complies with the OAS schema at "#/components/schemas/SubscriptionList"
+    And the response property "$.subscriptions" has 20 items
+    And the response property "$.pagination.page" is 1
+    And the response property "$.pagination.perPage" is 20
+
+  @webrtc_events_subscriptions_retrieveNotificationChannelSubscriptionList_04_pagination_middle_page
+  Scenario: Pagination fetching a middle page of the list
+    Given more than 40 subscriptions created by operation "createNotificationChannelSubscription" for the API client
+    When the request "retrieveNotificationChannelSubscriptionList" is sent with query parameters "page" set to 2 and "perPage" set to 20
+    Then the response status code is 200
+    And the response header "Content-Type" is "application/json"
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "link" contains a link to the previous page with rel="prev" and a link to the next page with rel="next"
+    And the response header "x-total-pages", if present, is equal to the response property "$.pagination.totalPages"
+    And the response header "x-total-count", if present, is equal to the response property "$.pagination.totalCount"
+    And the response body complies with the OAS schema at "#/components/schemas/SubscriptionList"
+    And the response property "$.subscriptions" has 20 items
+    And the response property "$.pagination.page" is 2
+    And the response property "$.pagination.perPage" is 20
+
+  @webrtc_events_subscriptions_retrieveNotificationChannelSubscriptionList_05_pagination_last_page
+  Scenario: Pagination fetching the last page of the list
+    Given more than 40 and less than 60 subscriptions created by operation "createNotificationChannelSubscription" for the API client
+    When the request "retrieveNotificationChannelSubscriptionList" is sent with query parameters "page" set to 3 and "perPage" set to 20
+    Then the response status code is 200
+    And the response header "Content-Type" is "application/json"
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "link" contains a link to the previous page with rel="prev"
+    And the response body complies with the OAS schema at "#/components/schemas/SubscriptionList"
+    And the response property "$.subscriptions" has between 1 and 20 items
+    And the response property "$.pagination.page" is 3
+    And the response property "$.pagination.totalPages", if present, is 3
 
 ############################ Error Scenarios #############################################
 
@@ -44,6 +90,26 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation retrieveNotificati
     Given the header "x-correlator" does not comply with the schema at "#/components/schemas/XCorrelator"
     When the request "retrieveNotificationChannelSubscriptionList" is sent
     Then the response status code is 400
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_events_subscriptions_retrieveNotificationChannelSubscriptionList_400.02_invalid_page
+  Scenario: Invalid value for query parameter page
+    Given the query parameter "page" is set to a value less than 1
+    When the request "retrieveNotificationChannelSubscriptionList" is sent
+    Then the response status code is 400
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @webrtc_events_subscriptions_retrieveNotificationChannelSubscriptionList_400.03_invalid_perPage
+  Scenario: Invalid value for query parameter perPage
+    Given the query parameter "perPage" is set to a value outside the range [1-100]
+    When the request "retrieveNotificationChannelSubscriptionList" is sent
+    Then the response status code is 400
+    And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response property "$.status" is 400
     And the response property "$.code" is "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
