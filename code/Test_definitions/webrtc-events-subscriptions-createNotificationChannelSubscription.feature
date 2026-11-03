@@ -176,7 +176,7 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation createNotification
 
   @webrtc_events_subscriptions_createNotificationChannelSubscription_400.05_invalid_event_type
   Scenario: Subscription creation with invalid event type
-    Given the request body property "$.types" is set to ["org.camaraproject.webrtc-events-subscriptions.v0.unknown-event"]
+    Given the request body property "$.types" is set to an event type not defined in the schema at "#/components/schemas/ApiEventType"
     When the request "createNotificationChannelSubscription" is sent
     Then the response status code is 400
     And the response header "x-correlator" has same value as the request header "x-correlator"
