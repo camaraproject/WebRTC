@@ -236,7 +236,7 @@ Feature: CAMARA WebRTC Registration, vwip - Operation createRegistration
     And the response property "$.code" is "PERMISSION_DENIED"
     And the response property "$.message" contains a user friendly text
 
-  @webrtc_registration_createRegistration_403.03_max_registration_per_user
+  @webrtc_registration_createRegistration_403.03_max_registrations_per_user
   Scenario: Maximum number of registrations per user reached
     Given the user owning the target phone number already has the maximum number of active registrations allowed per user
     When the request "createRegistration" is sent
@@ -244,10 +244,10 @@ Feature: CAMARA WebRTC Registration, vwip - Operation createRegistration
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response header "Content-Type" is "application/json"
     And the response property "$.status" is 403
-    And the response property "$.code" is "WEBRTC_REGISTRATION.MAX_REGISTRATION_PER_USER"
+    And the response property "$.code" is "WEBRTC_REGISTRATION.MAX_REGISTRATIONS_PER_USER"
     And the response property "$.message" contains a user friendly text
 
-  @webrtc_registration_createRegistration_403.04_max_registration_per_msisdn
+  @webrtc_registration_createRegistration_403.04_max_registrations_per_msisdn
   Scenario: Maximum number of registrations per MSISDN reached
     Given the target phone number already has the maximum number of active registrations allowed per MSISDN
     When the request "createRegistration" is sent
@@ -255,7 +255,7 @@ Feature: CAMARA WebRTC Registration, vwip - Operation createRegistration
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response header "Content-Type" is "application/json"
     And the response property "$.status" is 403
-    And the response property "$.code" is "WEBRTC_REGISTRATION.MAX_REGISTRATION_PER_MSISDN"
+    And the response property "$.code" is "WEBRTC_REGISTRATION.MAX_REGISTRATIONS_PER_MSISDN"
     And the response property "$.message" contains a user friendly text
 
   @webrtc_registration_createRegistration_403.05_max_devices_per_user

@@ -613,8 +613,8 @@ components:
                   code:
                     enum:
                       - PERMISSION_DENIED
-                      - WEBRTC_REGISTRATION.MAX_REGISTRATION_PER_USER
-                      - WEBRTC_REGISTRATION.MAX_REGISTRATION_PER_MSISDN
+                      - WEBRTC_REGISTRATION.MAX_REGISTRATIONS_PER_USER
+                      - WEBRTC_REGISTRATION.MAX_REGISTRATIONS_PER_MSISDN
                       - WEBRTC_REGISTRATION.MAX_DEVICES_PER_USER
           examples:
             GENERIC_403_PERMISSION_DENIED:
@@ -625,17 +625,17 @@ components:
                 status: 403
                 code: PERMISSION_DENIED
                 message: The API consumer is not authorized to register the requested phoneNumber.
-            WEBRTC_REGISTRATION_403_MAX_REGISTRATION_PER_USER:
+            WEBRTC_REGISTRATION_403_MAX_REGISTRATIONS_PER_USER:
               description: The maximum number of registrations per user has been reached
               value:
                 status: 403
-                code: WEBRTC_REGISTRATION.MAX_REGISTRATION_PER_USER
+                code: WEBRTC_REGISTRATION.MAX_REGISTRATIONS_PER_USER
                 message: The maximum number of service registrations per user has been reached.
-            WEBRTC_REGISTRATION_403_MAX_REGISTRATION_PER_MSISDN:
+            WEBRTC_REGISTRATION_403_MAX_REGISTRATIONS_PER_MSISDN:
               description: The maximum number of registrations per MSISDN has been reached
               value:
                 status: 403
-                code: WEBRTC_REGISTRATION.MAX_REGISTRATION_PER_MSISDN
+                code: WEBRTC_REGISTRATION.MAX_REGISTRATIONS_PER_MSISDN
                 message: The maximum number of service registrations per MSISDN has been reached.
             WEBRTC_REGISTRATION_403_MAX_DEVICES_PER_USER:
               description: The maximum number of devices per user has been reached

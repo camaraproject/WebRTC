@@ -78,7 +78,7 @@ info:
       - Events triggered when a new session is requested (e.g. incoming call
         received)
 
-    - `org.camaraproject.webrtc-events-subscriptions.v0.registration-ends`
+    - `org.camaraproject.webrtc-events-subscriptions.v0.registration-ended`
 
       - Events triggered when a webrtc registration is terminated (e.g. webrtc registration expired)
 
@@ -165,10 +165,10 @@ info:
     signal the need to check the event subscription status and attempt to refresh
     it in order to continue receiving new event notifications.
 
-    ## 4. Registration ends (`registration-ends`)
+    ## 4. Registration ended (`registration-ended`)
 
-    A `org.camaraproject.webrtc-events-subscriptions.v0.registration-ends` event indicates that a previously active registration has ended and is no longer valid.
-    From a developer's point of view, reception of the `registration-ends` event should be treated as a signal to renew the WebRTC registration in order to continue receiving or initiating calls for the registered phone number.
+    A `org.camaraproject.webrtc-events-subscriptions.v0.registration-ended` event indicates that a previously active registration has ended and is no longer valid.
+    From a developer's point of view, reception of the `registration-ended` event should be treated as a signal to renew the WebRTC registration in order to continue receiving or initiating calls for the registered phone number.
 
     <!-- CAMARA:MANDATORY:authorization-and-authentication:BEGIN -->
 
@@ -230,7 +230,7 @@ paths:
 
         - `org.camaraproject.webrtc-events-subscriptions.v0.session-invitation`: new calls event
         - `org.camaraproject.webrtc-events-subscriptions.v0.session-status`: updates on specific call
-        - `org.camaraproject.webrtc-events-subscriptions.v0.registration-ends`: registration termination event
+        - `org.camaraproject.webrtc-events-subscriptions.v0.registration-ended`: registration termination event
 
         To subscribe and receive notifications about new calls, a
         `session-invitation` subscription is required using the `deviceId` related to a valid registration.
@@ -242,7 +242,7 @@ paths:
         - openId:
             - webrtc-events-subscriptions:org.camaraproject.webrtc-events-subscriptions.v0.session-status:create
             - webrtc-events-subscriptions:org.camaraproject.webrtc-events-subscriptions.v0.session-invitation:create
-            - webrtc-events-subscriptions:org.camaraproject.webrtc-events-subscriptions.v0.registration-ends:create
+            - webrtc-events-subscriptions:org.camaraproject.webrtc-events-subscriptions.v0.registration-ended:create
       requestBody:
         content:
           application/json:
@@ -253,8 +253,8 @@ paths:
                 $ref: "#/components/examples/INVITE_SUBSCRIPTION"
               SESSION_SUBSCRIPTION (session-status):
                 $ref: "#/components/examples/SESSION_SUBSCRIPTION"
-              REGISTRATION_ENDS_SUBSCRIPTION (registration-ends):
-                $ref: "#/components/examples/REGISTRATION_ENDS_SUBSCRIPTION"
+              REGISTRATION_ENDED_SUBSCRIPTION (registration-ended):
+                $ref: "#/components/examples/REGISTRATION_ENDED_SUBSCRIPTION"
         required: true
       callbacks:
         notifications:
@@ -282,8 +282,8 @@ paths:
                         $ref: "#/components/examples/NEW_LOCATED_SESSION_INCOMING"
                       SESSION_UPDATE (session-status):
                         $ref: "#/components/examples/SESSION_UPDATE"
-                      REGISTRATION_EXPIRED (registration-ends):
-                        $ref: "#/components/examples/REGISTRATION_ENDS"
+                      REGISTRATION_EXPIRED (registration-ended):
+                        $ref: "#/components/examples/REGISTRATION_ENDED"
                       SUBSCRIPTION_ENDED (subscription-ended):
                         $ref: "#/components/examples/SUBSCRIPTION_ENDED"
               responses:
@@ -637,14 +637,14 @@ components:
           - Events triggered for any media session related event (e.g. far end new media endpoints)
         - `org.camaraproject.webrtc-events-subscriptions.v0.session-invitation`
           - Events triggered for any media endpoint registration event (e.g. incoming session)
-        - `org.camaraproject.webrtc-events-subscriptions.v0.registration-ends`
+        - `org.camaraproject.webrtc-events-subscriptions.v0.registration-ended`
           - Events triggered for registration termination (e.g. incoming session)
 
         Subscription lifecycle events are not subscribable. They are sent by default.
       enum:
         - org.camaraproject.webrtc-events-subscriptions.v0.session-status
         - org.camaraproject.webrtc-events-subscriptions.v0.session-invitation
-        - org.camaraproject.webrtc-events-subscriptions.v0.registration-ends
+        - org.camaraproject.webrtc-events-subscriptions.v0.registration-ended
 
     RegistrationId:
       type: string
@@ -693,7 +693,7 @@ components:
         mapping:
           org.camaraproject.webrtc-events-subscriptions.v0.session-invitation: "#/components/schemas/EventSessionInvitation"
           org.camaraproject.webrtc-events-subscriptions.v0.session-status: "#/components/schemas/EventSessionStatus"
-          org.camaraproject.webrtc-events-subscriptions.v0.registration-ends: "#/components/schemas/EventRegistrationEnds"
+          org.camaraproject.webrtc-events-subscriptions.v0.registration-ended: "#/components/schemas/EventRegistrationEnded"
 
     NotificationEvent:
       description: Union of all valid notification event groups at the callback endpoint.
@@ -886,8 +886,8 @@ components:
             data:
               $ref: "../common/CAMARA_event_common.yaml#/components/schemas/SubscriptionEnded"
 
-    # WebRTC Registration Ends event
-    EventRegistrationEnds:
+    # WebRTC Registration Ended event
+    EventRegistrationEnded:
       description: event structure for event subscription ends
       allOf:
         - $ref: "#/components/schemas/ApiNotificationEvent"
@@ -896,13 +896,13 @@ components:
             - data
           properties:
             data:
-              $ref: "#/components/schemas/RegistrationEnds"
+              $ref: "#/components/schemas/RegistrationEnded"
             type:
               enum:
-                - org.camaraproject.webrtc-events-subscriptions.v0.registration-ends
+                - org.camaraproject.webrtc-events-subscriptions.v0.registration-ended
 
-    RegistrationEnds:
-      description: Event detail structure for REGISTRATION_ENDS event. registrationExpireTime is absolute UTC. Clients SHOULD refresh in advance; otherwise a REGISTRATION_EXPIRED terminationReason will be emitted.
+    RegistrationEnded:
+      description: Event detail structure for REGISTRATION_ENDED event. registrationExpireTime is absolute UTC. Clients SHOULD refresh in advance; otherwise a REGISTRATION_EXPIRED terminationReason will be emitted.
       type: object
       required:
         - subscriptionId
@@ -1021,9 +1021,9 @@ components:
               $ref: "../common/CAMARA_event_common.yaml#/components/examples/GENERIC_422_PRIVATE_KEY_JWT_NOT_CONFIGURED"
   examples:
     # Subscription examples
-    REGISTRATION_ENDS_SUBSCRIPTION:
+    REGISTRATION_ENDED_SUBSCRIPTION:
       description: |-
-        A sample of `registration-ends` subscription for a `deviceId` at
+        A sample of `registration-ended` subscription for a `deviceId` at
         `acme.opentelco.com`.
 
         This will be used to receive WebRTC registration termination events
@@ -1037,7 +1037,7 @@ components:
           accessTokenExpiresUtc: "2024-12-06T14:37:56.147Z"
           accessTokenType: "bearer"
         types:
-          - org.camaraproject.webrtc-events-subscriptions.v0.registration-ends
+          - org.camaraproject.webrtc-events-subscriptions.v0.registration-ended
         config:
           subscriptionDetail:
             deviceId: "7d444840-9dc0-11d1-b245-5ffdce74fad2"
@@ -1048,7 +1048,7 @@ components:
 
         This will be used to receive incoming sessions (incoming calls) for
         any registration of the device. Registration termination is notified
-        through the `registration-ends` event type, which requires its own
+        through the `registration-ended` event type, which requires its own
         subscription.
 
         The example uses `sinkCredential` for authenticated event delivery and
@@ -1163,9 +1163,9 @@ components:
               pdf: normal
               value: 92
             timestamp: '2024-11-05T05:35:12.254Z'
-    REGISTRATION_ENDS:
+    REGISTRATION_ENDED:
       description: |-
-        Example of `registration-ends` events.
+        Example of `registration-ended` events.
 
         This scenario occurs when the device did not refresh before the registration expiry time (registrationExpireTime).
         When a re-registration is requested from server, maybe due to expire or
@@ -1180,7 +1180,7 @@ components:
       value:
         id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
         source: https://notificationServer.opentelco.com
-        type: org.camaraproject.webrtc-events-subscriptions.v0.registration-ends
+        type: org.camaraproject.webrtc-events-subscriptions.v0.registration-ended
         specversion: "1.0"
         datacontenttype: application/json
         time: 2024-11-05T05:40:23.682Z

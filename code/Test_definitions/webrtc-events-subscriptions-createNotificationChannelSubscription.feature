@@ -42,7 +42,7 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation createNotification
       | event_type                                                          |
       | org.camaraproject.webrtc-events-subscriptions.v0.session-invitation |
       | org.camaraproject.webrtc-events-subscriptions.v0.session-status     |
-      | org.camaraproject.webrtc-events-subscriptions.v0.registration-ends  |
+      | org.camaraproject.webrtc-events-subscriptions.v0.registration-ended  |
 
   @webrtc_events_subscriptions_createNotificationChannelSubscription_02_async_creation
   Scenario: Create a subscription asynchronously
@@ -312,7 +312,7 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation createNotification
       | event_type         |
       | session-invitation |
       | session-status     |
-      | registration-ends  |
+      | registration-ended  |
 
   @webrtc_events_subscriptions_createNotificationChannelSubscription_409.01_already_exists
   Scenario: Conflict due to an existing subscription
