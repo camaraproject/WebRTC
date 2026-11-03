@@ -25,8 +25,8 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation retrieveNotificati
     Then the response status code is 200
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response body is an array whose items comply with the OAS schema at "#/components/schemas/Subscription"
-    And the response body includes an item whose property "$.id" is the identifier of that subscription
+    And the response body complies with the OAS schema at "#/components/schemas/SubscriptionList"
+    And the response property "$.subscriptions" includes an item whose property "$.id" is the identifier of that subscription
 
   @webrtc_events_subscriptions_retrieveNotificationChannelSubscriptionList_02_empty_response
   Scenario: No existing subscriptions
@@ -35,7 +35,7 @@ Feature: CAMARA WebRTC Events Subscriptions, vwip - Operation retrieveNotificati
     Then the response status code is 200
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response body is an empty array "[]"
+    And the response property "$.subscriptions" is an empty array "[]"
 
 ############################ Error Scenarios #############################################
 
