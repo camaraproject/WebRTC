@@ -78,7 +78,6 @@ Changes documented below are compared to version 0.4.0-rc.1.
 * fix: `PUT /sessions/{mediaSessionId}/status` returns `200` with the current session only, `204` removed at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
 * fix: `locationDetails` uses the common `Area` (`area` replaces `shape` and `coordinates`); ellipsoid locations are no longer supported at PR [#252](https://github.com/camaraproject/WebRTC/pull/252)
 * task: align with Commonalities r4.4 (0.9.0): common error responses referenced from `CAMARA_common.yaml`, mandatory `info.description` templates updated at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
-* task: `x-correlator` and `DateTime` referenced from `CAMARA_common.yaml` at PR [#252](https://github.com/camaraproject/WebRTC/pull/252)
 
 ### Fixed
 
@@ -129,7 +128,6 @@ Changes documented below are compared to version 0.3.0-rc.1.
 * fix: `locationDetails` uses the common `Area` (`area` replaces `shape` and `coordinates`); ellipsoid locations are no longer supported at PR [#252](https://github.com/camaraproject/WebRTC/pull/252)
 * fix: `sink` maxLength increased from 1024 to 2048, following `CAMARA_event_common.yaml` at PR [#252](https://github.com/camaraproject/WebRTC/pull/252)
 * task: align with Commonalities r4.4 (0.9.0): common error responses referenced from `CAMARA_common.yaml` and `CAMARA_event_common.yaml`, mandatory `info.description` templates updated at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
-* task: subscription and event schemas from `CAMARA_event_common.yaml` (`Config` extends `ConfigBase`, `SinkCredential`, `Protocol`, `SubscriptionId`, subscription lifecycle events) at PR [#252](https://github.com/camaraproject/WebRTC/pull/252)
 
 ### Fixed
 
@@ -171,7 +169,6 @@ Changes documented below are compared to version 0.4.0-rc.1.
 * fix: `PUT /sessions/{registrationId}` returns `200` with `expiresAt` only, `204` removed at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
 * fix: registration refresh honours the requested `registrationExpireTime` within the allowed range at PR [#237](https://github.com/camaraproject/WebRTC/pull/237)
 * task: align with Commonalities r4.4 (0.9.0): common error responses referenced from `CAMARA_common.yaml`, mandatory `info.description` templates updated at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
-* task: `phoneNumber`, `x-correlator` and date-time fields referenced from `CAMARA_common.yaml` at PR [#252](https://github.com/camaraproject/WebRTC/pull/252)
 
 ### Fixed
 
