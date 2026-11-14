@@ -56,6 +56,11 @@ info:
     identified and recognized as reachable by the server side of the network.
     - **registrationId**: Unique identifier of an device **registration**.
       Retrieved using the `webrtc-registration` API
+    - **trust domain**: The set of API consumers to which the API provider may
+      disclose network-internal signalling information without modification, in
+      the sense of the Spec(T) defined in RFC 3325. Whether an API consumer
+      belongs to the trust domain is determined by the API provider according to
+      operator policy.
 
     # API functionality
 
@@ -153,6 +158,45 @@ info:
     party that generated the event. Any party (originating or answering)
     MAY include `locationDetails` in events and updates it sends; the field
     always refers to the sender's own device location.
+
+    **Retargeting information**
+
+    When the incoming session was retargeted in the network before reaching the
+    endpoint (e.g. a service number such as a freephone number was translated
+    into a routable number, or the call was diverted by a communication
+    diversion service), the event MAY include information about the original
+    target(s) of the session, derived from the History-Info header field
+    (RFC 7044) received by the API provider.
+
+    - For API consumers within the trust domain, the event includes
+      `historyInfo`, an array carrying every hi-entry of the History-Info header
+      field as received, one hi-entry per element, in header field order. The
+      API provider splits the header field into hi-entries according to the ABNF
+      of RFC 7044 and does not parse or modify the hi-entries themselves; the
+      same `historyInfo` is produced regardless of whether the History-Info
+      header field was received as multiple header field rows or as a single
+      comma-separated row (RFC 3261 section 7.3.1). An hi-entry whose
+      hi-targeted-to-uri carries an escaped Privacy header field with the value
+      "history" MUST NOT be presented to the end user (RFC 7044).
+    - For API consumers outside the trust domain, the event includes
+      `originallyDialedAddress` (the address corresponding to the service number,
+      e.g. a freephone number, the session was placed to before the service
+      number translation; derived from the hi-targeted-to-uri of the History-Info
+      entry preceding the last entry carrying "cause=380", so that when two
+      successive service number translations took place the second service
+      number is reported) and `forwardedFromAddress` (the address corresponding
+      to the number from which the session was last diverted to the receiver,
+      when the session was diverted; derived from the hi-targeted-to-uri of the
+      last but one History-Info entry). They correspond to the ISUP called IN
+      number and redirecting number respectively. The reason for the retargeting
+      is not disclosed. Either is omitted when the corresponding History-Info
+      entry is marked private (Privacy "history").
+
+    Which of the two forms is included is decided by the API provider according
+    to operator policy. `historyInfo` is absent when no History-Info header field
+    was received; `originallyDialedAddress` is absent when no service number
+    translation took place, and `forwardedFromAddress` is absent when the session
+    was not diverted.
 
     The `locationDetails` schema follows PIDF-LO concepts (3GPP TS 24.229,
     RFC 4119, RFC 5139, RFC 5491) with the location area expressed as a CAMARA common `Area` (circle or polygon).
@@ -278,6 +322,14 @@ paths:
                     examples:
                       NEW_SESSION_INCOMING (session-invitation):
                         $ref: "#/components/examples/NEW_SESSION_INCOMING"
+                      NEW_SESSION_WITH_HISTORY_INFO_TRANSLATION_AND_FORWARDING (session-invitation):
+                        $ref: "#/components/examples/NEW_SESSION_WITH_HISTORY_INFO_TRANSLATION_AND_FORWARDING"
+                      NEW_SESSION_WITH_HISTORY_INFO_BUSY_FORWARDING (session-invitation):
+                        $ref: "#/components/examples/NEW_SESSION_WITH_HISTORY_INFO_BUSY_FORWARDING"
+                      NEW_SESSION_WITH_RETARGETING_ADDRESSES (session-invitation):
+                        $ref: "#/components/examples/NEW_SESSION_WITH_RETARGETING_ADDRESSES"
+                      NEW_SESSION_WITH_FORWARDED_FROM_ADDRESS (session-invitation):
+                        $ref: "#/components/examples/NEW_SESSION_WITH_FORWARDED_FROM_ADDRESS"
                       NEW_LOCATED_SESSION_INCOMING (session-invitation):
                         $ref: "#/components/examples/NEW_LOCATED_SESSION_INCOMING"
                       SESSION_UPDATE (session-status):
@@ -757,11 +809,9 @@ components:
         subscriptionId:
           $ref: "../common/CAMARA_event_common.yaml#/components/schemas/SubscriptionId"
         originatorAddress:
-          type: string
           description: Sender (originator) address
-          pattern: '^(tel:\+[1-9][0-9]{4,14}|tel:[0-9*#]{1,15};phone-context=(?:\+[1-9][0-9]{0,14}|[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+)|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|sip:[0-9*#]{1,15};phone-context=(?:\+[1-9][0-9]{0,14}|[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+)@[A-Za-z0-9.-]+\.[A-Za-z]{2,};user=phone|urn:service:sos(?:\.[a-z0-9](?:[a-z0-9\-]{0,30}[a-z0-9])?)*|sip:anonymous@anonymous\.invalid)$'
-          maxLength: 256
-          example: 'tel:+11234567899'
+          allOf:
+            - $ref: '#/components/schemas/Address'
         originatorName:
           type: string
           maxLength: 256
@@ -769,11 +819,9 @@ components:
           description: Friendly name of the call originator
           example: 'Alice'
         receiverAddress:
-          type: string
           description: Receiver (terminator) address
-          pattern: '^(tel:\+[1-9][0-9]{4,14}|tel:[0-9*#]{1,15};phone-context=(?:\+[1-9][0-9]{0,14}|[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+)|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|sip:[0-9*#]{1,15};phone-context=(?:\+[1-9][0-9]{0,14}|[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+)@[A-Za-z0-9.-]+\.[A-Za-z]{2,};user=phone|urn:service:sos(?:\.[a-z0-9](?:[a-z0-9\-]{0,30}[a-z0-9])?)*|sip:anonymous@anonymous\.invalid)$'
-          maxLength: 256
-          example: 'tel:+11234567899'
+          allOf:
+            - $ref: '#/components/schemas/Address'
         receiverName:
           type: string
           maxLength: 256
@@ -847,6 +895,42 @@ components:
             - originatorAddress
             - receiverAddress
             - status
+          properties:
+            historyInfo:
+              type: array
+              description: |-
+                hi-entries of the History-Info header field (RFC 7044) received
+                from the network for this session, one hi-entry per element, in
+                header field order and as received. Included only for API
+                consumers within the trust domain. Absent when no History-Info
+                header field was received.
+              minItems: 1
+              maxItems: 8
+              items:
+                $ref: '#/components/schemas/HistoryInfoEntry'
+            originallyDialedAddress:
+              description: |-
+                Address corresponding to the service number (e.g. a freephone
+                number) the session was placed to before the service number
+                translation. Derived from the hi-targeted-to-uri of the
+                History-Info entry preceding the last entry carrying
+                "cause=380"; when two successive service number translations
+                took place, the second service number. Included only for API
+                consumers outside the trust domain. Absent when no service
+                number translation took place or when the address may not be
+                disclosed.
+              allOf:
+                - $ref: '#/components/schemas/Address'
+            forwardedFromAddress:
+              description: |-
+                Address corresponding to the number from which the session was
+                last diverted to the receiver, when the session was diverted.
+                Derived from the hi-targeted-to-uri of the last but one
+                History-Info entry. Included only for API consumers outside the
+                trust domain. Absent when the session was not diverted or when
+                the address may not be disclosed.
+              allOf:
+                - $ref: '#/components/schemas/Address'
 
     WrtcSdpDescriptor:
       description: SDP descriptor object carrying an inlined Session Description Protocol payload
@@ -978,6 +1062,47 @@ components:
             If not provided, current timestamp will be used by default.
           allOf:
             - $ref: "../common/CAMARA_common.yaml#/components/schemas/DateTime"
+
+    HistoryInfoEntry:
+      type: string
+      description: |-
+        One hi-entry of the History-Info header field, as defined by the ABNF
+        in RFC 7044 section 10.1 (hi-targeted-to-uri followed by zero or more
+        ";"-separated hi-params such as "index", "rc", "mp" and "np"), carried
+        exactly as received from the network: the hi-targeted-to-uri keeps its
+        display-name, URI parameters (e.g. "cause", RFC 4458) and escaped
+        header fields (e.g. Reason, RFC 3326, and Privacy, RFC 3323) in their
+        original, percent-encoded form. Leading and trailing whitespace is
+        removed. The string is encoded as a JSON string (RFC 8259 section 7).
+        The API consumer is responsible for parsing the hi-entry.
+      pattern: '^(?:[^<"]|"(?:[^"\\]|\\.)*")*<[^<>]+>([ \t]*;.*)?$'
+      maxLength: 1024
+      example: "<sip:+81611111111@example.com;user=phone;cause=302>;index=1.1;mp=1"
+
+    Address:
+      type: string
+      description: >-
+        Subscriber address (Sender or Receiver).
+        The following formats are supported:
+        - A TEL URI :
+          - an international format; or
+          - a home local number (as defined in 3GPP TS 24.229 subclause 5.1.2A.1.5) qualified by a `phone-context`
+            parameter identifying the home network numbering plan.
+        - A SIP URI :
+          - SIP URI with a generic user part;
+          - SIP URI with a home local number (`user=phone`). The user part MAY contain a home local number qualified by
+            a `phone-context` parameter, in which case the `user=phone` URI parameter SHALL be appended;
+          - an emergency service URN; or
+          - anonymous SIP URI
+
+        The reserved value `sip:anonymous@anonymous.invalid` (as defined in RFC 3323) MAY be used to indicate
+        that the calling party identity is withheld within the trust domain. When `sip:anonymous@anonymous.invalid` is set
+        as the `originatorAddress`, the session SHALL be handled as an anonymous call origination.
+        This value SHALL NOT be used as the `receiverAddress`.
+
+      pattern: '^(tel:\+[1-9][0-9]{4,14}|tel:[0-9*#]{1,15};phone-context=(?:\+[1-9][0-9]{0,14}|[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+)|sip:[A-Za-z0-9_.!%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|sip:[0-9*#]{1,15};phone-context=(?:\+[1-9][0-9]{0,14}|[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+)@[A-Za-z0-9.-]+\.[A-Za-z]{2,};user=phone|urn:service:sos(?:\.[a-z0-9](?:[a-z0-9\-]{0,30}[a-z0-9])?)*|sip:anonymous@anonymous\.invalid)$'
+      example: 'tel:+11234567899'
+      maxLength: 256
 
   responses:
     CreateSubscriptionUnprocessableEntity422:
@@ -1247,3 +1372,115 @@ components:
           subscriptionId: qs15-h556-rt89-1298
           terminationReason: SUBSCRIPTION_EXPIRED
           terminationDescription: "Subscription expired"
+
+    NEW_SESSION_WITH_HISTORY_INFO_TRANSLATION_AND_FORWARDING:
+      description: |-
+        Example of a `session-invitation` event for an API consumer
+        within the trust domain.
+
+        A freephone number is translated to a geographic number,
+        and the call is subsequently forwarded to a mobile number.
+        The History-Info entries are provided as received from the network.
+      value:
+        id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
+        source: https://notificationServer.opentelco.com
+        type: org.camaraproject.webrtc-events-subscriptions.v0.session-invitation
+        specversion: "1.0"
+        datacontenttype: application/json
+        time: 2024-11-05T05:40:23.682Z
+        data:
+          subscriptionId: "qs15-h556-rt89-1298"
+          originatorAddress: "tel:+81311111111"
+          receiverAddress: "tel:+819022222222"
+          status: "Initial"
+          offer:
+            sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0"
+          mediaSessionId: "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
+          sequenceNumber: 1
+          historyInfo:
+            - "<sip:+81120012345@example.com;user=phone>;index=1"
+            - "<sip:+81611111111@example.com;user=phone;cause=380?Privacy=history>;index=1.1;mp=1"
+            - "<sip:+819022222222@example.com;user=phone;cause=302>;index=1.1.1;mp=1.1"
+
+    NEW_SESSION_WITH_HISTORY_INFO_BUSY_FORWARDING:
+      description: |-
+        Example of a `session-invitation` event for an API consumer
+        within the trust domain.
+
+        A call to a geographic number is forwarded to another geographic number
+        because the originally called party is busy.
+        The History-Info entries include the SIP 486 response reason.
+      value:
+        id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
+        source: https://notificationServer.opentelco.com
+        type: org.camaraproject.webrtc-events-subscriptions.v0.session-invitation
+        specversion: "1.0"
+        datacontenttype: application/json
+        time: 2024-11-05T05:40:23.682Z
+        data:
+          subscriptionId: "qs15-h556-rt89-1298"
+          originatorAddress: "tel:+81311111111"
+          receiverAddress: "tel:+81333333333"
+          status: "Initial"
+          offer:
+            sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0"
+          mediaSessionId: "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
+          sequenceNumber: 1
+          historyInfo:
+            - "<sip:+81322222222@example.com;user=phone?Reason=SIP%3Bcause%3D486%3Btext%3D%22Busy%20Here%22>;index=1"
+            - "<sip:+81333333333@example.com;user=phone;cause=486>;index=1.1;mp=1"
+
+    NEW_SESSION_WITH_RETARGETING_ADDRESSES:
+      description: |-
+        Example of a `session-invitation` event for an API consumer
+        outside the trust domain.
+
+        A freephone number is translated to a geographic number,
+        and the call is subsequently forwarded to a mobile number.
+        Only the originally dialed address and forwarding source
+        address are provided, without the History-Info entries.
+      value:
+        id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
+        source: https://notificationServer.opentelco.com
+        type: org.camaraproject.webrtc-events-subscriptions.v0.session-invitation
+        specversion: "1.0"
+        datacontenttype: application/json
+        time: 2024-11-05T05:40:23.682Z
+        data:
+          subscriptionId: "qs15-h556-rt89-1298"
+          originatorAddress: "tel:+81311111111"
+          receiverAddress: "tel:+819022222222"
+          status: "Initial"
+          offer:
+            sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0"
+          mediaSessionId: "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
+          sequenceNumber: 1
+          originallyDialedAddress: "tel:+81120012345"
+          forwardedFromAddress: "tel:+81611111111"
+
+    NEW_SESSION_WITH_FORWARDED_FROM_ADDRESS:
+      description: |-
+        Example of a `session-invitation` event for an API consumer
+        outside the trust domain.
+
+        A call to a geographic number is forwarded to another geographic number
+        because the originally called party is busy.
+        Only the forwarding source address is provided.
+        The History-Info entries and retargeting reason are not disclosed.
+      value:
+        id: "VzYQCOClM6Kc7Xmyq7mP58Jx"
+        source: https://notificationServer.opentelco.com
+        type: org.camaraproject.webrtc-events-subscriptions.v0.session-invitation
+        specversion: "1.0"
+        datacontenttype: application/json
+        time: 2024-11-05T05:40:23.682Z
+        data:
+          subscriptionId: "qs15-h556-rt89-1298"
+          originatorAddress: "tel:+81311111111"
+          receiverAddress: "tel:+81333333333"
+          status: "Initial"
+          offer:
+            sdp: "v=0\r\no=- 4576312012535546667 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0"
+          mediaSessionId: "0AEE1B58BAEEDA3EABA42B32EBB3DFE07E9CFF402EAF9EED8EF"
+          sequenceNumber: 1
+          forwardedFromAddress: "tel:+81322222222"
