@@ -2,6 +2,7 @@
 
 <!-- TOC:START -->
 ## Table of Contents
+- **[r3.3](#r33)**
 - [r3.2](#r32)
 - [r3.1](#r31)
 <!-- TOC:END -->
@@ -14,6 +15,161 @@ The below sections record the changes for each API version in each release as fo
 * for the first release-candidate, all changes since the last public release
 * for subsequent release-candidate(s), only the delta to the previous release-candidate
 * for a public release, the consolidated changes since the previous public release
+
+# r3.3
+
+## Release Notes
+
+This public release contains the definition and documentation of
+* webrtc-call-handling 0.4.0
+* webrtc-events-subscriptions 0.3.0
+* webrtc-registration 0.4.0
+
+The API definition(s) are based on
+* Commonalities r4.4 (0.9.0)
+* Identity and Consent Management r4.2 (0.5.0)
+
+Changes below are consolidated since the previous public release r2.2, covering release candidates r3.1 and r3.2. Changes introduced and reverted within the cycle are not listed.
+
+Highlights:
+* Emergency calling and caller location in webrtc-call-handling.
+* `webrtc-events` replaced by `webrtc-events-subscriptions`, with subscriptions decoupled from individual media sessions and registrations.
+* Registration retrieval (`GET /sessions`) and explicit `phoneNumber` support for two-legged access tokens in webrtc-registration.
+* All APIs aligned with Commonalities r4.4: common errors, schemas, subscription model and mandatory `info.description` sections.
+
+## webrtc-call-handling 0.4.0
+
+**webrtc-call-handling 0.4.0 is an initial public version of this API.**
+
+Changes documented below are compared to version 0.3.0.
+
+- API definition **with inline documentation**:
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r3.3/code/API_definitions/webrtc-call-handling.yaml&nocors)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r3.3/code/API_definitions/webrtc-call-handling.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r3.3/code/API_definitions/webrtc-call-handling.yaml)
+
+### Breaking changes
+
+* Request and response bodies split by operation (`MediaSessionCreate`, `MediaSessionStatusChange`, `MediaSessionResponse`): `originatorAddress`, `receiverAddress` and `offer` are required in `POST /sessions`; `status` is required in `PUT /sessions/{mediaSessionId}/status`, which accepts only `status`, `offer`, `answer` and `locationDetails`; `status`, `answer` and `mediaSessionId` are no longer accepted in `POST /sessions`; `reason`, `sequenceNumber`, `clientCorrelator`, `serverCorrelator`, `callObjectRef` and `offerRequired` removed at PRs [#119](https://github.com/camaraproject/WebRTC/pull/119), [#124](https://github.com/camaraproject/WebRTC/pull/124), [#164](https://github.com/camaraproject/WebRTC/pull/164), [#244](https://github.com/camaraproject/WebRTC/pull/244)
+* `PUT /sessions/{mediaSessionId}/status` always returns `200` with the current session; `204` removed at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
+* New API-specific error code `422 WEBRTC_CALL_HANDLING.CALLTYPE_EMERGENCY_NOT_SUPPORTED` on `POST /sessions` at PRs [#120](https://github.com/camaraproject/WebRTC/pull/120), [#241](https://github.com/camaraproject/WebRTC/pull/241)
+* Potentially breaking: request body strictness as defined in the [CAMARA API Design Guide](https://github.com/camaraproject/Commonalities/blob/r4.4/documentation/CAMARA-API-Design-Guide.md#23-strictness-of-request-body-schemas) is applied, requests with properties not declared in the API definition are rejected with `400 INVALID_ARGUMENT`; clients which adhered to the previous API definition are not impacted at PR [#202](https://github.com/camaraproject/WebRTC/pull/202)
+
+### Added
+
+* Emergency calling: optional `callType` (`REGULAR`, `EMERGENCY`) and emergency service URNs (`urn:service:sos`) as address; unsupported emergency calls return `422 WEBRTC_CALL_HANDLING.CALLTYPE_EMERGENCY_NOT_SUPPORTED` at PRs [#120](https://github.com/camaraproject/WebRTC/pull/120), [#241](https://github.com/camaraproject/WebRTC/pull/241)
+* Located calls: optional `locationDetails` (PIDF-LO based, common `Area`, RFC 3339 `timestamp`) for the originator in `POST /sessions` and for the updating party in `PUT /sessions/{mediaSessionId}/status` at PRs [#120](https://github.com/camaraproject/WebRTC/pull/120), [#142](https://github.com/camaraproject/WebRTC/pull/142), [#227](https://github.com/camaraproject/WebRTC/pull/227), [#252](https://github.com/camaraproject/WebRTC/pull/252)
+* `Address` supports anonymous origination (`sip:anonymous@anonymous.invalid`) and home local numbers at PR [#178](https://github.com/camaraproject/WebRTC/pull/178)
+
+### Changed
+
+* Media session schemas split into `MediaSessionCreate`, `MediaSessionResponse` and `MediaSessionStatusChange` at PRs [#164](https://github.com/camaraproject/WebRTC/pull/164), [#244](https://github.com/camaraproject/WebRTC/pull/244)
+* `PUT /sessions/{mediaSessionId}/status` always returns `200` with the current session at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
+* Aligned with Commonalities r4.4 (0.9.0): common error responses and headers referenced from `CAMARA_common.yaml`, mandatory `info.description` sections (authorization and authentication, additional error responses, request body strictness), `pattern` on all string fields at PRs [#172](https://github.com/camaraproject/WebRTC/pull/172), [#174](https://github.com/camaraproject/WebRTC/pull/174), [#193](https://github.com/camaraproject/WebRTC/pull/193), [#202](https://github.com/camaraproject/WebRTC/pull/202), [#241](https://github.com/camaraproject/WebRTC/pull/241), [#245](https://github.com/camaraproject/WebRTC/pull/245)
+* Editorial: tag renamed to `Call Handling`, standard `apiRoot` description at PRs [#225](https://github.com/camaraproject/WebRTC/pull/225), [#226](https://github.com/camaraproject/WebRTC/pull/226)
+
+### Fixed
+
+* Missing `x-correlator` response header on `PUT /sessions/{mediaSessionId}/status` at PR [#222](https://github.com/camaraproject/WebRTC/pull/222)
+* Inline documentation and examples aligned with the API definition (pick-up with `Connected` and `answer`) at PRs [#237](https://github.com/camaraproject/WebRTC/pull/237), [#244](https://github.com/camaraproject/WebRTC/pull/244)
+
+### Removed
+
+* Media session fields `reason`, `sequenceNumber`, `clientCorrelator`, `serverCorrelator`, `callObjectRef` and `offerRequired` at PRs [#119](https://github.com/camaraproject/WebRTC/pull/119), [#124](https://github.com/camaraproject/WebRTC/pull/124)
+* `204` response on `PUT /sessions/{mediaSessionId}/status` at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
+* Unused error codes `INVALID_TOKEN_CONTEXT`, `IDENTIFIER_NOT_FOUND` and `OUT_OF_RANGE` at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
+
+## webrtc-events-subscriptions 0.3.0
+
+**webrtc-events-subscriptions 0.3.0 is an initial public version of this API.** It replaces `webrtc-events` 0.2.0 released in r2.2; changes documented below are compared to `webrtc-events` 0.2.0.
+
+- API definition **with inline documentation**:
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r3.3/code/API_definitions/webrtc-events-subscriptions.yaml&nocors)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r3.3/code/API_definitions/webrtc-events-subscriptions.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r3.3/code/API_definitions/webrtc-events-subscriptions.yaml)
+
+### Breaking changes
+
+* API renamed from `webrtc-events` to `webrtc-events-subscriptions` (new base path and scopes) at PRs [#183](https://github.com/camaraproject/WebRTC/pull/183), [#185](https://github.com/camaraproject/WebRTC/pull/185)
+* Subscriptions are bound to a device instead of a registration or media session: `config.subscriptionDetail` requires `deviceId`; `registrationId` and `sessionId` removed; one subscription covers up to 3 event types at PRs [#126](https://github.com/camaraproject/WebRTC/pull/126), [#156](https://github.com/camaraproject/WebRTC/pull/156), [#244](https://github.com/camaraproject/WebRTC/pull/244)
+* Event types follow CloudEvents naming `org.camaraproject.webrtc-events-subscriptions.v0.*` (session invitation, session status, `registration-ended`); `subscriptionId` required in event data at PRs [#183](https://github.com/camaraproject/WebRTC/pull/183), [#244](https://github.com/camaraproject/WebRTC/pull/244), [#252](https://github.com/camaraproject/WebRTC/pull/252)
+* `GET /subscriptions` returns a `SubscriptionList` object (`subscriptions` and `pagination`) with `page` and `perPage` parameters at PR [#252](https://github.com/camaraproject/WebRTC/pull/252)
+* Session event data fields `clientCorrelator`, `serverCorrelator`, `callObjectRef` and `offerRequired` removed at PR [#124](https://github.com/camaraproject/WebRTC/pull/124)
+* `initialEvent` removed from `config`; requests that include it are rejected at PR [#244](https://github.com/camaraproject/WebRTC/pull/244)
+* Potentially breaking: request body strictness as defined in the [CAMARA API Design Guide](https://github.com/camaraproject/Commonalities/blob/r4.4/documentation/CAMARA-API-Design-Guide.md#23-strictness-of-request-body-schemas) is applied, requests with properties not declared in the API definition are rejected with `400 INVALID_ARGUMENT`; clients which adhered to the previous API definition are not impacted at PR [#202](https://github.com/camaraproject/WebRTC/pull/202)
+
+### Added
+
+* Multiple event types per subscription at PR [#156](https://github.com/camaraproject/WebRTC/pull/156)
+* Subscription model aligned with `CAMARA_event_common.yaml`: `PRIVATE_KEY_JWT` sink credentials (`422 PRIVATE_KEY_JWT_NOT_CONFIGURED`) and `subscription-started` / `subscription-updated` lifecycle events at PR [#252](https://github.com/camaraproject/WebRTC/pull/252)
+* Optional `locationDetails` (PIDF-LO based, common `Area`) of the party that generated the event in session event data at PRs [#142](https://github.com/camaraproject/WebRTC/pull/142), [#252](https://github.com/camaraproject/WebRTC/pull/252)
+
+### Changed
+
+* API renamed to `webrtc-events-subscriptions` at PRs [#183](https://github.com/camaraproject/WebRTC/pull/183), [#185](https://github.com/camaraproject/WebRTC/pull/185)
+* Subscriptions decoupled from specific media sessions and registrations; a `registration-ended` event does not end the subscription at PRs [#126](https://github.com/camaraproject/WebRTC/pull/126), [#237](https://github.com/camaraproject/WebRTC/pull/237)
+* Event types renamed to CloudEvents naming; `subscriptionId` required in event data at PRs [#183](https://github.com/camaraproject/WebRTC/pull/183), [#244](https://github.com/camaraproject/WebRTC/pull/244), [#252](https://github.com/camaraproject/WebRTC/pull/252)
+* `GET /subscriptions` returns a paginated `SubscriptionList` at PR [#252](https://github.com/camaraproject/WebRTC/pull/252)
+* Aligned with Commonalities r4.4 (0.9.0): common error responses, `sink` and `terminationDescription` lengths, mandatory `info.description` sections (authorization and authentication, additional error responses, request body strictness), `pattern` on all string fields at PRs [#172](https://github.com/camaraproject/WebRTC/pull/172), [#174](https://github.com/camaraproject/WebRTC/pull/174), [#193](https://github.com/camaraproject/WebRTC/pull/193), [#202](https://github.com/camaraproject/WebRTC/pull/202), [#241](https://github.com/camaraproject/WebRTC/pull/241), [#245](https://github.com/camaraproject/WebRTC/pull/245), [#252](https://github.com/camaraproject/WebRTC/pull/252)
+* Editorial: tag `Webrtc Events Subscription`, standard `apiRoot` description, callback operationId `postNotification` (no change on the wire) at PRs [#225](https://github.com/camaraproject/WebRTC/pull/225), [#226](https://github.com/camaraproject/WebRTC/pull/226), [#244](https://github.com/camaraproject/WebRTC/pull/244)
+
+### Fixed
+
+* Access token sink credential fields are `writeOnly` at PR [#223](https://github.com/camaraproject/WebRTC/pull/223)
+* Examples and developer guidance aligned with the API definition at PRs [#151](https://github.com/camaraproject/WebRTC/pull/151), [#237](https://github.com/camaraproject/WebRTC/pull/237)
+
+### Removed
+
+* Session- and registration-bound subscriptions at PR [#126](https://github.com/camaraproject/WebRTC/pull/126)
+* `initialEvent` in `Config` at PR [#244](https://github.com/camaraproject/WebRTC/pull/244)
+* Session event data fields `clientCorrelator`, `serverCorrelator`, `callObjectRef` and `offerRequired` at PR [#124](https://github.com/camaraproject/WebRTC/pull/124)
+* Error code `429 QUOTA_EXCEEDED` at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
+
+## webrtc-registration 0.4.0
+
+**webrtc-registration 0.4.0 is an initial public version of this API.**
+
+Changes documented below are compared to version 0.3.0.
+
+- API definition **with inline documentation**:
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r3.3/code/API_definitions/webrtc-registration.yaml&nocors)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/WebRTC/r3.3/code/API_definitions/webrtc-registration.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/WebRTC/blob/r3.3/code/API_definitions/webrtc-registration.yaml)
+
+### Breaking changes
+
+* `POST /sessions` returns `201` (was `200`) at PR [#169](https://github.com/camaraproject/WebRTC/pull/169)
+* `POST /sessions` for a `deviceId` and phone number that already have an active registration is rejected with `409 ALREADY_EXISTS` instead of replacing the existing registration; the same `deviceId` can hold registrations for different phone numbers at PR [#180](https://github.com/camaraproject/WebRTC/pull/180)
+* `PUT /sessions/{registrationId}` returns `200` with `expiresAt`; `204` removed at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
+* `phoneNumber` handling depends on the token type: MUST be sent with a two-legged token, MUST NOT be sent with a three-legged token (`422 MISSING_IDENTIFIER` / `422 UNNECESSARY_IDENTIFIER`) at PRs [#187](https://github.com/camaraproject/WebRTC/pull/187), [#205](https://github.com/camaraproject/WebRTC/pull/205)
+* `registrationExpireTime` below the operator's minimum is rejected with `400 OUT_OF_RANGE` on create and refresh; on refresh, 0.3.0 fell back to the operator's policy at PRs [#165](https://github.com/camaraproject/WebRTC/pull/165), [#237](https://github.com/camaraproject/WebRTC/pull/237)
+* API-specific error codes renamed: `MAX_DEVICES_PER_USER`, `MAX_REGISTRATION_PER_MSISDN` and `MAX_REGISTRATION_PER_USER` are now `WEBRTC_REGISTRATION.MAX_DEVICES_PER_USER`, `WEBRTC_REGISTRATION.MAX_REGISTRATIONS_PER_MSISDN` and `WEBRTC_REGISTRATION.MAX_REGISTRATIONS_PER_USER` at PRs [#241](https://github.com/camaraproject/WebRTC/pull/241), [#252](https://github.com/camaraproject/WebRTC/pull/252)
+* Potentially breaking: request body strictness as defined in the [CAMARA API Design Guide](https://github.com/camaraproject/Commonalities/blob/r4.4/documentation/CAMARA-API-Design-Guide.md#23-strictness-of-request-body-schemas) is applied, requests with properties not declared in the API definition are rejected with `400 INVALID_ARGUMENT`; clients which adhered to the previous API definition are not impacted at PR [#202](https://github.com/camaraproject/WebRTC/pull/202)
+
+### Added
+
+* `GET /sessions` (by `deviceId` query parameter) and `GET /sessions/{registrationId}`, with scope `webrtc-registration:sessions:read`, limited to the phone number(s) authorized by the access token at PRs [#169](https://github.com/camaraproject/WebRTC/pull/169), [#204](https://github.com/camaraproject/WebRTC/pull/204), [#212](https://github.com/camaraproject/WebRTC/pull/212)
+* Optional `phoneNumber` in `POST /sessions`: required with a two-legged access token (`422 MISSING_IDENTIFIER`), not allowed with a three-legged access token (`422 UNNECESSARY_IDENTIFIER`) at PRs [#187](https://github.com/camaraproject/WebRTC/pull/187), [#205](https://github.com/camaraproject/WebRTC/pull/205)
+
+### Changed
+
+* `POST /sessions` for a `deviceId` and phone number that already have an active registration is rejected with `409 ALREADY_EXISTS` instead of replacing the existing registration; the same `deviceId` can hold registrations for different phone numbers at PR [#180](https://github.com/camaraproject/WebRTC/pull/180)
+* `PUT /sessions/{registrationId}` returns `200` with `expiresAt` at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
+* Registration lifetime: a `registrationExpireTime` within the operator's range is applied as requested, a value above the maximum is capped, a value below the minimum is rejected with `400 OUT_OF_RANGE`; ongoing media sessions MAY be terminated when the registration expires at PRs [#165](https://github.com/camaraproject/WebRTC/pull/165), [#166](https://github.com/camaraproject/WebRTC/pull/166), [#180](https://github.com/camaraproject/WebRTC/pull/180), [#237](https://github.com/camaraproject/WebRTC/pull/237)
+* API-specific error codes use the `WEBRTC_REGISTRATION.` prefix at PRs [#241](https://github.com/camaraproject/WebRTC/pull/241), [#252](https://github.com/camaraproject/WebRTC/pull/252)
+* Aligned with Commonalities r4.4 (0.9.0): common error responses, mandatory `info.description` sections (authorization and authentication, additional error responses, request body strictness, identifying the phone number from the access token), `pattern` on all string fields at PRs [#172](https://github.com/camaraproject/WebRTC/pull/172), [#174](https://github.com/camaraproject/WebRTC/pull/174), [#193](https://github.com/camaraproject/WebRTC/pull/193), [#202](https://github.com/camaraproject/WebRTC/pull/202), [#241](https://github.com/camaraproject/WebRTC/pull/241), [#245](https://github.com/camaraproject/WebRTC/pull/245), [#260](https://github.com/camaraproject/WebRTC/pull/260)
+* Editorial: standard `apiRoot` description at PR [#225](https://github.com/camaraproject/WebRTC/pull/225)
+
+### Fixed
+
+* `POST /sessions` returns `201`; `deviceId` format corrected at PR [#169](https://github.com/camaraproject/WebRTC/pull/169)
+
+### Removed
+
+* `204` response on `PUT /sessions/{registrationId}` at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
+* Unused error codes `EMERGENCY_ADDRESS_MISSING`, `INVALID_TOKEN_CONTEXT` and `IDENTIFIER_NOT_FOUND` at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
+
+**Full Changelog**: https://github.com/camaraproject/WebRTC/compare/r2.2...r3.3
 
 # r3.2
 
