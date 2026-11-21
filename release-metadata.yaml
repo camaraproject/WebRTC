@@ -2,7 +2,7 @@ repository:
   repository_name: WebRTC
   release_tag: r3.3
   release_type: public-release
-  release_date: null
+  release_date: '2026-11-21T09:19:53Z'
   src_commit_sha: deaf6eba162e89ccc309c8b811f8a6ab58ab9831
 apis:
 - api_name: webrtc-call-handling
