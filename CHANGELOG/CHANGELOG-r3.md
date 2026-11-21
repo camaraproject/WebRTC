@@ -133,7 +133,7 @@ Changes documented below are compared to version 0.3.0.
 * Request and response bodies split by operation (`MediaSessionCreate`, `MediaSessionStatusChange`, `MediaSessionResponse`): `originatorAddress`, `receiverAddress` and `offer` are required in `POST /sessions`; `status` is required in `PUT /sessions/{mediaSessionId}/status`, which accepts only `status`, `offer`, `answer` and `locationDetails`; `status`, `answer` and `mediaSessionId` are no longer accepted in `POST /sessions`; `reason`, `sequenceNumber`, `clientCorrelator`, `serverCorrelator`, `callObjectRef` and `offerRequired` removed at PRs [#119](https://github.com/camaraproject/WebRTC/pull/119), [#124](https://github.com/camaraproject/WebRTC/pull/124), [#164](https://github.com/camaraproject/WebRTC/pull/164), [#244](https://github.com/camaraproject/WebRTC/pull/244)
 * `PUT /sessions/{mediaSessionId}/status` always returns `200` with the current session; `204` removed at PR [#241](https://github.com/camaraproject/WebRTC/pull/241)
 * New API-specific error code `422 WEBRTC_CALL_HANDLING.CALLTYPE_EMERGENCY_NOT_SUPPORTED` on `POST /sessions` at PRs [#120](https://github.com/camaraproject/WebRTC/pull/120), [#241](https://github.com/camaraproject/WebRTC/pull/241)
-* Requests with properties not declared in the specification are rejected with `400 INVALID_ARGUMENT` (request body strictness) at PR [#202](https://github.com/camaraproject/WebRTC/pull/202)
+* Potentially breaking: request body strictness as defined in the [CAMARA API Design Guide](https://github.com/camaraproject/Commonalities/blob/r4.4/documentation/CAMARA-API-Design-Guide.md#23-strictness-of-request-body-schemas) is applied, requests with properties not declared in the API definition are rejected with `400 INVALID_ARGUMENT`; clients which adhered to the previous API definition are not impacted at PR [#202](https://github.com/camaraproject/WebRTC/pull/202)
 
 ### Added
 
@@ -176,7 +176,7 @@ Changes documented below are compared to version 0.3.0.
 * `GET /subscriptions` returns a `SubscriptionList` object (`subscriptions` and `pagination`) with `page` and `perPage` parameters at PR [#252](https://github.com/camaraproject/WebRTC/pull/252)
 * Session event data fields `clientCorrelator`, `serverCorrelator`, `callObjectRef` and `offerRequired` removed at PR [#124](https://github.com/camaraproject/WebRTC/pull/124)
 * `initialEvent` removed from `config`; requests that include it are rejected at PR [#244](https://github.com/camaraproject/WebRTC/pull/244)
-* Requests with properties not declared in the specification are rejected with `400 INVALID_ARGUMENT` (request body strictness) at PR [#202](https://github.com/camaraproject/WebRTC/pull/202)
+* Potentially breaking: request body strictness as defined in the [CAMARA API Design Guide](https://github.com/camaraproject/Commonalities/blob/r4.4/documentation/CAMARA-API-Design-Guide.md#23-strictness-of-request-body-schemas) is applied, requests with properties not declared in the API definition are rejected with `400 INVALID_ARGUMENT`; clients which adhered to the previous API definition are not impacted at PR [#202](https://github.com/camaraproject/WebRTC/pull/202)
 
 ### Added
 
@@ -224,7 +224,7 @@ Changes documented below are compared to version 0.3.0.
 * `phoneNumber` handling depends on the token type: MUST be sent with a two-legged token, MUST NOT be sent with a three-legged token (`422 MISSING_IDENTIFIER` / `422 UNNECESSARY_IDENTIFIER`) at PRs [#187](https://github.com/camaraproject/WebRTC/pull/187), [#205](https://github.com/camaraproject/WebRTC/pull/205)
 * `registrationExpireTime` below the operator's minimum is rejected with `400 OUT_OF_RANGE` on create and refresh; on refresh, 0.3.0 fell back to the operator's policy at PRs [#165](https://github.com/camaraproject/WebRTC/pull/165), [#237](https://github.com/camaraproject/WebRTC/pull/237)
 * API-specific error codes renamed: `MAX_DEVICES_PER_USER`, `MAX_REGISTRATION_PER_MSISDN` and `MAX_REGISTRATION_PER_USER` are now `WEBRTC_REGISTRATION.MAX_DEVICES_PER_USER`, `WEBRTC_REGISTRATION.MAX_REGISTRATIONS_PER_MSISDN` and `WEBRTC_REGISTRATION.MAX_REGISTRATIONS_PER_USER` at PRs [#241](https://github.com/camaraproject/WebRTC/pull/241), [#252](https://github.com/camaraproject/WebRTC/pull/252)
-* Requests with properties not declared in the specification are rejected with `400 INVALID_ARGUMENT` (request body strictness) at PR [#202](https://github.com/camaraproject/WebRTC/pull/202)
+* Potentially breaking: request body strictness as defined in the [CAMARA API Design Guide](https://github.com/camaraproject/Commonalities/blob/r4.4/documentation/CAMARA-API-Design-Guide.md#23-strictness-of-request-body-schemas) is applied, requests with properties not declared in the API definition are rejected with `400 INVALID_ARGUMENT`; clients which adhered to the previous API definition are not impacted at PR [#202](https://github.com/camaraproject/WebRTC/pull/202)
 
 ### Added
 
